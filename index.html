@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en" data-mode="none">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Abdelkader El Azzouzi · Integration Architect</title>
+  <meta name="description" content="Tech Lead MuleSoft & Informatica IDMC, integration architect and AI-enhanced full-stack developer. 120+ Mule APIs, 30 MCP servers, group MDM on Business 360." />
+  <meta property="og:title" content="Abdelkader El Azzouzi · Integration Architect" />
+  <meta property="og:description" content="MuleSoft · Informatica IDMC · Agentic AI · Full-stack" />
+  <meta name="theme-color" content="#05060a" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2305060a'/%3E%3Ccircle cx='18' cy='20' r='6' fill='%2300a0df'/%3E%3Ccircle cx='46' cy='20' r='6' fill='%23ff4d00'/%3E%3Ccircle cx='32' cy='46' r='6' fill='%23a78bfa'/%3E%3Cpath d='M18 20L46 20L32 46Z' fill='none' stroke='white' stroke-width='2.5'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <!-- ============ BOOT ============ -->
+  <div id="boot" aria-hidden="true">
+    <div class="boot-inner">
+      <div class="boot-log" id="boot-log"></div>
+      <div class="boot-bar"><span id="boot-fill"></span></div>
+      <div class="boot-pct"><span id="boot-pct">000</span><small>% handshake</small></div>
+    </div>
+  </div>
+
+  <div id="cursor"><span class="c-dot"></span><span class="c-ring"></span><span class="c-label" id="cursor-label"></span></div>
+  <div id="portal" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <!-- ============ NAV ============ -->
+  <header class="nav" id="nav">
+    <a href="#top" class="brand" data-cursor="home">
+      <span class="brand-mark"><i></i><i></i><i></i></span>
+      <span class="brand-name">Abdelkader<b>.</b></span>
+    </a>
+    <nav class="nav-links" aria-label="Sections">
+      <a href="#runtime">Runtime</a>
+      <a href="#ai">AI architecture</a>
+      <a href="#projects">Apps</a>
+      <a href="#timeline">Path</a>
+      <a href="#contact">Connect</a>
+    </nav>
+    <button class="mode-chip" id="mode-chip" type="button" aria-label="Switch runtime">
+      <span class="mc-dot"></span><span id="mode-chip-label">runtime: unset</span>
+    </button>
+    <div class="pipe-progress" aria-hidden="true"><span id="pipe-fill"></span><em id="pipe-tps">0 msg/s</em></div>
+  </header>
+
+  <main id="top">
+    <!-- ============ HERO ============ -->
+    <section class="hero" id="hero">
+      <canvas id="net" aria-hidden="true"></canvas>
+      <div class="hero-content">
+        <p class="eyebrow mono"><span class="live"></span> integration fabric online · Casablanca ⇄ Paris ⇄ 80+ countries</p>
+        <h1 class="hero-title">
+          <span class="line"><span class="scramble" data-text="Abdelkader">Abdelkader</span></span>
+          <span class="line"><span class="scramble outline" data-text="El Azzouzi">El Azzouzi</span></span>
+        </h1>
+        <p class="hero-role">
+          I wire enterprises together. <span class="serif">Tech Lead</span>
+          <span class="rotator" id="rotator"><span>MuleSoft</span><span>Informatica IDMC</span><span>Agentic AI</span><span>Full-stack</span></span>
+        </p>
+        <p class="hero-sub">120+ APIs in production, a group-wide MDM on Business 360, and 30 MCP servers that let AI agents talk to real company data. On the side, I ship apps with AI as my pair-programmer.</p>
+        <div class="hero-cta">
+          <a href="#runtime" class="btn primary magnetic" data-cursor="choose"><span>Choose your runtime</span><svg viewBox="0 0 24 24"><path d="M12 4v16m0 0l-6-6m6 6l6-6"/></svg></a>
+          <a href="#projects" class="btn ghost magnetic" data-cursor="open"><span>See the apps</span></a>
+        </div>
+        <p class="hero-hint mono">↳ move your cursor to bend the traffic · click to fire a burst</p>
+      </div>
+      <div class="hero-side mono" aria-hidden="true">
+        <div class="hs-row"><span>GET</span> /api/v1/coworkers <em>200 · 41ms</em></div>
+        <div class="hs-row"><span>EVT</span> b360.project.updated <em>→ mule</em></div>
+        <div class="hs-row"><span>MCP</span> tools/call search_projects <em>ok</em></div>
+        <div class="hs-row"><span>CDI</span> m_ingress_sap_ecc <em>12 431 rows</em></div>
+        <div class="hs-row"><span>GW</span> x-api-key policy <em>pass</em></div>
+      </div>
+      <div class="scroll-cue" aria-hidden="true"><span></span></div>
+    </section>
+
+    <!-- ============ TICKER ============ -->
+    <div class="ticker" aria-hidden="true"><div class="ticker-track" id="ticker"></div></div>
+
+    <!-- ============ STATS ============ -->
+    <section class="stats" id="stats">
+      <div class="section-head">
+        <p class="kicker mono">// 01 · throughput</p>
+        <h2 class="reveal-title" data-text="Numbers that run in production">Numbers that run in production</h2>
+      </div>
+      <div class="stats-grid" id="stats-grid"></div>
+    </section>
+
+    <!-- ============ RUNTIME CHOOSER ============ -->
+    <section class="runtime" id="runtime">
+      <div class="section-head">
+        <p class="kicker mono">// 02 · select runtime</p>
+        <h2 class="reveal-title" data-text="Two platforms. One architect.">Two platforms. One architect.</h2>
+        <p class="lede">Pick a side. The whole site re-routes its traffic to it. You can switch back any time from the chip at the top.</p>
+      </div>
+
+      <div class="chooser" id="chooser">
+        <button class="choice mule" data-mode="mule" type="button" data-cursor="deploy">
+          <canvas class="choice-fx"></canvas>
+          <span class="choice-logo" data-icon="mulesoft"></span>
+          <span class="choice-name">MuleSoft</span>
+          <span class="choice-sub mono">Anypoint · API-led · Flex Gateway · MCP</span>
+          <span class="choice-meta mono"><b>120+</b> APIs <b>9</b> domains <b>30</b> MCP servers</span>
+          <span class="choice-go mono">deploy →</span>
+        </button>
+        <div class="chooser-vs mono"><span>or</span></div>
+        <button class="choice infa" data-mode="infa" type="button" data-cursor="deploy">
+          <canvas class="choice-fx"></canvas>
+          <span class="choice-logo" data-icon="informatica"></span>
+          <span class="choice-name">Informatica</span>
+          <span class="choice-sub mono">IDMC · Business 360 · CDI · CAI</span>
+          <span class="choice-meta mono"><b>150</b> mappings <b>140</b> jobs <b>14</b> sources</span>
+          <span class="choice-go mono">deploy →</span>
+        </button>
+      </div>
+
+      <div class="stage" id="stage" hidden>
+        <div class="stage-switch" role="tablist" aria-label="Runtime">
+          <button role="tab" data-mode="mule" type="button"><span data-icon="mulesoft"></span>MuleSoft</button>
+          <button role="tab" data-mode="infa" type="button"><span data-icon="informatica"></span>Informatica</button>
+          <i class="switch-thumb"></i>
+        </div>
+
+        <div class="stage-head">
+          <p class="kicker mono" id="stage-kicker"></p>
+          <h3 id="stage-title"></h3>
+          <p class="lede" id="stage-lede"></p>
+        </div>
+
+        <div class="diagram-wrap">
+          <p class="swipe-hint mono">← swipe to follow the flow →</p>
+          <div class="diagram-cols mono" id="diagram-cols"></div>
+          <div class="diagram" id="diagram">
+            <svg id="diagram-svg" aria-hidden="true"></svg>
+            <canvas id="diagram-fx" aria-hidden="true"></canvas>
+            <div class="diagram-nodes" id="diagram-nodes"></div>
+          </div>
+          <p class="diagram-hint mono" id="diagram-hint"></p>
+          <div class="diagram-detail" id="diagram-detail"></div>
+        </div>
+
+        <div class="merge-lab" id="merge-lab" hidden>
+          <div class="merge-copy">
+            <p class="kicker mono">match &amp; merge · live</p>
+            <h4>Three messy records walk in. <em class="serif">One golden record</em> walks out.</h4>
+            <p>Per-source trust decides which value survives for every field. Click <b>Run match</b> to watch survivorship do its job.</p>
+            <button class="btn primary magnetic" id="merge-run" type="button"><span>Run match</span></button>
+          </div>
+          <div class="merge-board" id="merge-board"></div>
+        </div>
+
+        <div class="highlights" id="highlights"></div>
+
+        <div class="skills" id="skills"></div>
+      </div>
+    </section>
+
+    <!-- ============ AI ARCHITECTURE ============ -->
+    <section class="ai" id="ai">
+      <div class="section-head">
+        <p class="kicker mono">// 03 · agentic architecture</p>
+        <h2 class="reveal-title" data-text="AI that reads the company, safely">AI that reads the company, safely</h2>
+        <p class="lede">The same discipline as an enterprise integration, applied to agents: identity first, contracts, gateways, caches, observability. Ask the system something and follow the request through every hop.</p>
+      </div>
+
+      <div class="ai-grid">
+        <div class="seq" id="seq">
+          <div class="seq-ask">
+            <span class="mono prompt">ask ›</span>
+            <div class="seq-input" id="seq-input">How many active projects mention “tunnel”?</div>
+            <button class="btn primary sm magnetic" id="seq-run" type="button"><span>Send</span></button>
+          </div>
+          <div class="seq-lanes" id="seq-lanes">
+            <svg id="seq-svg" aria-hidden="true"></svg>
+          </div>
+        </div>
+        <div class="term" id="term">
+          <div class="term-bar"><i></i><i></i><i></i><span class="mono">mdm-beam · server.log</span></div>
+          <pre class="term-body mono" id="term-body"><span class="dim">$ npm run dev
+› server listening on :3000
+› waiting for a question…</span></pre>
+        </div>
+      </div>
+
+      <div class="principles">
+        <article class="pr"><span class="pr-n mono">01</span><h4>Secrets never reach the browser</h4><p>Entra tokens, Foundry keys and MCP access tokens live server-side, cached and refreshed before they expire.</p></article>
+        <article class="pr"><span class="pr-n mono">02</span><h4>Deterministic before generative</h4><p>Counts, lookups and lists take a fast path with server-built answers. The model is used where interpretation is actually needed.</p></article>
+        <article class="pr"><span class="pr-n mono">03</span><h4>Gateways all the way down</h4><p>Every agent tool is a governed API: Flex Gateway policies, API keys, rate limits and Splunk traces, exactly like any other consumer.</p></article>
+        <article class="pr"><span class="pr-n mono">04</span><h4>Latency is a feature</h4><p>Warm caches at boot, stale-while-revalidate catalogues, concurrent pagination and parallel tool calls.</p></article>
+      </div>
+    </section>
+
+    <!-- ============ PROJECTS ============ -->
+    <section class="projects" id="projects">
+      <div class="section-head">
+        <p class="kicker mono">// 04 · deployed applications</p>
+        <h2 class="reveal-title" data-text="Everything I've shipped">Everything I've shipped</h2>
+        <p class="lede">From enterprise integration to Android Auto, CRMs and WebGL sites, plus the side projects from way back that started it all.</p>
+      </div>
+      <div class="filters mono" id="filters" role="tablist" aria-label="Filter projects"></div>
+      <div class="grid" id="grid"></div>
+    </section>
+
+    <!-- ============ TIMELINE ============ -->
+    <section class="timeline" id="timeline">
+      <div class="section-head">
+        <p class="kicker mono">// 05 · message history</p>
+        <h2 class="reveal-title" data-text="The path, replayed">The path, replayed</h2>
+      </div>
+      <div class="tl" id="tl">
+        <svg class="tl-line" id="tl-line" aria-hidden="true"><path id="tl-path"/><path id="tl-path-fill"/></svg>
+        <span class="tl-packet" id="tl-packet"></span>
+        <ol class="tl-list" id="tl-list"></ol>
+      </div>
+    </section>
+
+    <!-- ============ CONTACT ============ -->
+    <section class="contact" id="contact">
+      <canvas id="contact-fx" aria-hidden="true"></canvas>
+      <div class="contact-inner">
+        <p class="kicker mono">// 06 · open a connection</p>
+        <h2 class="contact-title"><span class="scramble" data-text="Let's integrate.">Let's integrate.</span></h2>
+        <p class="lede">Integration architecture, MDM, agentic AI on enterprise data, or a product that needs to exist by next month. English C2 · French C2/C1 · Arabic native.</p>
+        <div class="contact-links">
+          <a class="cl magnetic" href="mailto:abdelkader.elazzouzi@gmail.com" data-cursor="send"><span data-icon="gmail"></span><b>abdelkader.elazzouzi@gmail.com</b><em class="mono">POST /mail</em></a>
+          <a class="cl magnetic" href="https://www.linkedin.com/in/abdelkader-el-azzouzi-7778a5189" target="_blank" rel="noopener" data-cursor="open"><span data-icon="linkedin"></span><b>LinkedIn</b><em class="mono">GET /in/abdelkader</em></a>
+          <a class="cl magnetic" href="https://github.com/abk541" target="_blank" rel="noopener" data-cursor="open"><span data-icon="github"></span><b>GitHub</b><em class="mono">GET /abk541</em></a>
+        </div>
+      </div>
+      <footer class="foot mono">
+        <span>© 2026 Abdelkader El Azzouzi</span>
+        <span>Hand-built: vanilla JS, Canvas, SVG, GSAP. No templates were harmed.</span>
+        <span id="uptime">uptime 00:00:00</span>
+      </footer>
+    </section>
+  </main>
+
+  <!-- ============ MODAL ============ -->
+  <div class="modal" id="modal" hidden>
+    <div class="modal-backdrop" data-close></div>
+    <article class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <button class="modal-close" data-close type="button" aria-label="Close">×</button>
+      <div class="modal-visual"><canvas id="modal-fx"></canvas></div>
+      <div class="modal-body" id="modal-body"></div>
+    </article>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
