@@ -1,5 +1,6 @@
 // AI section: a chat demo with a "behind the scenes" step list.
 import { $, $$, icon, sleep, REDUCED, escapeHtml } from './util.js';
+import { LANG, mergeInto, t } from './lang.js';
 
 const IC = {
   browser: '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9h18"/><circle cx="6.5" cy="6.5" r=".6"/><circle cx="9" cy="6.5" r=".6"/></svg>',
@@ -50,11 +51,47 @@ const FLOWS = [
   },
 ];
 
+const FLOWS_FR = [
+  {
+    q: 'Combien de projets actifs mentionnent « tunnel » ?',
+    hint: 'Simple comptage → réponse sans IA',
+    meta: 'Voie rapide · 412 ms',
+    steps: [
+      { t: 'Question envoyée', d: 'Seule la question quitte le navigateur. Aucune clé, aucun jeton.' },
+      { t: 'Reconnu comme un simple comptage', d: 'Les demandes simples se passent entièrement du modèle IA.', tag: 'sans appel IA' },
+      { t: 'Jeton d’identité déjà en cache', d: 'Le jeton Microsoft Entra ID a été préchauffé au démarrage.' },
+      { t: 'Outil de recherche appelé via la gateway', d: 'Anypoint MCP derrière Flex Gateway : contrôle de la clé d’API et du débit.' },
+      { t: '4 pages de résultats en parallèle', d: 'Jusqu’à 6 requêtes simultanées au lieu d’une par une.' },
+      { t: 'Réponse construite par le serveur', d: 'Déterministe, instantanée et sans aucun jeton IA consommé.' },
+    ],
+    answer: `<b>37 projets actifs</b> mentionnent « tunnel » dans leur nom.<div class="meta"><span>412 ms</span><span>voie rapide</span><span>0 jeton IA</span></div>`,
+  },
+  {
+    q: 'Quels projets de tunnel en Suisse ont démarré après 2023, et qui les pilote ?',
+    hint: 'Demande une interprétation → Claude + 2 outils',
+    meta: 'Voie IA · 2,1 s',
+    steps: [
+      { t: 'Question envoyée', d: 'Seule la question quitte le navigateur.' },
+      { t: 'Interprétation nécessaire → voie IA', d: 'Filtres sur le pays, la date et les personnes : un travail pour le modèle.' },
+      { t: 'Nouveau jeton d’identité', d: 'Flux client-credentials avec Microsoft Entra ID, mis en cache pour l’heure.' },
+      { t: 'Claude choisit 2 outils', d: 'Parmi un catalogue de 14 outils MCP en cache (rafraîchi en arrière-plan).' },
+      { t: 'Les deux outils tournent en parallèle', d: 'Projets en Suisse + leurs responsables, via Flex Gateway.' },
+      { t: 'Golden records renvoyés', d: 'Directement depuis le MDM Informatica Business 360.' },
+      { t: 'Réponse ancrée dans les résultats', d: 'Le modèle voit les totaux et un échantillon, pas tout le jeu de données.' },
+      { t: 'Réponse + tableau complet', d: 'L’interface affiche toutes les lignes.', tag: '2,1 s' },
+    ],
+    answer: `<b>6 projets de tunnel en Suisse</b> ont démarré après 2023. Les voici avec leurs responsables :
+      <table><tr><td>Tunnel · Lausanne</td><td>J. M•••</td></tr><tr><td>Galerie · Valais</td><td>S. B•••</td></tr><tr><td>Tunnel · Berne</td><td>L. R•••</td></tr><tr><td colspan="2" style="text-align:left">+ 3 autres</td></tr></table>
+      <div class="meta"><span>2,1 s</span><span>2 appels d’outils</span><span>sourcé</span></div>`,
+  },
+];
+if (LANG === 'fr') mergeInto(FLOWS, FLOWS_FR);
+
 let runId = 0;
 
 export function initAI() {
   const body = $('#chat-body'), chips = $('#chat-chips'), hops = $('#hops'), meta = $('#route-meta');
-  body.innerHTML = `<p class="chat-empty">Pick a question below to see how MDM Beam answers it.</p>`;
+  body.innerHTML = `<p class="chat-empty">${t('Pick a question below to see how MDM Beam answers it.')}</p>`;
   chips.innerHTML = FLOWS.map((f, i) => `<button class="chip-q" data-i="${i}" type="button"><span>${escapeHtml(f.q)}<small>${escapeHtml(f.hint)}</small></span><span class="go"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>`).join('');
 
   const renderSteps = (f) => {

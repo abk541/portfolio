@@ -6,6 +6,7 @@ import { initAI } from './ai.js';
 import { MOTIFS } from './motifs.js';
 import { initIntro } from './intro.js';
 import { skillInfo } from './skills.js';
+import { LANG, AUTO_LANG, OTHER_LANGS, t, translateDom } from './lang.js';
 
 const gsap = window.gsap;
 const ST = window.ScrollTrigger;
@@ -17,6 +18,7 @@ const store = {
   set(k, v) { try { localStorage.setItem(k, v); } catch { /* private mode */ } },
 };
 
+translateDom();
 hydrateIcons();
 
 /* =====================================================================
@@ -110,7 +112,7 @@ function initTicker() {
 function initStats() {
   const grid = $('#stats-grid');
   const COL = { mule: '#00a0df', infa: '#ff5a1f', ai: '#a78bfa' };
-  const TAG = { mule: 'MuleSoft', infa: 'Informatica', ai: 'AI · Lead' };
+  const TAG = { mule: 'MuleSoft', infa: 'Informatica', ai: t('AI · Lead') };
   grid.innerHTML = STATS.map((s) => `<div class="stat" style="--c:${COL[s.mode]}"><span class="stat-tag">${TAG[s.mode]}</span><div class="stat-n"><span class="num">0</span><sup>${s.suffix}</sup></div><div class="stat-l">${escapeHtml(s.label)}</div><canvas></canvas></div>`).join('');
   $$('.stat', grid).forEach((el, i) => {
     const s = STATS[i];
@@ -217,7 +219,7 @@ function setMode(mode) {
   $('#stage-lede').textContent = D.lede;
   $('#highlights').innerHTML = D.highlights.map((h) => `<div class="hl"><b>${escapeHtml(h.k)}</b><p>${escapeHtml(h.t)}</p></div>`).join('')
     + (mode === 'infa' ? D.cards.map((c) => `<div class="hl"><b class="t">${escapeHtml(c.name)}</b><p>${escapeHtml(c.text)}</p></div>`).join('') : '');
-  $('#skills').innerHTML = Object.entries(D.skills).map(([k, v]) => `<div class="sk-row"><h5>${escapeHtml(k)}</h5><div class="sk-tags">${v.map((s) => `<button type="button" class="sk" data-skill="${escapeHtml(s)}">${escapeHtml(s)}</button>`).join('')}</div></div>`).join('');
+  $('#skills').innerHTML = Object.entries(D.skills).map(([k, v]) => `<div class="sk-row"><h5>${escapeHtml(t(k))}</h5><div class="sk-tags">${v.map((s) => `<button type="button" class="sk" data-skill="${escapeHtml(s)}">${escapeHtml(s)}</button>`).join('')}</div></div>`).join('');
   setDiagramMode(mode);
   initMagnetic($('#stage'));
   if (anim) gsap.from('.stage-head > *', { y: 16, opacity: 0, duration: 0.5, stagger: 0.06, ease: 'power3.out' });
@@ -270,7 +272,7 @@ function initExpertise() {
 /* =====================================================================
    Projects
    ===================================================================== */
-const CAT_LABEL = { all: 'All', ai: 'AI & agents', mule: 'MuleSoft', infa: 'Informatica', web: 'Web & full-stack', mobile: 'Mobile', data: 'Data', archive: 'Early days' };
+const CAT_LABEL = Object.fromEntries(Object.entries({ all: 'All', ai: 'AI & agents', mule: 'MuleSoft', infa: 'Informatica', web: 'Web & full-stack', mobile: 'Mobile', data: 'Data', archive: 'Early days' }).map(([k, v]) => [k, t(v)]));
 const CAT_COLOR = { ai: '#a78bfa', mule: '#00a0df', infa: '#ff5a1f', web: '#34d399', mobile: '#fbbf24', data: '#22d3ee', archive: '#f472b6' };
 
 function initProjects() {
@@ -289,7 +291,7 @@ function initProjects() {
         <span class="card-kicker">${escapeHtml(p.kicker)}</span>
         <h3>${escapeHtml(p.title)}</h3>
         <p>${escapeHtml(p.summary)}</p>
-        <div class="card-foot"><div class="card-tags">${p.stack.slice(0, 3).map((s) => `<span>${escapeHtml(s)}</span>`).join('')}</div><span class="card-more">Details</span></div>
+        <div class="card-foot"><div class="card-tags">${p.stack.slice(0, 3).map((s) => `<span>${escapeHtml(s)}</span>`).join('')}</div><span class="card-more">${t('Details')}</span></div>
       </div>
     </article>`).join('');
 
@@ -335,8 +337,8 @@ function openModal(p) {
   lastFocus = document.activeElement;
   const cats = p.cats.map((c) => `<span class="chip-cat" style="color:${CAT_COLOR[c]}">${CAT_LABEL[c]}</span>`).join(' ');
   const link = p.link
-    ? `<a class="btn primary sm magnetic" href="${p.link}" target="_blank" rel="noopener"><span>${p.link.includes('github.com') ? 'View the code' : 'Open the live site'} ↗</span></a>`
-    : '<p style="font-size:13px;color:var(--muted);margin:0">Private repository · demo on request</p>';
+    ? `<a class="btn primary sm magnetic" href="${p.link}" target="_blank" rel="noopener"><span>${p.link.includes('github.com') ? t('View the code') : t('Open the live site')} ↗</span></a>`
+    : `<p style="font-size:13px;color:var(--muted);margin:0">${t('Private repository · demo on request')}</p>`;
   $('#modal-body').innerHTML = `
     <div style="display:flex;gap:6px;flex-wrap:wrap">${cats}</div>
     <h3 id="modal-title">${escapeHtml(p.title)}</h3>
@@ -439,7 +441,15 @@ initNet($('#net'));
 initSkillPop();
 initMotion();
 const intro = initIntro({ onEnter: (phase) => { if (phase === 'start') setTimeout(heroIn, 550); } });
-intro.show();
+initLang();
+let restoreY = null;
+try { restoreY = sessionStorage.getItem('restoreY'); sessionStorage.removeItem('restoreY'); } catch { /* ignore */ }
+if (restoreY !== null) {
+  intro.skip();
+  heroIn();
+  requestAnimationFrame(() => { scrollTo({ top: +restoreY, behavior: 'instant' }); ST && ST.refresh(); });
+  if (anim) gsap.from('#top', { opacity: 0, duration: 0.6, ease: 'power2.out' });
+} else intro.show();
 $('#brand').addEventListener('click', (e) => { e.preventDefault(); scrollTo({ top: 0, behavior: 'instant' }); intro.show(); });
 $('#modal').addEventListener('click', (e) => { if (e.target.closest('[data-close]')) closeModal(); });
 addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
@@ -503,4 +513,73 @@ function initMotion() {
   let skew = 0;
   ST.create({ onUpdate: (self) => { skew = Math.max(-12, Math.min(12, self.getVelocity() / 300)); } });
   gsap.ticker.add(() => { skew *= 0.9; track.style.setProperty('--sk', `${-skew}deg`); });
+}
+
+/* =====================================================================
+   Language switcher: EN / FR hand-written, others via automatic translation
+   ===================================================================== */
+function initLang() {
+  const current = AUTO_LANG || LANG;
+  const label = (AUTO_LANG || LANG).split('-')[0].toUpperCase();
+  const menuHtml = `
+    <button class="lang-opt${!AUTO_LANG && LANG === 'en' ? ' on' : ''}" data-lang="en" type="button" translate="no"><b>EN</b>English</button>
+    <button class="lang-opt${!AUTO_LANG && LANG === 'fr' ? ' on' : ''}" data-lang="fr" type="button" translate="no"><b>FR</b>Français</button>
+    <span class="lang-sep">${t('Other languages (automatic)')}</span>
+    <div class="lang-grid">${OTHER_LANGS.map(([c, n]) => `<button class="lang-opt sm${AUTO_LANG === c ? ' on' : ''}" data-auto="${c}" type="button" translate="no">${n}</button>`).join('')}</div>`;
+  $$('.lang').forEach((wrap) => {
+    wrap.innerHTML = `<button class="lang-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="${t('Language')}" translate="no">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg><span>${label}</span></button>
+      <div class="lang-menu" role="menu" hidden>${menuHtml}</div>`;
+    const btn = $('.lang-btn', wrap), menu = $('.lang-menu', wrap);
+    const close = () => { menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); };
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const open = menu.hidden;
+      $$('.lang-menu').forEach((m) => (m.hidden = true));
+      menu.hidden = !open; btn.setAttribute('aria-expanded', String(open));
+      if (open && anim) gsap.fromTo(menu, { opacity: 0, y: -8, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.3, ease: 'back.out(2)' });
+    });
+    document.addEventListener('click', (e) => { if (!wrap.contains(e.target)) close(); });
+    menu.addEventListener('click', (e) => {
+      const o = e.target.closest('.lang-opt'); if (!o) return;
+      if (o.dataset.lang) switchLang({ lang: o.dataset.lang, auto: '' }, e);
+      else switchLang({ lang: 'en', auto: o.dataset.auto }, e);
+    });
+  });
+  if (AUTO_LANG) loadAutoTranslate(AUTO_LANG);
+  void current;
+}
+
+function setTransCookie(val) {
+  const host = location.hostname;
+  const exp = val ? '' : '; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+  [`; path=/`, `; path=/; domain=${host}`, `; path=/; domain=.${host}`].forEach((sfx) => { document.cookie = `googtrans=${val}${exp}${sfx}`; });
+}
+
+async function switchLang({ lang, auto }, e) {
+  if (lang === LANG && auto === AUTO_LANG) return;
+  try {
+    localStorage.setItem('lang', lang);
+    if (auto) localStorage.setItem('autoLang', auto); else localStorage.removeItem('autoLang');
+    sessionStorage.setItem('restoreY', String(document.getElementById('intro').hidden ? scrollY : 0));
+  } catch { /* storage blocked: still reload */ }
+  setTransCookie(auto ? `/en/${auto}` : '');
+  if (!document.getElementById('intro').hidden) { try { sessionStorage.removeItem('restoreY'); } catch { /* */ } }
+  await wave(currentMode || 'mule', e ? e.clientX : innerWidth / 2, e ? e.clientY : innerHeight / 2);
+  location.reload();
+}
+
+function loadAutoTranslate(code) {
+  setTransCookie(`/en/${code}`);
+  const holder = document.createElement('div');
+  holder.id = 'gt-el'; holder.style.display = 'none';
+  document.body.appendChild(holder);
+  window.googleTranslateElementInit = () => {
+    try { new window.google.translate.TranslateElement({ pageLanguage: 'en', autoDisplay: false }, 'gt-el'); } catch { /* ignore */ }
+  };
+  const sc = document.createElement('script');
+  sc.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+  sc.async = true;
+  document.body.appendChild(sc);
+  if (code === 'ar') document.documentElement.classList.add('auto-rtl');
 }

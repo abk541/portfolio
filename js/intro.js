@@ -360,6 +360,12 @@ export function initIntro({ onEnter }) {
     start();
   }
 
+  function skip() {
+    entered = true; running = false;
+    root.hidden = true;
+    document.body.classList.remove('intro-open');
+  }
+
   $('#intro-enter').addEventListener('click', enter);
   root.addEventListener('wheel', (e) => { if (e.deltaY > 12) enter(); }, { passive: true });
   let ty0 = null;
@@ -369,5 +375,5 @@ export function initIntro({ onEnter }) {
   let rT;
   addEventListener('resize', () => { if (root.hidden) return; clearTimeout(rT); rT = setTimeout(resize, 150); });
 
-  return { show, enter };
+  return { show, enter, skip };
 }

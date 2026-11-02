@@ -1,6 +1,7 @@
 // Interactive, animated architecture diagrams for the MuleSoft and Informatica runtimes.
 import { MULE, INFA } from './data.js';
 import { metrics } from './net.js';
+import { t, LANG } from './lang.js';
 import { $, canvasLoop, escapeHtml, rand, REDUCED, hexToRgb, accentRGB, bez } from './util.js';
 
 const gsap = window.gsap;
@@ -111,7 +112,7 @@ function buildMule() {
     html += `<div class="dn consumer" data-c="${c.id}" style="left:${MX.cons}%;top:${y}%">${escapeHtml(c.label)}<small>${escapeHtml(c.sub)}</small></div>`;
   });
   els.nodes.innerHTML = html;
-  els.hint.textContent = 'Back-ends → System APIs → Process APIs → Gateway → consumers';
+  els.hint.textContent = t('Back-ends → System APIs → Process APIs → Gateway → consumers');
   bindDomains('[data-d]', (id) => MULE.domains.find((d) => d.id === id));
   buildPills(MULE.domains);
 }
@@ -127,7 +128,7 @@ const REALTIME = ['IAM', 'Employee Profile', 'CoWorker Tool', 'eCheckIn'];
 
 function buildInfa() {
   els.diagram.style.height = '560px';
-  setCols(['Source systems', 'Ingestion', 'Business 360 MDM core', 'Distribution', 'Consumers'], [IX.src, IX.ing, IX.core, IX.dif, IX.cons]);
+  setCols(['Source systems', 'Ingestion', 'Business 360 MDM core', 'Distribution', 'Consumers'].map(t), [IX.src, IX.ing, IX.core, IX.dif, IX.cons]);
   let html = '';
   const ns = INFA.sources.length;
   INFA.sources.forEach((s, i) => {
@@ -138,11 +139,11 @@ function buildInfa() {
     html += `<div class="dn stage-node" data-i="${g.id}" style="left:${IX.ing}%;top:${i ? 70 : 32}%">${escapeHtml(g.label)}<small>${escapeHtml(g.sub)}</small></div>`;
   });
   html += `<div class="dn core" style="left:${IX.core}%;top:50%">
-    <span class="core-title">Golden record per domain</span>
+    <span class="core-title">${t('Golden record per domain')}</span>
     ${INFA.domains.map((d) => `<button class="core-dom" data-d="${d.id}" style="--c:${d.color}" type="button">${escapeHtml(d.name)}</button>`).join('')}
     <span class="core-chips">${INFA.core.map((c) => `<span>${escapeHtml(c)}</span>`).join('')}</span>
     <span class="core-stat" id="core-stat">${escapeHtml(INFA.coreStats)}</span>
-    <span class="core-stat mono" id="core-count">0 records consolidated</span>
+    <span class="core-stat" id="core-count">0 ${t('records consolidated')}</span>
   </div>`;
   INFA.diffusion.forEach((g, i) => {
     html += `<div class="dn stage-node" data-f="${g.id}" style="left:${IX.dif}%;top:${20 + i * 30}%">${escapeHtml(g.label)}<small>${escapeHtml(g.sub)}</small></div>`;
@@ -151,7 +152,7 @@ function buildInfa() {
     html += `<div class="dn consumer" data-c="${c.id}" style="left:${IX.cons}%;top:${20 + i * 30}%">${escapeHtml(c.label)}<small>${escapeHtml(c.sub)}</small></div>`;
   });
   els.nodes.innerHTML = html;
-  els.hint.textContent = 'Sources → ingestion → golden record → distribution → consumers';
+  els.hint.textContent = t('Sources → ingestion → golden record → distribution → consumers');
   bindDomains('[data-d]', (id) => INFA.domains.find((d) => d.id === id));
   buildPills(INFA.domains);
 }
@@ -173,7 +174,7 @@ function bindDomains(sel, find) {
 let pinned = null;
 
 function buildPills(domains) {
-  els.pills.innerHTML = `<button class="pill-btn on" data-all type="button" style="--c:#ffffff"><i></i>All traffic</button>` +
+  els.pills.innerHTML = `<button class="pill-btn on" data-all type="button" style="--c:#ffffff"><i></i>${t('All traffic')}</button>` +
     domains.map((d) => `<button class="pill-btn" data-d="${d.id}" type="button" style="--c:${d.color}"><i></i>${escapeHtml(d.name)}</button>`).join('');
   els.pills.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
     const id = b.dataset.d || null;
@@ -344,7 +345,7 @@ function draw(s, dt) {
         coreHits++;
         if (coreHits % 3 === 0) emitGolden();
         const el = document.getElementById('core-count');
-        if (el) el.textContent = `${(coreHits * 1371).toLocaleString('en-US')} records consolidated`;
+        if (el) el.textContent = `${(coreHits * 1371).toLocaleString(LANG === 'fr' ? 'fr-FR' : 'en-US')} ${t('records consolidated')}`;
       }
       packets.splice(i, 1);
       continue;
@@ -389,17 +390,17 @@ function buildLab(m) {
   board.innerHTML = '';
   board.classList.toggle('cutover', m === 'mule');
   if (m === 'mule') {
-    copy.innerHTML = `<span class="eyebrow">Mule 3 → Mule 4 migration</span>
-      <h4>Migrating ~40 critical HR interfaces <em class="serif">without dropping a single message.</em></h4>
-      <p>Proxy APIs sat in front of every legacy flow, so traffic could shift interface by interface across 80+ countries. Drag the slider to replay the cut-over.</p>
-      <label class="cut"><span>cut-over</span><input type="range" min="0" max="100" value="0" id="cut"><b id="cut-v">0%</b></label>
-      <p class="cut-meta" id="cut-meta">0 / 40 interfaces on Mule 4</p>`;
+    copy.innerHTML = `<span class="eyebrow">${t('Mule 3 → Mule 4 migration')}</span>
+      <h4>${t('lab.mule.title') || 'Migrating ~40 critical HR interfaces <em class="serif">without dropping a single message.</em>'}</h4>
+      <p>${t('lab.mule.text') || 'Proxy APIs sat in front of every legacy flow, so traffic could shift interface by interface across 80+ countries. Drag the slider to replay the cut-over.'}</p>
+      <label class="cut"><span>${t('cut-over')}</span><input type="range" min="0" max="100" value="0" id="cut" aria-label="${t('cut-over')}"><b id="cut-v">0%</b></label>
+      <p class="cut-meta" id="cut-meta">0 / 40 ${t('interfaces on Mule 4')}</p>`;
     buildCutover(board);
   } else {
-    copy.innerHTML = `<span class="eyebrow">Match &amp; merge</span>
-      <h4>Three messy records walk in. <em class="serif">One golden record walks out.</em></h4>
-      <p>Per-source trust decides which value survives for every field. Run the match to watch survivorship do its job.</p>
-      <button class="btn primary magnetic" id="merge-run" type="button"><span>Run match</span></button>`;
+    copy.innerHTML = `<span class="eyebrow">${t('Match & merge')}</span>
+      <h4>${t('lab.infa.title') || 'Three messy records walk in. <em class="serif">One golden record walks out.</em>'}</h4>
+      <p>${t('lab.infa.text') || 'Per-source trust decides which value survives for every field. Run the match to watch survivorship do its job.'}</p>
+      <button class="btn primary magnetic" id="merge-run" type="button"><span>${t('Run match')}</span></button>`;
     buildMerge(board);
   }
 }
@@ -413,7 +414,7 @@ function buildCutover(board) {
   input.addEventListener('input', () => {
     cut = +input.value / 100;
     vEl.textContent = `${input.value}%`;
-    meta.textContent = `${Math.round(cut * 40)} / 40 interfaces on Mule 4 · ${cut >= 1 ? 'Mule 3 decommissioned ✓' : 'zero downtime'}`;
+    meta.textContent = `${Math.round(cut * 40)} / 40 ${t('interfaces on Mule 4')} · ${cut >= 1 ? t('Mule 3 decommissioned ✓') : t('zero downtime')}`;
   });
   // auto-play once when visible
   const io = new IntersectionObserver(([e]) => {
@@ -432,10 +433,10 @@ function buildCutover(board) {
     const bw = Math.min(124, w * 0.29), bh = 48;
     const src = [bw / 2 + 2, h * 0.5], proxy = [w * 0.47, h * 0.5], m3 = [w - bw / 2 - 2, h * 0.24], m4 = [w - bw / 2 - 2, h * 0.76];
     const nodes = [
-      { p: src, label: 'HR consumers', sub: '80+ countries', c: '#ffffff' },
-      { p: proxy, label: 'Proxy API', sub: 'routing rule', c: '#00a0df' },
-      { p: m3, label: 'Mule 3', sub: `${40 - Math.round(cut * 40)} flows`, c: '#6b7280', fade: 1 - cut },
-      { p: m4, label: 'Mule 4', sub: `${Math.round(cut * 40)} flows`, c: '#00a0df' },
+      { p: src, label: t('HR consumers'), sub: t('80+ countries'), c: '#ffffff' },
+      { p: proxy, label: t('Proxy API'), sub: t('routing rule'), c: '#00a0df' },
+      { p: m3, label: 'Mule 3', sub: `${40 - Math.round(cut * 40)} ${t('flows')}`, c: '#6b7280', fade: 1 - cut },
+      { p: m4, label: 'Mule 4', sub: `${Math.round(cut * 40)} ${t('flows')}`, c: '#00a0df' },
     ];
     const c1 = curve(src, proxy), c3 = curve(proxy, m3), c4 = curve(proxy, m4);
     const stroke = (c, col, a) => { ctx.strokeStyle = col; ctx.globalAlpha = a; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(...c[0]); ctx.bezierCurveTo(...c[1], ...c[2], ...c[3]); ctx.stroke(); ctx.globalAlpha = 1; };
@@ -457,7 +458,10 @@ function buildCutover(board) {
       ctx.globalAlpha = a;
       ctx.fillStyle = '#0a0c14'; ctx.strokeStyle = n.c; ctx.lineWidth = 1.5;
       ctx.beginPath(); ctx.roundRect(n.p[0] - bw / 2, n.p[1] - bh / 2, bw, bh, 12); ctx.fill(); ctx.stroke();
-      ctx.fillStyle = '#f1f3f9'; ctx.font = `600 ${bw < 110 ? 12 : 13.5}px Inter, sans-serif`; ctx.textAlign = 'center';
+      let fsz = bw < 110 ? 12 : 13.5;
+      ctx.font = `600 ${fsz}px Inter, sans-serif`;
+      while (fsz > 8 && ctx.measureText(n.label).width > bw - 12) { fsz -= 0.5; ctx.font = `600 ${fsz}px Inter, sans-serif`; }
+      ctx.fillStyle = '#f1f3f9'; ctx.textAlign = 'center';
       ctx.fillText(n.label, n.p[0], n.p[1] - 2);
       ctx.fillStyle = '#7d8699'; ctx.font = `${bw < 110 ? 10 : 11}px Inter, sans-serif`;
       ctx.fillText(n.sub, n.p[0], n.p[1] + 13);

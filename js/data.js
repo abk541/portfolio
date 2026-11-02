@@ -1,4 +1,6 @@
 // Content for the portfolio. Everything here comes from the CVs and the public/private repos.
+import { LANG, mergeInto } from './lang.js';
+import { FR } from './data.fr.js';
 
 export const STATS = [
   { n: 120, suffix: '+', label: 'Mule APIs designed & in production', mode: 'mule' },
@@ -292,3 +294,12 @@ export const TIMELINE = [
   { y: '2025', t: 'Agentic AI on enterprise data', s: 'MCP Bridge PoC → 30 MCP servers in production' },
   { y: '2026', t: 'AI-enhanced full-stack', s: 'MDM Beam, HEV Dash, CRM/ERP, WebGL sites' },
 ];
+
+// French: merge the translated fields over the English content.
+if (LANG === 'fr') {
+  mergeInto(STATS, FR.STATS);
+  mergeInto(MULE, FR.MULE);
+  mergeInto(INFA, FR.INFA);
+  mergeInto(TIMELINE, FR.TIMELINE);
+  PROJECTS.forEach((p) => mergeInto(p, FR.PROJECTS[p.id]));
+}

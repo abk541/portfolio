@@ -1,0 +1,110 @@
+// Version française du contenu. Fusionnée par-dessus data.js (mêmes structures, mêmes index / ids).
+export const FR = {
+  STATS: [
+    { label: 'API Mule conçues et en production' },
+    { label: 'serveurs MCP au service des agents IA' },
+    { label: 'mappings CDI livrés' },
+    { label: 'pays couverts par les flux RH migrés' },
+  ],
+
+  MULE: {
+    title: 'Architecture d’intégration, conçue et exploitée',
+    lede: 'Plus de 120 API Mule selon l’approche API-led. Les API système encapsulent chaque back-end, les API process orchestrent chaque domaine métier, et Flex Gateway les expose aux applications, aux partenaires et aux agents IA.',
+    columns: ['Systèmes back-end', 'API système', 'API process par domaine', 'Flex Gateway', 'Consommateurs'],
+    consumers: [
+      { label: 'Applications métier', sub: 'internes et externes' },
+      { label: 'Applications non-Mule', sub: '25+ proxys gateway' },
+      { label: 'Agents IA', sub: '30 serveurs MCP' },
+    ],
+    domains: [
+      { name: 'Hub données de référence', text: 'API système exposant le MDM pour les collaborateurs, les projets et les tiers. Diffusion de chaque modification vers les systèmes aval via un gestionnaire d’événements, et API process de recherche paginée et de mise à jour asynchrone. Sources : Employee Profile, eCheckIn, SAP, Global HR, SAP BW, Salesforce et Dataverse.' },
+      { name: 'Finance & achats SAP', text: 'Une API système par périmètre SAP : commandes d’achat et réceptions avec suivi des IDoc, sous-traitance, immobilisations, feuilles de temps, écritures de paie et reporting BW, ainsi qu’une API de données de référence et l’import des factures de flotte.' },
+      { name: 'Facturation électronique', tag: 'Norme EN 16931', text: 'API facture avec événements de statut, schémas JSON publiés et catalogue de champs. Flux de bout en bout avec la plateforme Generix et intégration SAP pour la lecture, l’écriture et l’archivage des factures.' },
+      { name: 'RH & collaborateurs', tag: 'Global HR · paie · identité', text: 'API annuaire et fiche collaborateur. Flux Zellis vers Global HR, Dayforce vers SAP Concur et TimeExpert vers Infotech. Cycle de vie des identités dans Memority et synchronisation des collaborateurs vers Salesforce Pardot avec suivi des traitements bulk.' },
+      { name: 'Back-office RH & intérim', tag: 'Runtimes on-premise', text: 'Plateforme batch de gestion des contrats d’intérim et des commandes FTP. Collecte des pointages multi-sources avec suivi des anomalies, valorisation et export vers SAP, connecteurs de paie et génération des fichiers de facturation Chorus.' },
+      { name: 'Losinger (CH)', tag: 'Filiale suisse · SFTP', text: 'Routage des fichiers entrants via un listener SFTP. Conversion des pointages et éléments variables pour la paie Abacus, échange des temps avec Sirius, comptabilisation des salaires dans SAP et alimentation d’Egencia et de Visual Planning.' },
+      { name: 'Équipements & logistique', tag: 'Opérations chantier', text: 'Intégration de l’ERP équipements Hexagon, des réservations Tracktor, du transport Dashdoc et des bons de livraison Distrimo et Eqiom. Validation des commandes en amont de SAP et collecte des dépenses avec dead-letter queues. Données sécurité Cority et Edoc.' },
+      { name: 'CRM & commerce', text: 'Transmission des opportunités Salesforce vers les projets MDM et archivage des documents SAV dans la GED. Envoi du courrier papier via Maileva avec retour de statut, et redigitalisation des documents via Qoosy.' },
+      { name: 'Plateforme, gateway & IA', text: '30 serveurs MCP donnant aux agents IA un accès gouverné aux données de référence. Plus de 25 proxys gateway sécurisés par une policy de clé d’API sur mesure. Référentiel de bonnes pratiques et templates de flux servant de base à chaque nouvelle API, et journalisation centralisée dans Splunk.' },
+    ],
+    highlights: [
+      { t: 'API Mule sur 9 domaines métier : données de référence, finance SAP, facturation électronique (EN 16931), RH, intérim, logistique des équipements, CRM et paie suisse.' },
+      { t: 'interfaces RH critiques migrées de Mule 3 vers Mule 4, déployées dans plus de 80 pays, avec prise en charge exclusive des 4 derniers mois. Continuité assurée par des API proxy et une bascule progressive.' },
+      { t: 'serveurs MCP permettant aux agents IA d’interroger les données de référence, nés du PoC MCP Bridge sur Azure OpenAI.' },
+      { t: 'proxys Flex Gateway offrant aux applications non-Mule un accès gouverné à SAP et aux outils internes, avec une policy d’authentification par clé d’API développée sur mesure.' },
+      { t: 'golden book : le référentiel de bonnes pratiques de l’équipe et ses templates : gestionnaire d’erreurs global, connecteur de logging, templates de projet. Design-first (RAML/OAS), MUnit, policies API Manager.' },
+      { t: 'responsabilité de la production sur CloudHub 1.0 et 2.0, Runtime Fabric et runtimes on-premise : Anypoint Monitoring, Splunk, analyse des causes racines et SLA.' },
+    ],
+  },
+
+  INFA: {
+    title: 'Plateforme de données de référence sur IDMC',
+    lede: 'MDM groupe sur Informatica Business 360. Les sources arrivent par CDI et par API, sont consolidées sur trois domaines maîtres, puis diffusées par événements vers MuleSoft et par egress vers Snowflake.',
+    ingestion: [
+      { label: 'Batch CDI', sub: '150 mappings · 36 jobs ingress' },
+      { label: 'Temps réel', sub: 'API REST du MDM' },
+    ],
+    domains: [
+      { name: 'Collaborateurs', sub: 'CoWorker, tiers, affectations', text: 'Modèle CoWorker de 50 champs avec groupes de postes et d’affectations, 24 listes de valeurs. Relations manager, référent, rattachement UO et UOA, sociétés juridiques. Sources : SAS SI RH, ADP, IAM, Employee Profile, eCheckIn.' },
+      { name: 'Projets et Opérations', sub: 'Opérations, sous-opérations, SAP', text: 'Sub Operation sur 42 champs avec engagements environnementaux et 32 listes de valeurs. Génération des codes de sous-opérations, rattachement aux opérations et aux références SAP, produits demandés et localisations.' },
+      { name: 'Organisation et Finance', sub: 'Hiérarchies RH et financières', text: 'Profit centers et groupes, sociétés comptables et juridiques, unités financières, pôles, entités et UO. Hiérarchies construites en JSON avec Hierarchy Builder, événements dédiés à la clôture des relations.' },
+    ],
+    diffusion: [
+      { label: 'Business events', sub: '32 jobs · toutes les 5 à 15 min' },
+      { label: 'Egress', sub: '39 jobs d’export' },
+      { label: 'CAI', sub: 'fichiers et mails' },
+    ],
+    consumers: [
+      { sub: 'paie, RH, outils projets' },
+      { sub: 'BI, tables par entité' },
+      { label: 'Outils tiers', sub: 'exports, notifications' },
+    ],
+    core: ['Validation', 'Survivance', 'Match and merge', 'Reference 360'],
+    coreStats: '20 entités · 40 relations · 50 listes de valeurs · 30 pages UI',
+    cards: [
+      { name: 'Qualité et rapprochement', sub: 'Validation, survivance, match and merge', text: 'Contrôles sur noms, téléphone, email, date de naissance, pièces d’identité et cohérence des contrats. Fiabilité par source pour chaque champ du golden record. 21 jobs de match and merge, seuils testés et modèles versionnés.' },
+      { name: 'Diffusion', sub: 'Business events, MuleSoft, Snowflake', text: 'Publication des modifications vers le gestionnaire d’événements MuleSoft, puis vers la paie, les outils projets et les affectations. Exports Snowflake par entité et par relation, avec requêtes de contrôle des volumes et des hiérarchies.' },
+      { name: 'Industrialisation et run', sub: 'Déploiements, outillage, support', text: 'Promotion DEV, PREPROD, PROD par export/import avec remappage des connexions et des agents. Sauvegardes, checksums et journal de modifications. Patch et contrôle des packages IDMC en Node.js et PowerShell.' },
+    ],
+    highlights: [
+      { t: 'domaines maîtres (Collaborateurs, Projets et Opérations, Organisation et Finance), une vingtaine de business entities, 40 relationships et 50 listes de valeurs Reference 360.' },
+      { t: 'systèmes sources intégrés (SAP ECC et BW, SIRH, IAM, ADP, outils métiers) : environ 150 mappings CDI, 110 taskflows et 140 jobs B360.' },
+      { t: 'business events publiés vers MuleSoft, exports egress vers Snowflake pour la BI, enchaînement des jobs par processus CAI.' },
+      { t: 'jobs de match and merge avec survivance par fiabilité de source, critères exacts et approchés, seuils de fusion et tests de non-régression.' },
+      { t: 'plusieurs millions d’enregistrements fiabilisés par les règles de qualité (contrôles, dédoublonnage, rapprochement et fusion).' },
+      { t: 'étude make or buy MDM : comparaison d’IDMC avec Semarchy et une solution open source, PoC AtroCore sur les domaines Collaborateurs et Tiers, estimation des charges.' },
+    ],
+  },
+
+  PROJECTS: {
+    'mdm-beam': { kicker: 'Chatbot sécurisé sur les données de l’entreprise', summary: 'Un assistant conversationnel qui répond aux questions sur les données de référence en appelant en direct des outils MCP exposés via Anypoint. Claude (via Microsoft Foundry) choisit l’outil, le serveur fait le reste.', points: ['Cache du jeton Entra côté serveur et découverte MCP tools/list au démarrage : aucun démarrage à froid', 'Voie rapide hybride : réponses déterministes pour compter, trouver, lister, sans appel au modèle', 'Recherche paginée en parallèle (6 requêtes simultanées) avec une passe de rattrapage', 'Catalogue d’outils en cache 5 min, rafraîchi en arrière-plan ; appels d’outils parallèles', 'Le navigateur ne voit jamais le secret client, la clé Foundry ni le jeton MCP'] },
+    'mcp-bridge-poc': { kicker: 'MDM piloté par l’IA, MuleSoft × Azure OpenAI', summary: 'Preuve de concept exposant les opérations du MDM Informatica comme outils pour des agents IA (Azure OpenAI), via MuleSoft et Flex Gateway. Devenue le modèle de 30 serveurs MCP en production.', points: ['Recherche, lecture et mise à jour du MDM exposées comme outils d’agent', 'Gouvernance par les policies Flex Gateway', 'A donné naissance à 30 serveurs MCP en production'] },
+    'b360-mdm': { title: 'MDM groupe sur Business 360', kicker: 'Plateforme de données de référence, construite et exploitée', summary: 'Le golden record du groupe pour les collaborateurs, les projets et l’organisation : 3 domaines, une vingtaine de business entities, 14 sources, diffusé par événements vers MuleSoft et par egress vers Snowflake.', points: ['~150 mappings CDI, 110 taskflows, 140 jobs B360', '21 jobs de match and merge avec survivance par source', '~30 business events toutes les 5 à 15 min ; exports Snowflake par entité', 'Étude make or buy face à Semarchy et une solution open source, PoC AtroCore'] },
+    'mule-platform': { title: 'Plateforme d’intégration groupe', kicker: '120+ API sur 9 domaines', summary: 'Le socle d’intégration reliant SAP, Salesforce, le MDM Informatica, les RH, la paie et les outils chantier dans plus de 80 pays, avec le golden book et les templates dont part chaque API.', points: ['Design-first RAML / OAS, MUnit, policies API Manager', 'Gestionnaire d’erreurs global, connecteur de logging et templates de projet', '25+ proxys Flex Gateway avec une policy de clé d’API sur mesure', 'Production sur CloudHub 1.0 / 2.0, Runtime Fabric et on-premise'] },
+    'idmc-tooling': { title: 'Outillage de livraison IDMC', kicker: 'Des déploiements sans surprise', summary: 'Scripts qui patchent et vérifient les packages d’export IDMC entre DEV, PREPROD et PROD : remappage des connexions et des agents, checksums, sauvegardes et journal, pour des promotions reproductibles et réversibles.', points: ['Patch et validation des packages en Node.js et PowerShell', 'Remappage des connexions et Secure Agents par environnement', 'Sauvegardes, checksums et retour arrière', 'Playwright pour les contrôles UI que l’API ne couvre pas'] },
+    'mule-architect': { kicker: 'Un architecte solution IA, guidé par prompt', summary: 'Un assistant spécialisé qui rédige des spécifications techniques et fonctionnelles API-led détaillées, dans le respect des standards de l’équipe : découpage Flow / Process / System API, réutilisation d’abord, Azure AD partout, SAPI privées.', points: ['Encode l’architecture de référence maison sous forme de règles', 'Hypothèses explicites et traçables quand une information manque', 'Produit des spécifications en français prêtes à relire'] },
+    'hev-dash': { kicker: 'Tableau de bord Android Auto sur mesure', summary: 'Un compteur numérique lumineux pour une Elantra Hybrid 2022, affiché sur l’écran Android Auto. Déclaré comme application de navigation pour dessiner librement, pendant que Spotify, Maps et Waze continuent de fonctionner.', points: ['Vitesse, carburant/batterie, autonomie, kilométrage depuis la voiture, avec repli GPS', 'Un seul moteur de rendu pour l’écran de la voiture et l’aperçu sur le téléphone', 'Thèmes, intensité du halo, fonds carbone / OLED, mode démo', 'La CI publie un APK signé à chaque push'] },
+    'ce-crm': { kicker: 'Plateforme d’opérations pour un prestataire fédéral', summary: 'CRM/ERP full-stack couvrant tout le cycle des marchés publics fédéraux : suivi commercial, pipeline, propositions, contrats, références, base de sous-traitants, RH, certifications et projections financières.', points: ['Plus de 15 modules métier avec administration par rôles', 'API Node/TypeScript avec migrations SQL et plan de bascule vers Postgres natif', 'Génération de PDF et QR codes, notifications, tableaux de bord Recharts'] },
+    'docfdar': { kicker: 'Visites médicales à domicile à la demande', summary: 'Permet aux habitants de Rabat, Salé et Témara de demander une visite médicale à domicile par téléphone ou WhatsApp, avec couverture, disponibilité, délai et tarif confirmés pour chaque demande.', points: ['En-tête statique pré-rendu par route pour le SEO, sitemap et robots générés', 'Backend Supabase avec Edge Functions, secrets gardés côté serveur', 'Hébergement Firebase, testé avant chaque déploiement'] },
+    'blue-site': { kicker: 'Pilotage de l’eau sur les chantiers', summary: 'Estime, suit et optimise la consommation d’eau des chantiers : un calculateur et un tableau de bord IoT avec seuils, filtres, PowerRank, alertes et détail par capteur.', points: ['Moteur de calcul entièrement côté client, couvert par Vitest', 'Rapport imprimable / PDF qui suit les filtres actifs', 'Télémesure IoT simulée avec graphiques en direct'] },
+    'cutanea': { kicker: 'Site vitrine d’un laboratoire de soins, WebGL', summary: 'Le site vitrine d’un laboratoire de soins de la peau : fond liquide WebGL réactif, intro rideau et compteur, chorégraphie au scroll et mise en scène des produits.', points: ['Shader liquide WebGL qui réagit au curseur', 'GSAP ScrollTrigger + défilement fluide Lenis', 'Export statique déployé sur GitHub Pages'] },
+    'ce-site': { kicker: 'Site d’un prestataire fédéral, en deux versions', summary: 'Un site Next.js + three.js, puis une refonte sans framework : champ d’étoiles WebGL, typographie animée, logo en masque CSS, CI contrôlée par Lighthouse avec une accessibilité ≥ 95.', points: ['Contenu visible sans JavaScript ; l’animation est un plus', 'Seuls transform, opacity et clip-path sont animés, aucune boucle infinie', 'Parcours complet en mouvement réduit'] },
+    'gastroboard': { title: 'Studio de performance restaurant', kicker: 'Tableau de bord analytique à partir d’un CSV brut', summary: 'Un studio d’analyse sans installation construit à partir d’un export CSV de restaurant : vues produits, catégories, équipe, heatmap et tendances, avec bascule CSV / données de démo pour les présentations client.', points: ['Recherche, tri, filtres de dates et raccourcis', 'Heatmaps et tendances calculées dans le navigateur', 'Statique, prêt pour GitHub Pages'] },
+    'adaptive-tutor': { kicker: 'Un tuteur de maths IA pour chaque enfant', summary: 'Site produit et démo interactive d’un tuteur de mathématiques adaptatif qui ajuste la difficulté à chaque enfant, avec tableau de bord parent et suivi des progrès.', points: ['Sections démo et tableau de bord interactives', 'Testé avec Playwright et Vitest'] },
+    'aqp-apis': { kicker: 'Premières API API-led', summary: 'Une API système Salesforce et une API d’expérience SIG (ESRI), conçues contrat d’abord en RAML et publiées sur Anypoint Exchange.', points: ['Types de données RAML, exemples et modules Exchange', 'Implémentation découpée en flux config / common / implementation'] },
+    'flowise': { title: 'Expériences Flowise', kicker: 'Des flux LLM visuels, avant que ce soit à la mode', summary: 'Fork et bidouille de Flowise pour assembler visuellement des chaînes LLM et des agents : mes premiers pas vers ce qui deviendra les serveurs MCP et l’outillage d’agents.', points: ['Chaînes LLM en glisser-déposer', 'Premières expériences d’agents et d’outils'] },
+    'tft': { year: 'Il y a longtemps', kicker: 'Là où tout a commencé', summary: 'Un compagnon pour Teamfight Tactics qui aidait à décider quoi construire ensuite : l’une des premières applications que j’ai faites pour le plaisir, bien avant que l’intégration devienne mon métier.', points: ['Lecture de l’état du jeu et suggestion du prochain coup', 'La preuve que j’automatise tout ce que je touche'] },
+  },
+
+  TIMELINE: [
+    { t: 'Licence en ingénierie des systèmes d’information', s: 'ENSA Kénitra' },
+    { t: 'Master en sécurité des systèmes d’information', s: 'ENSA Kénitra · 2020 → 2022' },
+    { t: 'Consultant Intégration MuleSoft', s: 'Bouygues Construction IT · migration Mule 3 → 4 d’environ 40 interfaces RH' },
+    { t: 'API contrat d’abord et premiers flux LLM', s: 'Salesforce SAPI, ESRI XAPI, Flowise' },
+    { t: 'Consultant Data Integration, Informatica Cloud', s: 'Mappings CDI à forte volumétrie, modernisation de flux XML et PL/SQL historiques' },
+    { y: 'Juil. 2024', t: 'Tech Lead, Intégration MuleSoft & API Management', s: '120+ API, 9 domaines, équipe de 4' },
+    { y: 'Juil. 2024', t: 'Tech Lead, Plateforme de données de référence (IDMC MDM)', s: 'Business 360, 3 domaines, 14 sources, 3 environnements' },
+    { t: 'IA agentique sur les données d’entreprise', s: 'PoC MCP Bridge → 30 serveurs MCP en production' },
+    { t: 'Full-stack augmenté par l’IA', s: 'MDM Beam, HEV Dash, CRM/ERP, sites WebGL' },
+  ],
+};

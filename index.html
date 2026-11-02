@@ -19,17 +19,18 @@
   <div id="intro" role="dialog" aria-label="Welcome">
     <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
     <canvas id="intro-links" aria-hidden="true"></canvas>
-    <div id="intro-floaters" aria-hidden="true"></div>
+    <div id="intro-floaters" aria-hidden="true" translate="no"></div>
+    <div class="lang lang-intro"></div>
     <canvas id="intro-name" aria-hidden="true"></canvas>
     <h1 class="sr-only">Abdelkader El Azzouzi</h1>
     <div class="intro-ui">
-      <p class="intro-tag"><span class="serif">I make enterprise systems</span> talk to each other.</p>
-      <p class="intro-sub">Integration architect · MuleSoft · Informatica · AI</p>
+      <p class="intro-tag" data-i18n-html="intro.tag"><span class="serif">I make enterprise systems</span> talk to each other.</p>
+      <p class="intro-sub" data-i18n>Integration architect · MuleSoft · Informatica · AI</p>
       <button class="intro-enter" id="intro-enter" type="button" aria-label="Enter the site">
-        <svg class="ring" viewBox="0 0 100 100" aria-hidden="true"><defs><path id="circ" d="M50,50 m-38,0 a38,38 0 1,1 76,0 a38,38 0 1,1 -76,0"/></defs><text><textPath href="#circ">ENTER · EXPLORE · ENTER · EXPLORE ·</textPath></text></svg>
+        <svg class="ring" viewBox="0 0 100 100" aria-hidden="true"><defs><path id="circ" d="M50,50 m-38,0 a38,38 0 1,1 76,0 a38,38 0 1,1 -76,0"/></defs><text><textPath href="#circ" data-i18n>ENTER · EXPLORE · ENTER · EXPLORE ·</textPath></text></svg>
         <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14m0 0l-6-6m6 6l6-6"/></svg>
       </button>
-      <p class="intro-hint">Touch the letters · tap anywhere · then scroll or press Enter</p>
+      <p class="intro-hint" data-i18n>Touch the letters · tap anywhere · then scroll or press Enter</p>
     </div>
   </div>
 
@@ -40,25 +41,26 @@
   <header class="nav" id="nav">
     <a href="#top" class="brand" id="brand" aria-label="Replay the intro">
       <span class="brand-mark"><i></i><i></i><i></i></span>
-      <span class="brand-name">Abdelkader <span class="brand-last">El Azzouzi</span></span>
+      <span class="brand-name" translate="no">Abdelkader <span class="brand-last">El Azzouzi</span></span>
     </a>
     <nav class="nav-links" aria-label="Sections">
-      <a href="#expertise" data-nav="expertise">Expertise</a>
-      <a href="#ai" data-nav="ai">AI</a>
-      <a href="#projects" data-nav="projects">Projects</a>
-      <a href="#journey" data-nav="journey">Journey</a>
+      <a href="#expertise" data-nav="expertise" data-i18n>Expertise</a>
+      <a href="#ai" data-nav="ai" data-i18n>AI</a>
+      <a href="#projects" data-nav="projects" data-i18n>Projects</a>
+      <a href="#journey" data-nav="journey" data-i18n>Journey</a>
     </nav>
-    <a href="#contact" class="nav-cta" data-nav="contact">Contact</a>
+    <div class="lang lang-nav"></div>
+    <a href="#contact" class="nav-cta" data-nav="contact" data-i18n>Contact</a>
     <span class="nav-progress" aria-hidden="true"><span id="progress"></span></span>
   </header>
 
   <!-- ============ MOBILE TAB BAR ============ -->
   <nav class="tabbar" aria-label="Sections">
-    <a href="#top" data-nav="top"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg><span>Home</span></a>
-    <a href="#expertise" data-nav="expertise"><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8 7l3 9M16 7l-3 9M8.5 6h7"/></svg><span>Expertise</span></a>
-    <a href="#ai" data-nav="ai"><svg viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg><span>AI</span></a>
-    <a href="#projects" data-nav="projects"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg><span>Projects</span></a>
-    <a href="#contact" data-nav="contact"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7l8 6 8-6"/></svg><span>Contact</span></a>
+    <a href="#top" data-nav="top"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg><span data-i18n>Home</span></a>
+    <a href="#expertise" data-nav="expertise"><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8 7l3 9M16 7l-3 9M8.5 6h7"/></svg><span data-i18n>Expertise</span></a>
+    <a href="#ai" data-nav="ai"><svg viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg><span data-i18n>AI</span></a>
+    <a href="#projects" data-nav="projects"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg><span data-i18n>Projects</span></a>
+    <a href="#contact" data-nav="contact"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7l8 6 8-6"/></svg><span data-i18n>Contact</span></a>
   </nav>
 
   <div class="mode-float" id="mode-float" role="tablist" aria-label="Platform">
@@ -72,19 +74,19 @@
     <section class="hero" id="hero" data-section="top">
       <canvas id="net" aria-hidden="true"></canvas>
       <div class="hero-content">
-        <p class="pill"><span class="live"></span> Tech Lead · Bouygues Construction IT</p>
+        <p class="pill"><span class="live"></span> <span data-i18n>Tech Lead · Bouygues Construction IT</span></p>
         <h2 class="hero-title">
           <span class="line"><span class="scramble" data-text="Systems that">Systems that</span></span>
           <span class="line"><span class="scramble outline" data-text="talk.">talk.</span></span>
         </h2>
         <p class="hero-role">
-          I connect enterprise systems with
-          <span class="rotator" id="rotator"><span>MuleSoft</span><span>Informatica</span><span>Agentic AI</span><span>Full-stack apps</span></span>
+          <span data-i18n>I connect enterprise systems with</span>
+          <span class="rotator" id="rotator"><span>MuleSoft</span><span>Informatica</span><span data-i18n>Agentic AI</span><span data-i18n>Full-stack apps</span></span>
         </p>
-        <p class="hero-sub">120+ APIs in production, a group-wide MDM, and 30 MCP servers that let AI agents use real company data.</p>
+        <p class="hero-sub" data-i18n>120+ APIs in production, a group-wide MDM, and 30 MCP servers that let AI agents use real company data.</p>
         <div class="hero-cta">
-          <a href="#expertise" class="btn primary magnetic"><span>Explore my expertise</span><svg viewBox="0 0 24 24"><path d="M12 5v14m0 0l-6-6m6 6l6-6"/></svg></a>
-          <a href="#projects" class="btn ghost magnetic"><span>See projects</span></a>
+          <a href="#expertise" class="btn primary magnetic"><span data-i18n>Explore my expertise</span><svg viewBox="0 0 24 24"><path d="M12 5v14m0 0l-6-6m6 6l6-6"/></svg></a>
+          <a href="#projects" class="btn ghost magnetic"><span data-i18n>See projects</span></a>
         </div>
       </div>
       <a href="#impact" class="scroll-cue" aria-label="Scroll down"><span></span></a>
@@ -96,8 +98,8 @@
     <!-- ============ IMPACT ============ -->
     <section class="block" id="impact" data-section="top">
       <div class="head">
-        <span class="eyebrow">Impact</span>
-        <h2 class="reveal-title">Numbers that run in production</h2>
+        <span class="eyebrow" data-i18n>Impact</span>
+        <h2 class="reveal-title" data-i18n>Numbers that run in production</h2>
       </div>
       <div class="stats-grid" id="stats-grid"></div>
     </section>
@@ -105,22 +107,22 @@
     <!-- ============ EXPERTISE ============ -->
     <section class="block" id="expertise" data-section="expertise">
       <div class="head">
-        <span class="eyebrow">01 · Expertise</span>
-        <h2 class="reveal-title">Two platforms. One architect.</h2>
-        <p class="lede">Pick a platform to see the architecture I designed, a live demo, key results and skills.</p>
+        <span class="eyebrow" data-i18n>01 · Expertise</span>
+        <h2 class="reveal-title" data-i18n>Two platforms. One architect.</h2>
+        <p class="lede" data-i18n>Pick a platform to see the architecture I designed, a live demo, key results and skills.</p>
       </div>
 
       <div class="platforms" role="tablist" aria-label="Platform">
         <button class="platform mule" role="tab" data-mode="mule" aria-selected="true" type="button">
           <canvas class="platform-fx" aria-hidden="true"></canvas>
           <span class="platform-logo" data-icon="mulesoft"></span>
-          <span class="platform-text"><b>MuleSoft</b><small>API-led integration · since 2022</small></span>
+          <span class="platform-text"><b>MuleSoft</b><small data-i18n>API-led integration · since 2022</small></span>
           <span class="platform-check" aria-hidden="true"></span>
         </button>
         <button class="platform infa" role="tab" data-mode="infa" aria-selected="false" type="button">
           <canvas class="platform-fx" aria-hidden="true"></canvas>
           <span class="platform-logo" data-icon="informatica"></span>
-          <span class="platform-text"><b>Informatica</b><small>IDMC · Business 360 MDM · since 2024</small></span>
+          <span class="platform-text"><b>Informatica</b><small data-i18n>IDMC · Business 360 MDM · since 2024</small></span>
           <span class="platform-check" aria-hidden="true"></span>
         </button>
       </div>
@@ -133,7 +135,7 @@
 
         <div class="panel diagram-wrap">
           <div class="panel-top">
-            <span class="panel-label">Architecture · live traffic</span>
+            <span class="panel-label" data-i18n>Architecture · live traffic</span>
             <span class="panel-hint" id="diagram-hint">Select a domain to trace it</span>
           </div>
           <div class="diagram-fit" id="diagram-fit">
@@ -151,9 +153,9 @@
         </div>
 
         <div class="subtabs" role="tablist" aria-label="More">
-          <button role="tab" data-tab="demo" aria-selected="true" type="button">Live demo</button>
-          <button role="tab" data-tab="results" aria-selected="false" type="button">Key results</button>
-          <button role="tab" data-tab="skills" aria-selected="false" type="button">Skills</button>
+          <button role="tab" data-tab="demo" aria-selected="true" type="button" data-i18n>Live demo</button>
+          <button role="tab" data-tab="results" aria-selected="false" type="button" data-i18n>Key results</button>
+          <button role="tab" data-tab="skills" aria-selected="false" type="button" data-i18n>Skills</button>
         </div>
         <div class="tabpanes">
           <div class="pane panel merge-lab" data-pane="demo" id="merge-lab">
@@ -169,44 +171,44 @@
     <!-- ============ AI ============ -->
     <section class="block ai" id="ai" data-section="ai">
       <div class="head">
-        <span class="eyebrow">02 · AI architecture</span>
-        <h2 class="reveal-title">AI that reads the company, safely</h2>
-        <p class="lede">MDM Beam answers questions about company data through governed MCP tools. Pick a question and see what happens behind the scenes.</p>
+        <span class="eyebrow" data-i18n>02 · AI architecture</span>
+        <h2 class="reveal-title" data-i18n>AI that reads the company, safely</h2>
+        <p class="lede" data-i18n>MDM Beam answers questions about company data through governed MCP tools. Pick a question and see what happens behind the scenes.</p>
       </div>
 
       <div class="ai-grid">
         <div class="panel chat" id="chat">
           <div class="chat-head">
             <span class="chat-avatar" data-icon="claude"></span>
-            <div><b>MDM Beam</b><small>Company-data assistant</small></div>
-            <span class="chat-status"><i></i> online</span>
+            <div><b>MDM Beam</b><small data-i18n>Company-data assistant</small></div>
+            <span class="chat-status"><i></i> <span data-i18n>online</span></span>
           </div>
           <div class="chat-body" id="chat-body"></div>
           <div class="chat-ask">
-            <span class="chat-try">Try a question</span>
+            <span class="chat-try" data-i18n>Try a question</span>
             <div class="chat-chips" id="chat-chips"></div>
           </div>
         </div>
         <div class="panel route">
-          <div class="panel-top"><span class="panel-label">Behind the scenes</span><span class="route-meta" id="route-meta"></span></div>
+          <div class="panel-top"><span class="panel-label" data-i18n>Behind the scenes</span><span class="route-meta" id="route-meta"></span></div>
           <ol class="hops" id="hops"></ol>
         </div>
       </div>
 
       <div class="principles">
-        <article class="pr"><span class="pr-ic">🔒</span><h4>Secrets stay on the server</h4><p>Tokens and keys never reach the browser. They are cached and refreshed before they expire.</p></article>
-        <article class="pr"><span class="pr-ic">⚡</span><h4>Simple first, AI when needed</h4><p>Counts and lookups get an instant server-built answer. The model is used only when a question needs interpretation.</p></article>
-        <article class="pr"><span class="pr-ic">🛡️</span><h4>Every tool is a governed API</h4><p>Agent tools sit behind Flex Gateway with API keys, rate limits and Splunk traces, like any other consumer.</p></article>
-        <article class="pr"><span class="pr-ic">⏱️</span><h4>Fast by design</h4><p>Warm caches at start-up, parallel tool calls and concurrent pagination.</p></article>
+        <article class="pr"><span class="pr-ic">🔒</span><h4 data-i18n>Secrets stay on the server</h4><p data-i18n>Tokens and keys never reach the browser. They are cached and refreshed before they expire.</p></article>
+        <article class="pr"><span class="pr-ic">⚡</span><h4 data-i18n>Simple first, AI when needed</h4><p data-i18n>Counts and lookups get an instant server-built answer. The model is used only when a question needs interpretation.</p></article>
+        <article class="pr"><span class="pr-ic">🛡️</span><h4 data-i18n>Every tool is a governed API</h4><p data-i18n>Agent tools sit behind Flex Gateway with API keys, rate limits and Splunk traces, like any other consumer.</p></article>
+        <article class="pr"><span class="pr-ic">⏱️</span><h4 data-i18n>Fast by design</h4><p data-i18n>Warm caches at start-up, parallel tool calls and concurrent pagination.</p></article>
       </div>
     </section>
 
     <!-- ============ PROJECTS ============ -->
     <section class="block" id="projects" data-section="projects">
       <div class="head">
-        <span class="eyebrow">03 · Projects</span>
-        <h2 class="reveal-title">Everything I've shipped</h2>
-        <p class="lede">Enterprise integration, AI assistants, mobile, CRMs and WebGL sites. Tap any card for details.</p>
+        <span class="eyebrow" data-i18n>03 · Projects</span>
+        <h2 class="reveal-title" data-i18n>Everything I've shipped</h2>
+        <p class="lede" data-i18n>Enterprise integration, AI assistants, mobile, CRMs and WebGL sites. Tap any card for details.</p>
       </div>
       <div class="filters" id="filters" role="tablist" aria-label="Filter projects"></div>
       <div class="grid" id="grid"></div>
@@ -215,8 +217,8 @@
     <!-- ============ JOURNEY ============ -->
     <section class="block" id="journey" data-section="journey">
       <div class="head">
-        <span class="eyebrow">04 · Journey</span>
-        <h2 class="reveal-title">From security to integration to AI</h2>
+        <span class="eyebrow" data-i18n>04 · Journey</span>
+        <h2 class="reveal-title" data-i18n>From security to integration to AI</h2>
       </div>
       <div class="tl" id="tl">
         <span class="tl-rail" aria-hidden="true"><span id="tl-fill"></span></span>
@@ -228,23 +230,23 @@
     <section class="contact" id="contact" data-section="contact">
       <canvas id="contact-fx" aria-hidden="true"></canvas>
       <div class="contact-inner">
-        <span class="eyebrow">05 · Contact</span>
+        <span class="eyebrow" data-i18n>05 · Contact</span>
         <h2 class="contact-title"><span class="scramble" data-text="Let's integrate.">Let's integrate.</span></h2>
-        <p class="lede">Integration architecture, MDM, agentic AI on enterprise data, or a product that needs to exist by next month. English C2 · French C2/C1 · Arabic native.</p>
+        <p class="lede" data-i18n-html="contact.lede">Integration architecture, MDM, agentic AI on enterprise data, or a product that needs to exist by next month. English C2 · French C2/C1 · Arabic native.</p>
         <div class="contact-links">
-          <a class="cl magnetic" href="mailto:abdelkader.elazzouzi@gmail.com"><span data-icon="gmail"></span><b>Email me</b><em>abdelkader.elazzouzi@gmail.com</em></a>
-          <a class="cl magnetic" href="https://www.linkedin.com/in/abdelkader-el-azzouzi-7778a5189" target="_blank" rel="noopener"><span data-icon="linkedin"></span><b>LinkedIn</b><em>Let's connect</em></a>
+          <a class="cl magnetic" href="mailto:abdelkader.elazzouzi@gmail.com"><span data-icon="gmail"></span><b data-i18n>Email me</b><em>abdelkader.elazzouzi@gmail.com</em></a>
+          <a class="cl magnetic" href="https://www.linkedin.com/in/abdelkader-el-azzouzi-7778a5189" target="_blank" rel="noopener"><span data-icon="linkedin"></span><b>LinkedIn</b><em data-i18n>Let's connect</em></a>
           <a class="cl magnetic" href="https://github.com/abk541" target="_blank" rel="noopener"><span data-icon="github"></span><b>GitHub</b><em>@abk541</em></a>
         </div>
       </div>
       <footer class="foot">
         <span>© 2026 Abdelkader El Azzouzi</span>
-        <span>Hand-built with Canvas, SVG and GSAP</span>
+        <span data-i18n>Hand-built with Canvas, SVG and GSAP</span>
       </footer>
     </section>
   </main>
 
-  <div class="pop" id="pop" role="dialog" aria-modal="false" hidden><button class="pop-x" type="button" aria-label="Close">×</button><b id="pop-t"></b><p id="pop-what"></p><p class="pop-where"><span>Where I used it</span><em id="pop-where"></em></p></div>
+  <div class="pop" id="pop" role="dialog" aria-modal="false" hidden><button class="pop-x" type="button" aria-label="Close">×</button><b id="pop-t"></b><p id="pop-what"></p><p class="pop-where"><span data-i18n>Where I used it</span><em id="pop-where"></em></p></div>
 
   <!-- ============ MODAL ============ -->
   <div class="modal" id="modal" hidden>
