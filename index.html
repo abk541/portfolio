@@ -14,13 +14,31 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css" />
 </head>
-<body>
+<body class="intro-open">
+  <!-- ============ INTRO ============ -->
+  <div id="intro" role="dialog" aria-label="Welcome">
+    <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+    <canvas id="intro-links" aria-hidden="true"></canvas>
+    <div id="intro-floaters" aria-hidden="true"></div>
+    <canvas id="intro-name" aria-hidden="true"></canvas>
+    <h1 class="sr-only">Abdelkader El Azzouzi</h1>
+    <div class="intro-ui">
+      <p class="intro-tag"><span class="serif">I make enterprise systems</span> talk to each other.</p>
+      <p class="intro-sub">Integration architect · MuleSoft · Informatica · AI</p>
+      <button class="intro-enter" id="intro-enter" type="button" aria-label="Enter the site">
+        <svg class="ring" viewBox="0 0 100 100" aria-hidden="true"><defs><path id="circ" d="M50,50 m-38,0 a38,38 0 1,1 76,0 a38,38 0 1,1 -76,0"/></defs><text><textPath href="#circ">ENTER · EXPLORE · ENTER · EXPLORE ·</textPath></text></svg>
+        <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14m0 0l-6-6m6 6l6-6"/></svg>
+      </button>
+      <p class="intro-hint">Touch the letters · tap anywhere · then scroll or press Enter</p>
+    </div>
+  </div>
+
   <div id="glow" aria-hidden="true"></div>
   <div id="wave" aria-hidden="true"></div>
 
   <!-- ============ NAV ============ -->
   <header class="nav" id="nav">
-    <a href="#top" class="brand" aria-label="Back to top">
+    <a href="#top" class="brand" id="brand" aria-label="Replay the intro">
       <span class="brand-mark"><i></i><i></i><i></i></span>
       <span class="brand-name">Abdelkader <span class="brand-last">El Azzouzi</span></span>
     </a>
@@ -43,26 +61,31 @@
     <a href="#contact" data-nav="contact"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7l8 6 8-6"/></svg><span>Contact</span></a>
   </nav>
 
+  <div class="mode-float" id="mode-float" role="tablist" aria-label="Platform">
+    <button data-mode="mule" type="button" role="tab"><span data-icon="mulesoft"></span>MuleSoft</button>
+    <button data-mode="infa" type="button" role="tab"><span data-icon="informatica"></span>Informatica</button>
+    <i class="mf-thumb"></i>
+  </div>
+
   <main id="top">
     <!-- ============ HERO ============ -->
     <section class="hero" id="hero" data-section="top">
       <canvas id="net" aria-hidden="true"></canvas>
       <div class="hero-content">
         <p class="pill"><span class="live"></span> Tech Lead · Bouygues Construction IT</p>
-        <h1 class="hero-title">
-          <span class="line"><span class="scramble" data-text="Abdelkader">Abdelkader</span></span>
-          <span class="line"><span class="scramble outline" data-text="El Azzouzi">El Azzouzi</span></span>
-        </h1>
+        <h2 class="hero-title">
+          <span class="line"><span class="scramble" data-text="Systems that">Systems that</span></span>
+          <span class="line"><span class="scramble outline" data-text="talk.">talk.</span></span>
+        </h2>
         <p class="hero-role">
           I connect enterprise systems with
           <span class="rotator" id="rotator"><span>MuleSoft</span><span>Informatica</span><span>Agentic AI</span><span>Full-stack apps</span></span>
         </p>
-        <p class="hero-sub">120+ APIs in production, a group-wide MDM on Business 360, and 30 MCP servers that let AI agents work with real company data.</p>
+        <p class="hero-sub">120+ APIs in production, a group-wide MDM, and 30 MCP servers that let AI agents use real company data.</p>
         <div class="hero-cta">
           <a href="#expertise" class="btn primary magnetic"><span>Explore my expertise</span><svg viewBox="0 0 24 24"><path d="M12 5v14m0 0l-6-6m6 6l6-6"/></svg></a>
           <a href="#projects" class="btn ghost magnetic"><span>See projects</span></a>
         </div>
-        <p class="hero-hint">Tip: move over the globe to bend the traffic, click to send a burst.</p>
       </div>
       <a href="#impact" class="scroll-cue" aria-label="Scroll down"><span></span></a>
     </section>
@@ -220,6 +243,8 @@
       </footer>
     </section>
   </main>
+
+  <div class="pop" id="pop" role="dialog" aria-modal="false" hidden><button class="pop-x" type="button" aria-label="Close">×</button><b id="pop-t"></b><p id="pop-what"></p><p class="pop-where"><span>Where I used it</span><em id="pop-where"></em></p></div>
 
   <!-- ============ MODAL ============ -->
   <div class="modal" id="modal" hidden>

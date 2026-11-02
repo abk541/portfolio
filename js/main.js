@@ -4,6 +4,8 @@ import { initNet } from './net.js';
 import { initDiagram, setDiagramMode } from './diagram.js';
 import { initAI } from './ai.js';
 import { MOTIFS } from './motifs.js';
+import { initIntro } from './intro.js';
+import { skillInfo } from './skills.js';
 
 const gsap = window.gsap;
 const ST = window.ScrollTrigger;
@@ -208,12 +210,14 @@ function setMode(mode) {
   resetAccent();
   store.set('mode', mode);
   $$('.platform').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.mode === mode)));
+  $$('#mode-float button').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.mode === mode)));
+  requestAnimationFrame(() => { const b = $(`#mode-float button[data-mode="${mode}"]`), th = $('.mf-thumb'); th.style.width = `${b.offsetWidth}px`; th.style.transform = `translateX(${b.offsetLeft}px)`; });
   const D = mode === 'mule' ? MULE : INFA;
   $('#stage-title').textContent = D.title;
   $('#stage-lede').textContent = D.lede;
   $('#highlights').innerHTML = D.highlights.map((h) => `<div class="hl"><b>${escapeHtml(h.k)}</b><p>${escapeHtml(h.t)}</p></div>`).join('')
     + (mode === 'infa' ? D.cards.map((c) => `<div class="hl"><b class="t">${escapeHtml(c.name)}</b><p>${escapeHtml(c.text)}</p></div>`).join('') : '');
-  $('#skills').innerHTML = Object.entries(D.skills).map(([k, v]) => `<div class="sk-row"><h5>${escapeHtml(k)}</h5><div class="sk-tags">${v.map((s) => `<span class="sk">${escapeHtml(s)}</span>`).join('')}</div></div>`).join('');
+  $('#skills').innerHTML = Object.entries(D.skills).map(([k, v]) => `<div class="sk-row"><h5>${escapeHtml(k)}</h5><div class="sk-tags">${v.map((s) => `<button type="button" class="sk" data-skill="${escapeHtml(s)}">${escapeHtml(s)}</button>`).join('')}</div></div>`).join('');
   setDiagramMode(mode);
   initMagnetic($('#stage'));
   if (anim) gsap.from('.stage-head > *', { y: 16, opacity: 0, duration: 0.5, stagger: 0.06, ease: 'power3.out' });
@@ -230,21 +234,33 @@ function initExpertise() {
   }));
   // sub tabs
   const tabs = $$('.subtabs button');
-  tabs.forEach((t) => t.addEventListener('click', () => {
+  let tabIdx = 0;
+  tabs.forEach((t, ti) => t.addEventListener('click', () => {
+    if (ti === tabIdx) return;
+    const dir = ti > tabIdx ? 1 : -1;
+    tabIdx = ti;
     tabs.forEach((x) => x.setAttribute('aria-selected', String(x === t)));
     $$('.pane').forEach((p) => {
       const show = p.dataset.pane === t.dataset.tab;
       p.hidden = !show;
-      if (show && anim) gsap.from(p.children, { y: 16, opacity: 0, duration: 0.45, stagger: 0.03, ease: 'power3.out' });
+      if (show && anim) {
+        gsap.fromTo(p, { x: 60 * dir, opacity: 0 }, { x: 0, opacity: 1, duration: 0.5, ease: 'expo.out', clearProps: 'transform' });
+        gsap.from(p.querySelectorAll('.hl, .sk-row'), { y: 20, opacity: 0, duration: 0.45, stagger: 0.04, ease: 'power3.out', delay: 0.05 });
+      }
     });
     ST && ST.refresh();
   }));
-  // compact platform tabs once they stick
-  const plats = $('.platforms');
+  // floating switcher: visible while inside Expertise once the big tabs have scrolled away.
+  // It is position:fixed, so showing/hiding never changes the page layout (no jitter loop).
+  const mf = $('#mode-float'), plats = $('.platforms'), sec = $('#expertise');
+  $$('button', mf).forEach((b) => b.addEventListener('click', async (e) => {
+    if (b.dataset.mode === currentMode) return;
+    await wave(b.dataset.mode, e.clientX, e.clientY);
+    setMode(b.dataset.mode);
+  }));
   const onScroll = () => {
-    const top = parseFloat(getComputedStyle(plats).top) || 0;
-    const r = plats.getBoundingClientRect();
-    plats.classList.toggle('stuck', r.top <= top + 1 && $('#stage').getBoundingClientRect().top < top + r.height + 10);
+    const p = plats.getBoundingClientRect(), s = sec.getBoundingClientRect();
+    mf.classList.toggle('show', p.bottom < 60 && s.bottom > innerHeight * 0.5);
   };
   addEventListener('scroll', onScroll, { passive: true });
   const saved = store.get('mode');
@@ -327,7 +343,7 @@ function openModal(p) {
     <p class="sub">${escapeHtml(p.kicker)} · ${escapeHtml(p.year)}</p>
     <p>${escapeHtml(p.summary)}</p>
     <ul>${p.points.map((x) => `<li>${escapeHtml(x)}</li>`).join('')}</ul>
-    <div class="card-tags" style="margin-bottom:20px">${p.stack.map((s) => `<span>${escapeHtml(s)}</span>`).join('')}</div>
+    <div class="card-tags" style="margin-bottom:20px">${p.stack.map((s) => `<span class="${skillInfo(s) ? 'sk-mini tagbtn' : ''}" data-skill="${escapeHtml(s)}">${escapeHtml(s)}</span>`).join('')}</div>
     ${link}`;
   m.hidden = false;
   document.body.style.overflow = 'hidden';
@@ -420,6 +436,71 @@ initJourney();
 initContact();
 initMagnetic();
 initNet($('#net'));
-heroIn();
+initSkillPop();
+initMotion();
+const intro = initIntro({ onEnter: (phase) => { if (phase === 'start') setTimeout(heroIn, 550); } });
+intro.show();
+$('#brand').addEventListener('click', (e) => { e.preventDefault(); scrollTo({ top: 0, behavior: 'instant' }); intro.show(); });
 $('#modal').addEventListener('click', (e) => { if (e.target.closest('[data-close]')) closeModal(); });
 addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+/* =====================================================================
+   Skill popover: what it is + where I used it
+   ===================================================================== */
+function initSkillPop() {
+  const pop = $('#pop');
+  let cur = null;
+  const close = () => {
+    if (pop.hidden) return;
+    cur && cur.classList.remove('on'); cur = null;
+    document.body.classList.remove('pop-open');
+    if (anim) gsap.to(pop, { opacity: 0, scale: 0.94, duration: 0.16, ease: 'power2.in', onComplete: () => (pop.hidden = true) });
+    else pop.hidden = true;
+  };
+  document.addEventListener('click', (e) => {
+    const chip = e.target.closest('[data-skill]');
+    if (e.target.closest('.pop-x')) { close(); return; }
+    if (!chip) { if (!e.target.closest('#pop')) close(); return; }
+    const info = skillInfo(chip.dataset.skill);
+    if (!info) return;
+    if (cur === chip) { close(); return; }
+    cur && cur.classList.remove('on');
+    cur = chip; chip.classList.add('on');
+    $('#pop-t').textContent = chip.dataset.skill;
+    $('#pop-what').textContent = info[0];
+    $('#pop-where').textContent = info[1];
+    pop.hidden = false;
+    document.body.classList.add('pop-open');
+    openY = scrollY;
+    if (innerWidth > 700) {
+      const r = chip.getBoundingClientRect();
+      const pw = pop.offsetWidth, ph = pop.offsetHeight;
+      let left = Math.min(Math.max(12, r.left + r.width / 2 - pw / 2), innerWidth - pw - 12);
+      let top = r.bottom + 10;
+      if (top + ph > innerHeight - 12) top = r.top - ph - 10;
+      pop.style.left = `${left}px`; pop.style.top = `${top}px`;
+    }
+    if (anim) gsap.fromTo(pop, { opacity: 0, scale: 0.9, y: innerWidth > 700 ? -6 : 16 }, { opacity: 1, scale: 1, y: 0, duration: 0.35, ease: 'back.out(2)' });
+  });
+  addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+  let openY = 0;
+  addEventListener('scroll', () => { if (!pop.hidden && innerWidth > 700 && Math.abs(scrollY - openY) > 120) close(); }, { passive: true });
+}
+
+/* =====================================================================
+   Extra motion: hero parallax, panel reveals, ticker velocity
+   ===================================================================== */
+function initMotion() {
+  if (!anim || !ST) return;
+  gsap.to('.hero-content', { yPercent: -18, opacity: 0.1, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
+  gsap.to('#net', { scale: 1.25, opacity: 0.2, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
+  $$('.diagram-wrap, .ai-grid > .panel, .merge-lab').forEach((el) => {
+    gsap.fromTo(el, { clipPath: 'inset(8% 6% 8% 6% round 28px)', opacity: 0.2 }, { clipPath: 'inset(0% 0% 0% 0% round 20px)', opacity: 1, duration: 1.1, ease: 'expo.out', scrollTrigger: { trigger: el, start: 'top 88%' }, clearProps: 'clipPath' });
+  });
+  gsap.from('.tk', { opacity: 0, y: 10, stagger: 0.02, duration: 0.4, scrollTrigger: { trigger: '.ticker', start: 'top 95%' } });
+  // ticker reacts to scroll speed
+  const track = $('.ticker');
+  let skew = 0;
+  ST.create({ onUpdate: (self) => { skew = Math.max(-12, Math.min(12, self.getVelocity() / 300)); } });
+  gsap.ticker.add(() => { skew *= 0.9; track.style.setProperty('--sk', `${-skew}deg`); });
+}

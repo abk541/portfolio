@@ -4,11 +4,7 @@ export const STATS = [
   { n: 120, suffix: '+', label: 'Mule APIs designed & in production', mode: 'mule' },
   { n: 30, suffix: '', label: 'MCP servers serving AI agents', mode: 'ai' },
   { n: 150, suffix: '', label: 'CDI mappings shipped', mode: 'infa' },
-  { n: 140, suffix: '', label: 'Business 360 jobs in production', mode: 'infa' },
   { n: 80, suffix: '+', label: 'countries reached by migrated HR flows', mode: 'mule' },
-  { n: 25, suffix: '+', label: 'Flex Gateway proxies', mode: 'mule' },
-  { n: 14, suffix: '', label: 'source systems mastered in MDM', mode: 'infa' },
-  { n: 4, suffix: '', label: 'engineers led', mode: 'ai' },
 ];
 
 /* ---------- MuleSoft: API-led landscape (CV page 2) ---------- */
