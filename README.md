@@ -2,7 +2,7 @@
 
 Interactive portfolio: integration architecture (MuleSoft & Informatica IDMC), agentic AI on enterprise data, and AI-enhanced full-stack apps.
 
-**Live:** https://abk541.github.io/
+**Live:** https://abk541.github.io/portfolio/
 
 ## What's inside
 
