@@ -1,5 +1,6 @@
 // Landing: the name is written by rivers of data; platforms and APIs float in depth around it.
 import { $, icon, REDUCED, FINE, rand, clamp } from './util.js';
+import { t as tr } from './lang.js';
 
 const gsap = window.gsap;
 const PALETTE = [[0, 160, 223], [125, 211, 252], [167, 139, 250], [244, 114, 182], [255, 106, 43], [255, 176, 32]];
@@ -61,42 +62,53 @@ export function initIntro({ onEnter }) {
   const linkPackets = [];
 
   function placeFloaters() {
-    // scatter on an ellipse ring around the name, avoiding its centre band
     const n = fl.length;
     const mobile = W < 700;
-    fl.forEach((o, i) => {
-      o.w = o.el.offsetWidth; o.h = o.el.offsetHeight;
-      if (mobile) {
-        // phones: tidy 2-column grid, 4 rows above the name, 2 rows below the call-to-action
-        const slots = [];
-        const topA = H * 0.09, topB = band[1] - 50;
-        for (let r = 0; r < 4; r++) for (let c = 0; c < 2; c++) slots.push([c, topA + (r / 3) * (topB - topA)]);
-        const botA = H * 0.82, botB = H * 0.93;
-        for (let r = 0; r < 2; r++) for (let c = 0; c < 2; c++) slots.push([c, botA + r * (botB - botA)]);
-        const sl = slots[i];
-        o.el.style.display = sl ? '' : 'none';
-        if (!sl) return;
-        const cx = W * (sl[0] ? 0.7 : 0.3) + (Math.floor(i / 2) % 2 ? 14 : -14);
-        o.bx = Math.min(Math.max(cx, o.w * 0.4 + 8), W - o.w * 0.4 - 8);
+    fl.forEach((o) => { o.el.style.display = ''; o.w = o.el.offsetWidth; o.h = o.el.offsetHeight; o.region = 0; });
+    pairs.length = 0;
+    if (mobile) {
+      // Phones: a calm grid in the free space only (above the name, below the button).
+      // Rows are measured from the real layout so chips never touch the text.
+      const ui = root.querySelector('.intro-ui');
+      const uiBottom = ui ? ui.offsetTop + ui.offsetHeight : H * 0.8;
+      const ROW = 58;
+      const topA = 92, topB = band[1] - 34;
+      const topRows = Math.max(0, Math.min(3, Math.floor((topB - topA) / ROW) + 1));
+      const botA = uiBottom + 34, botB = H - 30;
+      const botRows = botB >= botA ? Math.min(2, Math.floor((botB - botA) / ROW) + 1) : 0;
+      const slots = [];
+      for (let r = 0; r < topRows; r++) for (let c = 0; c < 2; c++) slots.push([c, topRows === 1 ? topA : topA + (r / (topRows - 1)) * (topB - topA), 1]);
+      for (let r = 0; r < botRows; r++) for (let c = 0; c < 2; c++) slots.push([c, botRows === 1 ? (botA + botB) / 2 : botA + (r / (botRows - 1)) * (botB - botA), 2]);
+      // most recognisable chips first
+      const order = [...fl].sort((a, b) => (b.f.big ? 2 : b.f.ic ? 1 : 0) - (a.f.big ? 2 : a.f.ic ? 1 : 0));
+      order.forEach((o, k) => {
+        const sl = slots[k];
+        if (!sl) { o.el.style.display = 'none'; return; }
+        const half = W / 2;
+        const cx = sl[0] ? half + half / 2 : half / 2;
+        o.bx = Math.min(Math.max(cx, o.w * 0.45 + 10), W - o.w * 0.45 - 10);
         o.by = sl[1];
-        o.amp = rand(4, 9);
-      } else {
-        o.el.style.display = '';
+        o.region = sl[2];
+        o.amp = rand(3, 6);
+      });
+      // link only chips that sit in the same band, so no line crosses the name
+      [1, 2].forEach((reg) => {
+        const v = fl.map((o, i) => (o.el.style.display !== 'none' && o.region === reg ? i : -1)).filter((i) => i >= 0);
+        for (let k = 0; k + 1 < v.length; k++) pairs.push([v[k], v[k + 1]]);
+      });
+    } else {
+      fl.forEach((o, i) => {
         const a = (i / n) * Math.PI * 2 + rand(-0.2, 0.2);
         const jitter = rand(0.9, 1.1);
         o.bx = W / 2 + Math.cos(a) * W * 0.4 * jitter;
         o.by = H / 2 + Math.sin(a) * H * 0.38 * jitter;
-        // keep the name readable: push chips out of the lettering band
         if (o.by > band[1] - 30 && o.by < band[3] + 30 && o.bx > band[0] - 40 && o.bx < band[2] + 40) {
           o.bx = o.bx < W / 2 ? band[0] - o.w / 2 - 30 : band[2] + o.w / 2 + 30;
           if (o.bx - o.w / 2 < 8 || o.bx + o.w / 2 > W - 8) o.by = o.by < (band[1] + band[3]) / 2 ? band[1] - 50 : band[3] + 40;
         }
-      }
-    });
-    pairs.length = 0;
-    const vis = fl.map((o, i) => (o.el.style.display === 'none' ? -1 : i)).filter((i) => i >= 0);
-    const m = vis.length;
-    vis.forEach((i, k) => { pairs.push([i, vis[(k + 1) % m]]); if (k % 3 === 0) pairs.push([i, vis[(k + 5) % m]]); });
+      });
+      fl.forEach((o, i) => { pairs.push([i, (i + 1) % n]); if (i % 3 === 0) pairs.push([i, (i + 5) % n]); });
+    }
   }
 
   /* ---------- name mask ---------- */
@@ -203,8 +215,9 @@ export function initIntro({ onEnter }) {
     // --- floaters
     fl.forEach((o, i) => {
       o.ox *= 0.94; o.oy *= 0.94;
-      let x = o.bx + Math.cos(t * o.sp + o.ph) * o.amp - ptr.px * 90 * o.z;
-      let y = o.by + Math.sin(t * o.sp * 1.3 + o.ph) * o.amp - ptr.py * 70 * o.z;
+      const par = W < 700 ? 22 : 90;
+      let x = o.bx + Math.cos(t * o.sp + o.ph) * o.amp - ptr.px * par * o.z;
+      let y = o.by + Math.sin(t * o.sp * 1.3 + o.ph) * o.amp - ptr.py * par * 0.7 * o.z;
       if (ptr.active) {
         const dx = x - ptr.x, dy = y - ptr.y, d = Math.hypot(dx, dy) || 1;
         if (d < 170 && !o.hover) { o.ox += (dx / d) * (170 - d) * 0.06; o.oy += (dy / d) * (170 - d) * 0.06; }
@@ -242,9 +255,11 @@ export function initIntro({ onEnter }) {
       const mx = (A.x + B.x) / 2 + Math.sin(t * 0.4 + p.k) * 40, my = (A.y + B.y) / 2 + Math.cos(t * 0.3 + p.k) * 40;
       const u = 1 - p.s;
       const x = u * u * A.x + 2 * u * p.s * mx + p.s * p.s * B.x, y = u * u * A.y + 2 * u * p.s * my + p.s * p.s * B.y;
-      const g = lctx.createRadialGradient(x, y, 0, x, y, 10);
-      g.addColorStop(0, 'rgba(255,255,255,.95)'); g.addColorStop(1, 'rgba(255,255,255,0)');
-      lctx.fillStyle = g; lctx.beginPath(); lctx.arc(x, y, 10, 0, Math.PI * 2); lctx.fill();
+      const col = p.s < 0.5 ? A.f.c : B.f.c;
+      lctx.globalAlpha = Math.sin(p.s * Math.PI);
+      lctx.fillStyle = col; lctx.shadowColor = col; lctx.shadowBlur = 8;
+      lctx.beginPath(); lctx.arc(x, y, 2.2, 0, Math.PI * 2); lctx.fill();
+      lctx.shadowBlur = 0; lctx.globalAlpha = 1;
     }
     lctx.globalCompositeOperation = 'source-over';
 
@@ -252,7 +267,7 @@ export function initIntro({ onEnter }) {
     nctx.globalCompositeOperation = 'destination-out';
     nctx.fillStyle = `rgba(0,0,0,${leaving ? 0.22 : 0.24})`;
     nctx.fillRect(0, 0, W, H);
-    if (glyphs && !leaving) { nctx.globalCompositeOperation = 'source-over'; nctx.globalAlpha = 0.035; nctx.drawImage(glyphs, 0, 0, W, H); nctx.globalAlpha = 1; }
+    if (glyphs && !leaving) { nctx.globalCompositeOperation = 'source-over'; nctx.globalAlpha = W < 700 ? 0.06 : 0.035; nctx.drawImage(glyphs, 0, 0, W, H); nctx.globalAlpha = 1; }
     nctx.globalCompositeOperation = 'lighter';
     nctx.lineWidth = W < 700 ? 1.1 : 1.4;
     nctx.lineCap = 'round';
@@ -346,6 +361,8 @@ export function initIntro({ onEnter }) {
     root.hidden = false;
     root.style.webkitMaskImage = root.style.maskImage = '';
     document.body.classList.add('intro-open');
+    const hint = root.querySelector('.intro-hint');
+    if (hint && root.clientWidth < 700) hint.textContent = tr('Touch the letters · swipe up to enter');
     // the letters are sampled from the real font, so wait for it (max 1.5 s)
     try { await Promise.race([document.fonts.load('700 120px "Space Grotesk"'), new Promise((r) => setTimeout(r, 1500))]); } catch { /* ignore */ }
     resize();

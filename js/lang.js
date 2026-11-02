@@ -39,6 +39,7 @@ const FR_UI = {
   'intro.tag': '<span class="serif">Je fais dialoguer</span> les systèmes d’entreprise.',
   'Integration architect · MuleSoft · Informatica · AI': 'Architecte d’intégration · MuleSoft · Informatica · IA',
   'Touch the letters · tap anywhere · then scroll or press Enter': 'Touchez les lettres · tapez n’importe où · puis faites défiler ou appuyez sur Entrée',
+  'Touch the letters · swipe up to enter': 'Touchez les lettres · glissez vers le haut pour entrer',
   'ENTER · EXPLORE · ENTER · EXPLORE ·': 'ENTRER · EXPLORER · ENTRER · EXPLORER ·',
   // hero
   'Tech Lead · Bouygues Construction IT': 'Tech Lead · Bouygues Construction IT',

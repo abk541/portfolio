@@ -546,7 +546,7 @@ body.intro-open .nav, body.intro-open .tabbar, body.intro-open .mode-float { opa
 .intro-enter { position: relative; width: 104px; height: 104px; margin-top: clamp(18px, 4vh, 40px); border-radius: 50%; display: grid; place-items: center; color: #fff; background: radial-gradient(circle, rgba(255,255,255,.12), rgba(255,255,255,.02) 70%); border: 1px solid rgba(255,255,255,.18); backdrop-filter: blur(6px); transition: transform .4s var(--ease), background-color .3s; }
 .intro-enter:hover { transform: scale(1.08); background-color: rgba(255,255,255,.08); }
 .intro-enter .ring { position: absolute; inset: 0; width: 100%; height: 100%; animation: spin 14s linear infinite; }
-.intro-enter .ring text { fill: rgba(255,255,255,.75); font: 600 9.2px "Inter", sans-serif; letter-spacing: 2.6px; }
+.intro-enter .ring text { fill: rgba(255,255,255,.75); font: 600 8.6px "Inter", sans-serif; letter-spacing: 0; }
 .intro-enter .arrow { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; animation: nudge 1.6s var(--ease) infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes nudge { 0%, 100% { transform: translateY(-3px); } 50% { transform: translateY(4px); } }
