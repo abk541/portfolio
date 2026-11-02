@@ -40,18 +40,27 @@ let coreHits = 0;
 let fx;
 
 export function initDiagram() {
-  const wrap = $('.diagram-wrap');
-  // horizontal scroll container (mobile)
-  const scroller = document.createElement('div');
-  scroller.className = 'diagram-scroll';
-  wrap.insertBefore(scroller, $('#diagram-cols'));
-  scroller.appendChild($('#diagram-cols'));
-  scroller.appendChild($('#diagram'));
-  els = { wrap, cols: $('#diagram-cols'), diagram: $('#diagram'), svg: $('#diagram-svg'), nodes: $('#diagram-nodes'), canvas: $('#diagram-fx'), detail: $('#diagram-detail'), hint: $('#diagram-hint') };
-
-  fx = canvasLoop(els.canvas, draw, { onResize: () => mode && layoutRoutes() });
+  els = { fit: $('#diagram-fit'), inner: $('#diagram-inner'), cols: $('#diagram-cols'), diagram: $('#diagram'), svg: $('#diagram-svg'), nodes: $('#diagram-nodes'), canvas: $('#diagram-fx'), detail: $('#diagram-detail'), hint: $('#diagram-hint'), pills: $('#domain-pills') };
+  fx = canvasLoop(els.canvas, draw);
   els.nodes.addEventListener('mouseleave', () => { if (!pinned) setFocus(null); });
-  new ResizeObserver(() => mode && layoutRoutes()).observe(els.diagram);
+  let lastW = 0;
+  new ResizeObserver(() => {
+    const w = els.fit.clientWidth;
+    if (!mode || !w || Math.abs(w - lastW) < 1) return;
+    lastW = w; fit(); layoutRoutes();
+  }).observe(els.fit);
+}
+
+/** Lay the diagram out at a comfortable logical width, then scale it to fit the panel. */
+const LOGICAL_MIN = 940;
+function fit() {
+  const W = els.fit.clientWidth;
+  if (!W) return;
+  const L = Math.max(W, LOGICAL_MIN);
+  const k = W / L;
+  els.inner.style.width = `${L}px`;
+  els.inner.style.transform = k < 1 ? `scale(${k})` : '';
+  els.fit.style.height = `${els.inner.offsetHeight * k}px`;
 }
 
 export function setDiagramMode(m) {
@@ -60,6 +69,7 @@ export function setDiagramMode(m) {
   els.detail.innerHTML = '';
   packets = []; bursts = []; coreHits = 0;
   if (m === 'mule') buildMule(); else buildInfa();
+  fit();
   requestAnimationFrame(() => {
     layoutRoutes();
     if (!REDUCED && gsap) {
@@ -101,8 +111,9 @@ function buildMule() {
     html += `<div class="dn consumer" data-c="${c.id}" style="left:${MX.cons}%;top:${y}%">${escapeHtml(c.label)}<small>${escapeHtml(c.sub)}</small></div>`;
   });
   els.nodes.innerHTML = html;
-  els.hint.textContent = 'Each link is a back-end called by a business domain. Hover or tap a domain to trace its traffic.';
+  els.hint.textContent = 'Back-ends → System APIs → Process APIs → Gateway → consumers';
   bindDomains('[data-d]', (id) => MULE.domains.find((d) => d.id === id));
+  buildPills(MULE.domains);
 }
 
 /* ---------- INFA ---------- */
@@ -140,8 +151,9 @@ function buildInfa() {
     html += `<div class="dn consumer" data-c="${c.id}" style="left:${IX.cons}%;top:${20 + i * 30}%">${escapeHtml(c.label)}<small>${escapeHtml(c.sub)}</small></div>`;
   });
   els.nodes.innerHTML = html;
-  els.hint.textContent = 'Orchestration: CAI processes for launch, tracking & recovery · nightly schedules · DEV / PREPROD / PROD. Click a master domain to trace its sources.';
+  els.hint.textContent = 'Sources → ingestion → golden record → distribution → consumers';
   bindDomains('[data-d]', (id) => INFA.domains.find((d) => d.id === id));
+  buildPills(INFA.domains);
 }
 
 /* ---------- shared: domain focus ---------- */
@@ -160,6 +172,17 @@ function bindDomains(sel, find) {
 
 let pinned = null;
 
+function buildPills(domains) {
+  els.pills.innerHTML = `<button class="pill-btn on" data-all type="button" style="--c:#ffffff"><i></i>All traffic</button>` +
+    domains.map((d) => `<button class="pill-btn" data-d="${d.id}" type="button" style="--c:${d.color}"><i></i>${escapeHtml(d.name)}</button>`).join('');
+  els.pills.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
+    const id = b.dataset.d || null;
+    pinned = id;
+    setFocus(id, id ? domains.find((d) => d.id === id) : null);
+    b.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }));
+}
+
 function setFocus(id, d) {
   if (focus === id) return;
   focus = id;
@@ -176,6 +199,7 @@ function setFocus(id, d) {
 function applyFocus() {
   const id = focus;
   els.nodes.querySelectorAll('[data-d]').forEach((n) => n.classList.toggle('on', n.dataset.d === id));
+  els.pills.querySelectorAll('.pill-btn').forEach((n) => n.classList.toggle('on', id ? n.dataset.d === id : n.hasAttribute('data-all')));
   let related = null;
   if (id) {
     if (mode === 'mule') { const dom = MULE.domains.find((x) => x.id === id); related = new Set([...dom.links, ...dom.to]); }
@@ -193,10 +217,11 @@ function applyFocus() {
 }
 
 /* ---------- geometry ---------- */
+// Layout-space geometry (immune to the fit scale and to GSAP entrance transforms).
+// Every .dn is centred on its left/top via translate(-50%,-50%).
 function box(el) {
-  const r = el.getBoundingClientRect();
-  const o = els.diagram.getBoundingClientRect();
-  return { l: r.left - o.left, r: r.right - o.left, t: r.top - o.top, b: r.bottom - o.top, cx: (r.left + r.right) / 2 - o.left, cy: (r.top + r.bottom) / 2 - o.top };
+  const w = el.offsetWidth, h = el.offsetHeight, cx = el.offsetLeft, cy = el.offsetTop;
+  return { l: cx - w / 2, r: cx + w / 2, t: cy - h / 2, b: cy + h / 2, cx, cy };
 }
 
 function addLink(c, color, domain, base = 0.22) {
@@ -362,15 +387,16 @@ function buildLab(m) {
   const copy = lab.querySelector('.merge-copy');
   const board = $('#merge-board');
   board.innerHTML = '';
+  board.classList.toggle('cutover', m === 'mule');
   if (m === 'mule') {
-    copy.innerHTML = `<p class="kicker mono">mule 3 → mule 4 · progressive cut-over</p>
+    copy.innerHTML = `<span class="eyebrow">Mule 3 → Mule 4 migration</span>
       <h4>Migrating ~40 critical HR interfaces <em class="serif">without dropping a single message.</em></h4>
       <p>Proxy APIs sat in front of every legacy flow, so traffic could shift interface by interface across 80+ countries. Drag the slider to replay the cut-over.</p>
-      <label class="cut mono"><span>cut-over</span><input type="range" min="0" max="100" value="0" id="cut"><b id="cut-v">0%</b></label>
-      <p class="mono cut-meta" id="cut-meta">0 / 40 interfaces on Mule 4</p>`;
+      <label class="cut"><span>cut-over</span><input type="range" min="0" max="100" value="0" id="cut"><b id="cut-v">0%</b></label>
+      <p class="cut-meta" id="cut-meta">0 / 40 interfaces on Mule 4</p>`;
     buildCutover(board);
   } else {
-    copy.innerHTML = `<p class="kicker mono">match &amp; merge · live</p>
+    copy.innerHTML = `<span class="eyebrow">Match &amp; merge</span>
       <h4>Three messy records walk in. <em class="serif">One golden record walks out.</em></h4>
       <p>Per-source trust decides which value survives for every field. Run the match to watch survivorship do its job.</p>
       <button class="btn primary magnetic" id="merge-run" type="button"><span>Run match</span></button>`;
@@ -403,7 +429,8 @@ function buildCutover(board) {
   canvasLoop(cv, (s, dt) => {
     const { ctx, w, h } = s;
     ctx.clearRect(0, 0, w, h);
-    const src = [w * 0.1, h * 0.5], proxy = [w * 0.42, h * 0.5], m3 = [w * 0.86, h * 0.24], m4 = [w * 0.86, h * 0.76];
+    const bw = Math.min(124, w * 0.29), bh = 48;
+    const src = [bw / 2 + 2, h * 0.5], proxy = [w * 0.47, h * 0.5], m3 = [w - bw / 2 - 2, h * 0.24], m4 = [w - bw / 2 - 2, h * 0.76];
     const nodes = [
       { p: src, label: 'HR consumers', sub: '80+ countries', c: '#ffffff' },
       { p: proxy, label: 'Proxy API', sub: 'routing rule', c: '#00a0df' },
@@ -429,10 +456,10 @@ function buildCutover(board) {
       const a = n.fade === undefined ? 1 : 0.35 + 0.65 * n.fade;
       ctx.globalAlpha = a;
       ctx.fillStyle = '#0a0c14'; ctx.strokeStyle = n.c; ctx.lineWidth = 1.5;
-      ctx.beginPath(); ctx.roundRect(n.p[0] - 62, n.p[1] - 24, 124, 48, 12); ctx.fill(); ctx.stroke();
-      ctx.fillStyle = '#eef1f8'; ctx.font = '600 13px "Space Grotesk", sans-serif'; ctx.textAlign = 'center';
+      ctx.beginPath(); ctx.roundRect(n.p[0] - bw / 2, n.p[1] - bh / 2, bw, bh, 12); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#f1f3f9'; ctx.font = `600 ${bw < 110 ? 12 : 13.5}px Inter, sans-serif`; ctx.textAlign = 'center';
       ctx.fillText(n.label, n.p[0], n.p[1] - 2);
-      ctx.fillStyle = '#7c8599'; ctx.font = '10px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#7d8699'; ctx.font = `${bw < 110 ? 10 : 11}px Inter, sans-serif`;
       ctx.fillText(n.sub, n.p[0], n.p[1] + 13);
       ctx.globalAlpha = 1;
     });

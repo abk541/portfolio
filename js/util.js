@@ -47,9 +47,9 @@ export function canvasLoop(canvas, draw, { dpr = Math.min(window.devicePixelRati
   let last = performance.now();
 
   const resize = () => {
-    const r = canvas.getBoundingClientRect();
-    state.w = Math.max(1, r.width);
-    state.h = Math.max(1, r.height);
+    // layout size (ignores CSS transforms, so scaled parents still draw in their own units)
+    state.w = Math.max(1, canvas.clientWidth);
+    state.h = Math.max(1, canvas.clientHeight);
     canvas.width = Math.round(state.w * dpr);
     canvas.height = Math.round(state.h * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
