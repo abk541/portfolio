@@ -29,7 +29,7 @@ export function initIntro({ onEnter }) {
   const floatLayer = $('#intro-floaters');
   const lctx = linkCv.getContext('2d');
   const nctx = nameCv.getContext('2d');
-  const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+  const dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 760 ? 1.25 : 1.5);
 
   let band = [0, 0, 0, 0];
   let W = 0, H = 0, mask = null, maskW = 0, maskH = 0, inside = [], glyphs = null;
@@ -148,7 +148,7 @@ export function initIntro({ onEnter }) {
   const randomInside = () => { const k = ((Math.random() * (inside.length / 2)) | 0) * 2; return [inside[k], inside[k + 1]]; };
 
   function spawnParticles() {
-    const count = Math.round(clamp((W * H) / (W < 700 ? 200 : 330), 1100, 3400));
+    const count = Math.round(clamp((W * H) / (W < 700 ? 260 : 420), 800, 2400));
     parts = Array.from({ length: count }, () => {
       const [x, y] = randomInside();
       return { x, y, px: x, py: y, vx: 0, vy: 0, free: 0, tx: x, ty: y, life: rand(1, 4), c: 0 };

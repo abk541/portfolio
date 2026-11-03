@@ -11,7 +11,7 @@ export function initNet(canvas) {
   const edges = [];
   const packets = [];
   const rings = [];
-  const N = window.innerWidth < 700 ? 90 : 150;
+  const N = window.innerWidth < 760 ? 70 : 130;
   const golden = Math.PI * (3 - Math.sqrt(5));
 
   for (let i = 0; i < N; i++) {
@@ -136,7 +136,7 @@ export function initNet(canvas) {
     ctx.restore();
 
     // packets
-    if (!REDUCED && packets.length < 140 && Math.random() < 0.9) spawn();
+    if (!REDUCED && packets.length < (window.innerWidth < 760 ? 50 : 110) && Math.random() < 0.7) spawn();
     ctx.globalCompositeOperation = 'lighter';
     for (let i = packets.length - 1; i >= 0; i--) {
       const p = packets[i];
@@ -160,9 +160,7 @@ export function initNet(canvas) {
       const tx = x - (b.px - a.px) * 0.08 * p.dir, ty = y - (b.py - a.py) * 0.08 * p.dir;
       const al = 0.35 + (depth + 1) * 0.32;
       const [r, g, bb] = p.c;
-      const grad = ctx.createLinearGradient(tx, ty, x, y);
-      grad.addColorStop(0, `rgba(${r},${g},${bb},0)`); grad.addColorStop(1, `rgba(${r},${g},${bb},${al})`);
-      ctx.strokeStyle = grad; ctx.lineWidth = 2;
+      ctx.strokeStyle = `rgba(${r},${g},${bb},${al * 0.6})`; ctx.lineWidth = 2;
       ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(x, y); ctx.stroke();
       ctx.fillStyle = `rgba(${r},${g},${bb},${al})`;
       ctx.beginPath(); ctx.arc(x, y, 1.6 + (depth + 1) * 0.8, 0, Math.PI * 2); ctx.fill();

@@ -12,6 +12,7 @@ export const STATS = [
 /* ---------- MuleSoft: API-led landscape (CV page 2) ---------- */
 export const MULE = {
   title: 'Integration architecture, designed & operated',
+  plain: 'In plain words: the switchboard that lets more than a hundred business apps exchange data automatically, in 80+ countries.',
   lede: '120+ Mule APIs following API-led connectivity. System APIs wrap every back-end, Process APIs orchestrate each business domain, and Flex Gateway exposes them to applications, partners and AI agents.',
   columns: ['Back-end systems', 'System APIs', 'Process APIs by domain', 'Flex Gateway', 'Consumers'],
   backends: ['Informatica MDM', 'SAP BW', 'SAP ERP', 'Generix', 'Salesforce', 'Maileva', 'Global HR', 'Dayforce', 'Zellis', 'SAP Concur', 'Memority', 'Abacus', 'Hexagon', 'Tracktor', 'Dashdoc', 'Splunk'],
@@ -87,6 +88,7 @@ export const MULE = {
 /* ---------- Informatica: MDM on IDMC (CV page 2) ---------- */
 export const INFA = {
   title: 'Reference-data platform on IDMC',
+  plain: 'In plain words: one trusted record for every employee, project and company entity, shared by all the apps that need it.',
   lede: 'Group MDM on Informatica Business 360. Sources land through CDI and APIs, are consolidated into three master domains, then broadcast by business events to MuleSoft and by egress to Snowflake.',
   sources: ['SAP ECC', 'SAP BW', 'SAS SI RH', 'ADP', 'BMS', 'PUMA', 'eCheckIn', 'IAM', 'Employee Profile', 'CoWorker Tool', 'Salesforce CRM'],
   ingestion: [

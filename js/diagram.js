@@ -332,7 +332,7 @@ function draw(s, dt) {
   ctx.clearRect(0, 0, w, h);
   if (!mode) return;
   const rate = focus ? 0.5 : 0.75;
-  if (!REDUCED && packets.length < (w < 700 ? 60 : 130) && Math.random() < rate) spawn();
+  if (!REDUCED && packets.length < (w < 700 ? 45 : 100) && Math.random() < rate) spawn();
   ctx.globalCompositeOperation = 'lighter';
   for (let i = packets.length - 1; i >= 0; i--) {
     const p = packets[i];
@@ -356,9 +356,9 @@ function draw(s, dt) {
     ctx.lineWidth = p.size;
     ctx.lineCap = 'round';
     let prev = posAt(p.r, p.s);
-    for (let k = 1; k <= 8; k++) {
-      const q = posAt(p.r, p.s - dir * k * 5);
-      ctx.strokeStyle = `rgba(${r},${g},${b},${0.55 * (1 - k / 9)})`;
+    for (let k = 1; k <= 4; k++) {
+      const q = posAt(p.r, p.s - dir * k * 9);
+      ctx.strokeStyle = `rgba(${r},${g},${b},${0.55 * (1 - k / 5)})`;
       ctx.beginPath(); ctx.moveTo(prev[0], prev[1]); ctx.lineTo(q[0], q[1]); ctx.stroke();
       prev = q;
     }

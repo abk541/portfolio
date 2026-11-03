@@ -9,6 +9,7 @@ export const FR = {
 
   MULE: {
     title: 'Architecture d’intégration, conçue et exploitée',
+    plain: 'En clair : le standard qui permet à plus d’une centaine d’applications métier d’échanger leurs données automatiquement, dans plus de 80 pays.',
     lede: 'Plus de 120 API Mule selon l’approche API-led. Les API système encapsulent chaque back-end, les API process orchestrent chaque domaine métier, et Flex Gateway les expose aux applications, aux partenaires et aux agents IA.',
     columns: ['Systèmes back-end', 'API système', 'API process par domaine', 'Flex Gateway', 'Consommateurs'],
     consumers: [
@@ -39,6 +40,7 @@ export const FR = {
 
   INFA: {
     title: 'Plateforme de données de référence sur IDMC',
+    plain: 'En clair : une fiche fiable et unique pour chaque collaborateur, projet et entité, partagée par toutes les applications qui en ont besoin.',
     lede: 'MDM groupe sur Informatica Business 360. Les sources arrivent par CDI et par API, sont consolidées sur trois domaines maîtres, puis diffusées par événements vers MuleSoft et par egress vers Snowflake.',
     ingestion: [
       { label: 'Batch CDI', sub: '150 mappings · 36 jobs ingress' },

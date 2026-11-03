@@ -32,6 +32,15 @@ export function mergeInto(target, src) {
 
 // UI strings. Keys are the English text; only French needs an entry.
 const FR_UI = {
+  // overview / story
+  'Overview': 'En bref', 'In 60 seconds': 'En 60 secondes', 'What I actually do': 'Ce que je fais, concrètement',
+  'No jargon. Four short steps, then pick your team to see what it changes day to day.': 'Sans jargon. Quatre étapes courtes, puis choisissez votre équipe pour voir ce que ça change au quotidien.',
+  'Swipe': 'Glissez',
+  'What it changes for your team': 'Ce que ça change pour votre équipe',
+  'Pick a team: one action on the left, everything it updates automatically on the right.': 'Choisissez une équipe : une action d’un côté, tout ce qu’elle met à jour automatiquement de l’autre.',
+  'See it in 60 seconds': 'Comprendre en 60 secondes', 'Technical deep dive': 'Plongée technique',
+  'In plain words: MuleSoft connects the company’s apps so data flows on its own; Informatica keeps one correct version of that data.': 'En clair : MuleSoft connecte les applications de l’entreprise pour que les données circulent toutes seules ; Informatica garde une seule version correcte de ces données.',
+  'In plain words: employees ask a question in everyday language and get an answer from trusted company data, without the AI ever seeing passwords.': 'En clair : les collaborateurs posent une question en langage courant et obtiennent une réponse issue de données fiables, sans que l’IA ne voie jamais de mot de passe.',
   // nav
   'Expertise': 'Expertise', 'AI': 'IA', 'Projects': 'Projets', 'Journey': 'Parcours', 'Contact': 'Contact', 'Home': 'Accueil',
   'Language': 'Langue', 'Other languages (automatic)': 'Autres langues (automatique)',

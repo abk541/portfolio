@@ -2,14 +2,28 @@
 const TAU = Math.PI * 2;
 const rgba = (c, a) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
 
+// The grid + glow background never changes for a given size and colour: render once, then blit.
+const BG = new Map();
 function bg(ctx, w, h, c) {
-  const g = ctx.createRadialGradient(w * 0.5, h * 0.4, 0, w * 0.5, h * 0.4, Math.max(w, h) * 0.8);
-  g.addColorStop(0, rgba(c, 0.16)); g.addColorStop(1, 'rgba(10,12,20,0)');
-  ctx.fillStyle = '#0a0c14'; ctx.fillRect(0, 0, w, h);
-  ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
-  ctx.strokeStyle = 'rgba(255,255,255,0.035)'; ctx.lineWidth = 1;
-  for (let x = 0; x < w; x += 24) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
-  for (let y = 0; y < h; y += 24) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+  const key = `${w | 0}x${h | 0}:${c}`;
+  let off = BG.get(key);
+  if (!off) {
+    off = document.createElement('canvas');
+    off.width = Math.max(1, w | 0); off.height = Math.max(1, h | 0);
+    const o = off.getContext('2d');
+    const g = o.createRadialGradient(w * 0.5, h * 0.4, 0, w * 0.5, h * 0.4, Math.max(w, h) * 0.8);
+    g.addColorStop(0, rgba(c, 0.16)); g.addColorStop(1, 'rgba(10,12,20,0)');
+    o.fillStyle = '#0a0c14'; o.fillRect(0, 0, w, h);
+    o.fillStyle = g; o.fillRect(0, 0, w, h);
+    o.strokeStyle = 'rgba(255,255,255,0.035)'; o.lineWidth = 1;
+    o.beginPath();
+    for (let x = 0.5; x < w; x += 24) { o.moveTo(x, 0); o.lineTo(x, h); }
+    for (let y = 0.5; y < h; y += 24) { o.moveTo(0, y); o.lineTo(w, y); }
+    o.stroke();
+    if (BG.size > 60) BG.clear();
+    BG.set(key, off);
+  }
+  ctx.drawImage(off, 0, 0, w, h);
 }
 
 export const MOTIFS = {

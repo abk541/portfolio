@@ -44,6 +44,7 @@
       <span class="brand-name" translate="no">Abdelkader <span class="brand-last">El Azzouzi</span></span>
     </a>
     <nav class="nav-links" aria-label="Sections">
+      <a href="#story" data-nav="story" data-i18n>Overview</a>
       <a href="#expertise" data-nav="expertise" data-i18n>Expertise</a>
       <a href="#ai" data-nav="ai" data-i18n>AI</a>
       <a href="#projects" data-nav="projects" data-i18n>Projects</a>
@@ -56,7 +57,7 @@
 
   <!-- ============ MOBILE TAB BAR ============ -->
   <nav class="tabbar" aria-label="Sections">
-    <a href="#top" data-nav="top"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg><span data-i18n>Home</span></a>
+    <a href="#story" data-nav="story"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l5 3.5-5 3.5z"/></svg><span data-i18n>Overview</span></a>
     <a href="#expertise" data-nav="expertise"><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8 7l3 9M16 7l-3 9M8.5 6h7"/></svg><span data-i18n>Expertise</span></a>
     <a href="#ai" data-nav="ai"><svg viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg><span data-i18n>AI</span></a>
     <a href="#projects" data-nav="projects"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg><span data-i18n>Projects</span></a>
@@ -85,8 +86,8 @@
         </p>
         <p class="hero-sub" data-i18n>120+ APIs in production, a group-wide MDM, and 30 MCP servers that let AI agents use real company data.</p>
         <div class="hero-cta">
-          <a href="#expertise" class="btn primary magnetic"><span data-i18n>Explore my expertise</span><svg viewBox="0 0 24 24"><path d="M12 5v14m0 0l-6-6m6 6l6-6"/></svg></a>
-          <a href="#projects" class="btn ghost magnetic"><span data-i18n>See projects</span></a>
+          <a href="#story" class="btn primary magnetic"><span data-i18n>See it in 60 seconds</span><svg viewBox="0 0 24 24"><path d="M12 5v14m0 0l-6-6m6 6l6-6"/></svg></a>
+          <a href="#expertise" class="btn ghost magnetic"><span data-i18n>Technical deep dive</span></a>
         </div>
       </div>
       <a href="#impact" class="scroll-cue" aria-label="Scroll down"><span></span></a>
@@ -95,8 +96,50 @@
     <!-- ============ TICKER ============ -->
     <div class="ticker" aria-hidden="true"><div class="ticker-track" id="ticker"></div></div>
 
+    <!-- ============ STORY (plain language) ============ -->
+    <section class="block story" id="story" data-section="story">
+      <div class="head">
+        <span class="eyebrow" data-i18n>In 60 seconds</span>
+        <h2 class="reveal-title" data-i18n>What I actually do</h2>
+        <p class="lede" data-i18n>No jargon. Four short steps, then pick your team to see what it changes day to day.</p>
+      </div>
+      <div class="story-wrap">
+        <div class="panel story-stage">
+          <svg id="story-svg" role="img" aria-label="Animated explanation"></svg>
+          <div class="story-badge-row"><div class="story-badge" id="story-badge" aria-hidden="true"></div></div>
+          <span class="story-swipe" aria-hidden="true" data-i18n>Swipe</span>
+        </div>
+        <div class="story-copy">
+          <div class="story-steps" id="story-steps" role="tablist" aria-label="Steps"></div>
+          <div class="story-text" aria-live="polite">
+            <span class="story-num" id="story-num">01 / 04</span>
+            <h3 id="story-title"></h3>
+            <p id="story-body"></p>
+            <a class="story-tech" id="story-tech" href="#expertise" hidden><span></span><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          </div>
+          <div class="story-nav">
+            <button id="story-prev" type="button"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+            <button id="story-play" type="button"></button>
+            <button id="story-next" type="button"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="team">
+        <div class="team-head">
+          <h3 data-i18n>What it changes for your team</h3>
+          <p data-i18n>Pick a team: one action on the left, everything it updates automatically on the right.</p>
+        </div>
+        <div class="team-tabs" id="team-tabs" role="tablist" aria-label="Teams"></div>
+        <div class="panel team-stage">
+          <svg id="team-svg" role="img" aria-label="Data flow"></svg>
+        </div>
+        <div class="team-foot"><div class="team-stat" id="team-stat"></div><p class="team-text" id="team-text"></p></div>
+      </div>
+    </section>
+
     <!-- ============ IMPACT ============ -->
-    <section class="block" id="impact" data-section="top">
+    <section class="block" id="impact" data-section="story">
       <div class="head">
         <span class="eyebrow" data-i18n>Impact</span>
         <h2 class="reveal-title" data-i18n>Numbers that run in production</h2>
@@ -110,6 +153,7 @@
         <span class="eyebrow" data-i18n>01 · Expertise</span>
         <h2 class="reveal-title" data-i18n>Two platforms. One architect.</h2>
         <p class="lede" data-i18n>Pick a platform to see the architecture I designed, a live demo, key results and skills.</p>
+        <p class="plain"><span>💡</span><span data-i18n>In plain words: MuleSoft connects the company’s apps so data flows on its own; Informatica keeps one correct version of that data.</span></p>
       </div>
 
       <div class="platforms" role="tablist" aria-label="Platform">
@@ -130,6 +174,7 @@
       <div class="stage" id="stage">
         <div class="stage-head">
           <h3 id="stage-title"></h3>
+          <p class="plain stage-plain"><span>💡</span><span id="stage-plain"></span></p>
           <p class="lede" id="stage-lede"></p>
         </div>
 
@@ -174,6 +219,7 @@
         <span class="eyebrow" data-i18n>02 · AI architecture</span>
         <h2 class="reveal-title" data-i18n>AI that reads the company, safely</h2>
         <p class="lede" data-i18n>MDM Beam answers questions about company data through governed MCP tools. Pick a question and see what happens behind the scenes.</p>
+        <p class="plain"><span>💡</span><span data-i18n>In plain words: employees ask a question in everyday language and get an answer from trusted company data, without the AI ever seeing passwords.</span></p>
       </div>
 
       <div class="ai-grid">

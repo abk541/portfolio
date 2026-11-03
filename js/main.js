@@ -5,6 +5,7 @@ import { initDiagram, setDiagramMode } from './diagram.js';
 import { initAI } from './ai.js';
 import { MOTIFS } from './motifs.js';
 import { initIntro } from './intro.js';
+import { initStory } from './story.js';
 import { skillInfo } from './skills.js';
 import { LANG, AUTO_LANG, OTHER_LANGS, t, translateDom } from './lang.js';
 
@@ -129,7 +130,7 @@ function initStats() {
       ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.closePath();
       const g = ctx.createLinearGradient(0, 0, 0, h); g.addColorStop(0, `rgba(${col},0.22)`); g.addColorStop(1, `rgba(${col},0)`);
       ctx.fillStyle = g; ctx.fill();
-    });
+    }, { fps: 24 });
   });
   const run = () => $$('.stat .num', grid).forEach((n, i) => {
     const target = STATS[i].n;
@@ -187,7 +188,7 @@ function initPlatformFx() {
           ctx.beginPath(); ctx.arc(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr * 0.6, p.r, 0, Math.PI * 2); ctx.fill();
         });
       }
-    });
+    }, { fps: 30 });
   });
 }
 
@@ -217,6 +218,7 @@ function setMode(mode) {
   const D = mode === 'mule' ? MULE : INFA;
   $('#stage-title').textContent = D.title;
   $('#stage-lede').textContent = D.lede;
+  $('#stage-plain').textContent = D.plain;
   $('#highlights').innerHTML = D.highlights.map((h) => `<div class="hl"><b>${escapeHtml(h.k)}</b><p>${escapeHtml(h.t)}</p></div>`).join('')
     + (mode === 'infa' ? D.cards.map((c) => `<div class="hl"><b class="t">${escapeHtml(c.name)}</b><p>${escapeHtml(c.text)}</p></div>`).join('') : '');
   $('#skills').innerHTML = Object.entries(D.skills).map(([k, v]) => `<div class="sk-row"><h5>${escapeHtml(t(k))}</h5><div class="sk-tags">${v.map((s) => `<button type="button" class="sk" data-skill="${escapeHtml(s)}">${escapeHtml(s)}</button>`).join('')}</div></div>`).join('');
@@ -301,7 +303,7 @@ function initProjects() {
     canvasLoop(card.querySelector('canvas'), ({ ctx, w, h, t }, dt) => {
       energy += (target - energy) * Math.min(1, dt * 4);
       MOTIFS[p.motif](ctx, w, h, t, accentRGB(), energy);
-    });
+    }, { fps: 30 });
     if (FINE && !REDUCED) {
       card.addEventListener('pointermove', (e) => {
         const r = card.getBoundingClientRect();
@@ -416,7 +418,7 @@ function initContact() {
       ctx.fillStyle = `rgba(${r},${g},${b},${0.3 + k * 0.7})`;
       ctx.beginPath(); ctx.arc(u * u * sx + 2 * u * k * mx + k * k * cx, u * u * sy + 2 * u * k * my + k * k * cy, 1.2 + k * 1.5, 0, Math.PI * 2); ctx.fill();
     });
-  });
+  }, { fps: 40 });
   const title = $('.contact-title .scramble');
   const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { io.disconnect(); scramble(title, title.dataset.text, { duration: 0.9 }); } }, { threshold: 0.5 });
   io.observe(title);
@@ -432,6 +434,7 @@ initTicker();
 initStats();
 initReveals();
 initExpertise();
+initStory();
 initAI();
 initProjects();
 initJourney();
@@ -508,11 +511,6 @@ function initMotion() {
     gsap.fromTo(el, { clipPath: 'inset(8% 6% 8% 6% round 28px)', opacity: 0.2 }, { clipPath: 'inset(0% 0% 0% 0% round 20px)', opacity: 1, duration: 1.1, ease: 'expo.out', scrollTrigger: { trigger: el, start: 'top 88%' }, clearProps: 'clipPath' });
   });
   gsap.from('.tk', { opacity: 0, y: 10, stagger: 0.02, duration: 0.4, scrollTrigger: { trigger: '.ticker', start: 'top 95%' } });
-  // ticker reacts to scroll speed
-  const track = $('.ticker');
-  let skew = 0;
-  ST.create({ onUpdate: (self) => { skew = Math.max(-12, Math.min(12, self.getVelocity() / 300)); } });
-  gsap.ticker.add(() => { skew *= 0.9; track.style.setProperty('--sk', `${-skew}deg`); });
 }
 
 /* =====================================================================
@@ -583,3 +581,9 @@ function loadAutoTranslate(code) {
   document.body.appendChild(sc);
   if (code === 'ar') document.documentElement.classList.add('auto-rtl');
 }
+
+// "Technically: …" links from the plain-language story open the right platform
+document.addEventListener('goto-platform', async (e) => {
+  $('#expertise').scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' });
+  if (e.detail !== currentMode) { await wave(e.detail, innerWidth / 2, innerHeight / 2); setMode(e.detail); }
+});

@@ -40,7 +40,10 @@ export function resetAccent() { ACC = null; }
  * Canvas loop that sizes itself to its element, honours DPR, and only animates
  * while on screen and the tab is visible.
  */
-export function canvasLoop(canvas, draw, { dpr = Math.min(window.devicePixelRatio || 1, 2), onResize, always = false } = {}) {
+export const IS_PHONE = window.innerWidth < 760 || /Android|iPhone|iPad/i.test(navigator.userAgent);
+export function canvasLoop(canvas, draw, { dpr = Math.min(window.devicePixelRatio || 1, IS_PHONE ? 1.5 : 2), onResize, always = false, fps = 60 } = {}) {
+  const minGap = 1000 / fps - 2;
+  let lastDraw = 0;
   const ctx = canvas.getContext('2d');
   const state = { w: 0, h: 0, t: 0, visible: always, ctx, canvas, dpr, running: true };
   let raf = 0;
@@ -59,6 +62,10 @@ export function canvasLoop(canvas, draw, { dpr = Math.min(window.devicePixelRati
   const frame = (now) => {
     raf = 0;
     if (!state.visible || !state.running || document.hidden) return;
+    // nothing behind the landing page needs to animate
+    if (!always && document.body.classList.contains('intro-open')) { raf = requestAnimationFrame(frame); return; }
+    if (now - lastDraw < minGap) { raf = requestAnimationFrame(frame); return; }
+    lastDraw = now;
     const dt = Math.max(0, Math.min(0.05, (now - last) / 1000));
     last = now;
     state.t += dt;
