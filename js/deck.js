@@ -13,7 +13,7 @@ const CHAPTERS = [
   { id: 'contact', label: 'Contact' },
 ];
 
-let chapters = [], marks = [], hScroll = null, current = '';
+let chapters = [], marks = [], hScroll = null, current = '', railLinks = [];
 const isDesk = () => innerWidth >= 1000;
 
 export function chapterTop(id) {
@@ -37,6 +37,11 @@ export function initDeck() {
     m.dataset.for = c.dataset.chap;
     c.parentNode.insertBefore(m, c);
     c.style.zIndex = String(2 + i);
+    c.__live = true;
+    const dim = document.createElement('div');
+    dim.className = 'chap-dim';
+    c.appendChild(dim);
+    c.__dim = dim;
     // big chapter number in each header
     const head = c.querySelector('.head');
     if (head && i > 0) head.dataset.num = String(i).padStart(2, '0');
@@ -46,6 +51,8 @@ export function initDeck() {
   // rail (desktop)
   const rail = $('#rail');
   rail.innerHTML = CHAPTERS.slice(1).map((c, i) => `<a href="#${c.id}" data-rail="${c.id}"><span class="rn">${String(i + 1).padStart(2, '0')}</span><span class="rl">${t(c.label)}</span><i class="rp"><i></i></i></a>`).join('');
+  railLinks = $$('[data-rail]');
+  railLinks.forEach((a) => { a.__bar = a.querySelector('.rp i'); });
 
   // every in-page link goes through the deck (markers, not the sticky sections)
   document.addEventListener('click', (e) => {
@@ -82,35 +89,42 @@ function layout() {
 
 function onScroll() {
   const H = innerHeight;
-  // recede the chapter that is being covered
+  // ---- read phase (no writes in between, so no forced layouts)
+  const nextTops = chapters.map((c, i) => (chapters[i + 1] ? chapters[i + 1].getBoundingClientRect().top : Infinity));
+  const rects = chapters.map((c) => c.getBoundingClientRect());
+  const markTops = marks.map((m) => m.getBoundingClientRect().top);
+  const docH = document.documentElement.scrollHeight;
+  // ---- write phase
+  // a chapter completely hidden under a later full-screen card is taken out of rendering entirely
+  let coverFrom = Infinity;
+  for (let j = chapters.length - 1; j >= 0; j--) if (rects[j].top <= 0.5 && rects[j].bottom >= H - 0.5) { coverFrom = j; break; }
   chapters.forEach((c, i) => {
-    const next = chapters[i + 1];
-    let p = 0;
-    if (next) {
-      const r = next.getBoundingClientRect().top;
-      p = Math.max(0, Math.min(1, 1 - r / H));
-    }
-    const k = Math.round(p * 100) / 100;
+    const hide = i < coverFrom && coverFrom !== Infinity;
+    if (c.__hidden !== hide) { c.__hidden = hide; c.style.visibility = hide ? 'hidden' : ''; }
+    const p = nextTops[i] === Infinity ? 0 : Math.max(0, Math.min(1, 1 - nextTops[i] / H));
+    const k = Math.round(p * 50) / 50;
+    // "live" = actually visible: animations inside covered chapters pause (see canvasLoop)
+    c.__live = !hide && k < 0.97 && rects[i].bottom > 0 && rects[i].top < H;
     if (c._p === k) return;
     c._p = k;
-    c.style.setProperty('--cover', (k * 0.6).toFixed(3));
+    if (c.__dim) { c.__dim.style.opacity = (k * 0.6).toFixed(2); c.__dim.style.visibility = k ? 'visible' : 'hidden'; }
   });
-  // active chapter + per-chapter progress in the rail
   let active = 'top';
-  marks.forEach((m) => { if (m.getBoundingClientRect().top <= H * 0.4) active = m.dataset.for; });
-  if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) active = 'contact';
+  markTops.forEach((tp, i) => { if (tp <= H * 0.4) active = marks[i].dataset.for; });
+  if (H + scrollY >= docH - 4) active = 'contact';
   if (active !== current) {
     current = active;
-    $$('[data-rail]').forEach((a) => a.classList.toggle('on', a.dataset.rail === active));
-    $$('[data-nav]').forEach((l) => l.classList.toggle('active', l.dataset.nav === active || (active === 'top' && l.dataset.nav === 'story' && false)));
+    railLinks.forEach((a) => a.classList.toggle('on', a.dataset.rail === active));
+    $$('[data-nav]').forEach((l) => l.classList.toggle('active', l.dataset.nav === active));
     document.documentElement.dataset.chapter = active;
   }
-  $$('[data-rail]').forEach((a) => {
-    const i = marks.findIndex((m) => m.dataset.for === a.dataset.rail);
-    const start = marks[i].getBoundingClientRect().top;
-    const end = marks[i + 1] ? marks[i + 1].getBoundingClientRect().top : document.documentElement.scrollHeight - scrollY;
+  railLinks.forEach((a, k) => {
+    const i = k + 1;
+    const start = markTops[i];
+    const end = markTops[i + 1] !== undefined ? markTops[i + 1] : docH - scrollY;
     const p = Math.max(0, Math.min(1, (H * 0.4 - start) / Math.max(1, end - start)));
-    a.style.setProperty('--p', p.toFixed(3));
+    const v = p.toFixed(2);
+    if (a._v !== v) { a._v = v; a.__bar.style.transform = `scaleY(${v})`; }
   });
   if (hScroll) hScroll.update();
 }

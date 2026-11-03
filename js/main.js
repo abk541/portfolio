@@ -14,6 +14,8 @@ const gsap = window.gsap;
 const ST = window.ScrollTrigger;
 if (gsap && ST) gsap.registerPlugin(ST);
 const anim = !!gsap && !REDUCED;
+// everything snappier: all GSAP motion plays 1.6x faster
+if (gsap) { gsap.globalTimeline.timeScale(1.6); gsap.ticker.lagSmoothing(500, 33); }
 
 const store = {
   get(k) { try { return localStorage.getItem(k); } catch { return null; } },
@@ -59,7 +61,7 @@ function initNav() {
   const nav = $('#nav'), bar = $('#progress');
   const update = () => {
     nav.classList.toggle('scrolled', scrollY > 20);
-    bar.style.width = `${(scrollY / Math.max(1, document.documentElement.scrollHeight - innerHeight)) * 100}%`;
+    bar.style.transform = `scaleX(${(scrollY / Math.max(1, document.documentElement.scrollHeight - innerHeight)).toFixed(3)})`;
   };
   addEventListener('scroll', update, { passive: true });
   addEventListener('resize', update);
@@ -70,7 +72,7 @@ function initNav() {
    Hero
    ===================================================================== */
 function heroIn() {
-  $$('.hero .scramble').forEach((el, i) => scramble(el, el.dataset.text, { duration: 0.8, delay: i * 0.12 }));
+  $$('.hero .scramble').forEach((el, i) => scramble(el, el.dataset.text, { duration: 0.5, delay: i * 0.08 }));
   if (anim) {
     gsap.from('.hero-title .line > span', { yPercent: 110, duration: 1, ease: 'expo.out', stagger: 0.1 });
     gsap.from(['.pill', '.hero-role', '.hero-sub', '.hero-cta', '.hero-hint'], { y: 24, opacity: 0, duration: 0.8, ease: 'power3.out', stagger: 0.06, delay: 0.2 });

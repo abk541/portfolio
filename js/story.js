@@ -6,6 +6,8 @@ import { LANG } from './lang.js';
 const gsap = window.gsap;
 const NS = 'http://www.w3.org/2000/svg';
 const FR = LANG === 'fr';
+let CHAP_EL;
+const CHAP = () => (CHAP_EL === undefined ? (CHAP_EL = document.getElementById('story')) : CHAP_EL);
 const mk = (tag, attrs = {}, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
 
 /* ------------------------------------------------------------------ copy */
@@ -239,7 +241,7 @@ export function initStory() {
   function render(now) {
     raf = 0;
     if (!visible || document.hidden) return;
-    if (document.body.classList.contains('intro-open')) { raf = requestAnimationFrame(render); return; }
+    if (document.body.classList.contains('intro-open') || (CHAP() && CHAP().__live === false)) { raf = 0; setTimeout(kick, 200); return; }
     const dt = Math.min(0.05, (now - (last || now)) / 1000); last = now;
     // tiles
     M.tiles.forEach((t, i) => {
@@ -438,6 +440,7 @@ function initTeams() {
   function render(now) {
     raf = 0;
     if (!visible || document.hidden) return;
+    if (CHAP() && CHAP().__live === false) { raf = 0; setTimeout(kick, 200); return; }
     const dt = Math.min(0.05, (now - (last || now)) / 1000); last = now;
     if (G_TEAM && !REDUCED && packets.length < 14 && Math.random() < 0.09) G_TEAM.spawn();
     for (let i = packets.length - 1; i >= 0; i--) {

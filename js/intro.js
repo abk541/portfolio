@@ -22,6 +22,14 @@ const FLOATERS = [
   { t: 'event · project.updated', c: '#f472b6', code: 1 },
 ];
 
+const NB = 12;
+const BUCKETS = Array.from({ length: NB }, () => []);
+const BUCKET_COL = Array.from({ length: NB }, (_, q) => {
+  const k = ((q + 0.5) / NB) * (PALETTE.length - 1);
+  const i0 = Math.min(PALETTE.length - 2, k | 0), f = k - i0, A = PALETTE[i0], B = PALETTE[i0 + 1];
+  return `rgba(${(A[0] + (B[0] - A[0]) * f) | 0},${(A[1] + (B[1] - A[1]) * f) | 0},${(A[2] + (B[2] - A[2]) * f) | 0},0.85)`;
+});
+
 export function initIntro({ onEnter }) {
   const root = $('#intro');
   const linkCv = $('#intro-links');
@@ -29,7 +37,7 @@ export function initIntro({ onEnter }) {
   const floatLayer = $('#intro-floaters');
   const lctx = linkCv.getContext('2d');
   const nctx = nameCv.getContext('2d');
-  const dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 760 ? 1.25 : 1.5);
+  const dpr = window.innerWidth < 760 ? 1.5 : 1;
 
   let band = [0, 0, 0, 0];
   let W = 0, H = 0, mask = null, maskW = 0, maskH = 0, inside = [], glyphs = null;
@@ -148,7 +156,7 @@ export function initIntro({ onEnter }) {
   const randomInside = () => { const k = ((Math.random() * (inside.length / 2)) | 0) * 2; return [inside[k], inside[k + 1]]; };
 
   function spawnParticles() {
-    const count = Math.round(clamp((W * H) / (W < 700 ? 260 : 420), 800, 2400));
+    const count = Math.round(clamp((W * H) / (W < 700 ? 300 : 560), 700, 1800));
     parts = Array.from({ length: count }, () => {
       const [x, y] = randomInside();
       return { x, y, px: x, py: y, vx: 0, vy: 0, free: 0, tx: x, ty: y, life: rand(1, 4), c: 0 };
@@ -235,9 +243,7 @@ export function initIntro({ onEnter }) {
       const A = fl[a], B = fl[b];
       const hot = A.hover || B.hover;
       const mx = (A.x + B.x) / 2 + Math.sin(t * 0.4 + k) * 40, my = (A.y + B.y) / 2 + Math.cos(t * 0.3 + k) * 40;
-      const grad = lctx.createLinearGradient(A.x, A.y, B.x, B.y);
-      grad.addColorStop(0, A.f.c); grad.addColorStop(1, B.f.c);
-      lctx.strokeStyle = grad;
+      lctx.strokeStyle = A.f.c;
       lctx.globalAlpha = hot ? 0.55 : 0.12 * Math.min(A.z, B.z) + 0.05;
       lctx.lineWidth = hot ? 1.6 : 1;
       lctx.beginPath(); lctx.moveTo(A.x, A.y); lctx.quadraticCurveTo(mx, my, B.x, B.y); lctx.stroke();
@@ -257,9 +263,9 @@ export function initIntro({ onEnter }) {
       const x = u * u * A.x + 2 * u * p.s * mx + p.s * p.s * B.x, y = u * u * A.y + 2 * u * p.s * my + p.s * p.s * B.y;
       const col = p.s < 0.5 ? A.f.c : B.f.c;
       lctx.globalAlpha = Math.sin(p.s * Math.PI);
-      lctx.fillStyle = col; lctx.shadowColor = col; lctx.shadowBlur = 8;
+      lctx.fillStyle = col;
       lctx.beginPath(); lctx.arc(x, y, 2.2, 0, Math.PI * 2); lctx.fill();
-      lctx.shadowBlur = 0; lctx.globalAlpha = 1;
+      lctx.globalAlpha = 1;
     }
     lctx.globalCompositeOperation = 'source-over';
 
@@ -267,7 +273,6 @@ export function initIntro({ onEnter }) {
     nctx.globalCompositeOperation = 'destination-out';
     nctx.fillStyle = `rgba(0,0,0,${leaving ? 0.22 : 0.24})`;
     nctx.fillRect(0, 0, W, H);
-    if (glyphs && !leaving) { nctx.globalCompositeOperation = 'source-over'; nctx.globalAlpha = W < 700 ? 0.06 : 0.035; nctx.drawImage(glyphs, 0, 0, W, H); nctx.globalAlpha = 1; }
     nctx.globalCompositeOperation = 'lighter';
     nctx.lineWidth = W < 700 ? 1.1 : 1.4;
     nctx.lineCap = 'round';
@@ -308,11 +313,18 @@ export function initIntro({ onEnter }) {
           }
         }
       }
-      const k = clamp(p.x / W, 0, 0.999) * (PALETTE.length - 1);
-      const i0 = k | 0, f = k - i0, A = PALETTE[i0], B = PALETTE[i0 + 1];
-      const r = A[0] + (B[0] - A[0]) * f, g = A[1] + (B[1] - A[1]) * f, b = A[2] + (B[2] - A[2]) * f;
-      nctx.strokeStyle = `rgba(${r | 0},${g | 0},${b | 0},${p.free > 0 ? 0.95 : 0.75})`;
-      nctx.beginPath(); nctx.moveTo(p.px, p.py); nctx.lineTo(p.x + 0.01, p.y); nctx.stroke();
+      const bk = Math.min(NB - 1, Math.max(0, (p.x / W * NB) | 0));
+      const arr = BUCKETS[bk];
+      arr.push(p.px, p.py, p.x + 0.01, p.y);
+    }
+    for (let q = 0; q < NB; q++) {
+      const arr = BUCKETS[q];
+      if (!arr.length) continue;
+      nctx.strokeStyle = BUCKET_COL[q];
+      nctx.beginPath();
+      for (let z = 0; z < arr.length; z += 4) { nctx.moveTo(arr[z], arr[z + 1]); nctx.lineTo(arr[z + 2], arr[z + 3]); }
+      nctx.stroke();
+      arr.length = 0;
     }
     ptr.vx *= 0.8; ptr.vy *= 0.8;
     nctx.globalCompositeOperation = 'source-over';
@@ -346,7 +358,7 @@ export function initIntro({ onEnter }) {
       .to('.intro-ui', { opacity: 0, y: 20, duration: 0.35, ease: 'power2.in' }, 0)
       .to(fl.map((o) => o.el), { opacity: 0, duration: 0.6, ease: 'power2.in', stagger: 0.02 }, 0)
       .add(() => fl.forEach((o) => { o.ox += (o.x - cx) * 1.6; o.oy += (o.y - cy) * 1.6; }), 0)
-      .fromTo(site, { scale: 1.18, filter: 'blur(14px)' }, { scale: 1, filter: 'blur(0px)', duration: 1.1, ease: 'expo.out', clearProps: 'transform,filter' }, 0.55)
+      .fromTo(site, { scale: 1.08, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.9, ease: 'expo.out', clearProps: 'transform,opacity' }, 0.45)
       .to(hole, {
         r: R, duration: 1.05, ease: 'expo.in',
         onUpdate: () => {

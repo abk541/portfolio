@@ -63,7 +63,11 @@ export function canvasLoop(canvas, draw, { dpr = Math.min(window.devicePixelRati
     raf = 0;
     if (!state.visible || !state.running || document.hidden) return;
     // nothing behind the landing page needs to animate
-    if (!always && document.body.classList.contains('intro-open')) { raf = requestAnimationFrame(frame); return; }
+    if (!always && document.body.classList.contains('intro-open')) { raf = 0; setTimeout(kick, 250); return; }
+    if (!always) {
+      if (state.chap === undefined) state.chap = canvas.closest('[data-chap]') || null;
+      if (state.chap && state.chap.__live === false) { raf = 0; setTimeout(kick, 200); return; }
+    }
     if (now - lastDraw < minGap) { raf = requestAnimationFrame(frame); return; }
     lastDraw = now;
     const dt = Math.max(0, Math.min(0.05, (now - last) / 1000));

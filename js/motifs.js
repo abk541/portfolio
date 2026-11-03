@@ -99,10 +99,9 @@ export const MOTIFS = {
     ctx.lineCap = 'round';
     ctx.strokeStyle = 'rgba(255,255,255,0.08)'; ctx.lineWidth = 10;
     ctx.beginPath(); ctx.arc(cx, cy, r, a0, a1); ctx.stroke();
-    ctx.shadowColor = rgba(c, 1); ctx.shadowBlur = 24;
+    
     ctx.strokeStyle = rgba(c, 1);
     ctx.beginPath(); ctx.arc(cx, cy, r, a0, a0 + (a1 - a0) * speed); ctx.stroke();
-    ctx.shadowBlur = 0;
     for (let i = 0; i <= 12; i++) {
       const a = a0 + (a1 - a0) * (i / 12);
       ctx.strokeStyle = 'rgba(255,255,255,.3)'; ctx.lineWidth = 2;
@@ -137,7 +136,7 @@ export const MOTIFS = {
   },
   pulse(ctx, w, h, t, c, e) {
     bg(ctx, w, h, c);
-    ctx.strokeStyle = rgba(c, 1); ctx.lineWidth = 2; ctx.shadowColor = rgba(c, 1); ctx.shadowBlur = 12;
+    ctx.strokeStyle = rgba(c, 1); ctx.lineWidth = 2; 
     ctx.beginPath();
     for (let x = 0; x <= w; x += 2) {
       const k = ((x / w) * 3 - t * (0.8 + e)) % 1;
@@ -148,7 +147,7 @@ export const MOTIFS = {
       else if (kk >= 0.5 && kk < 0.55) y = -(0.55 - kk) * 10 * h * 0.12;
       x === 0 ? ctx.moveTo(x, h / 2 + y) : ctx.lineTo(x, h / 2 + y);
     }
-    ctx.stroke(); ctx.shadowBlur = 0;
+    ctx.stroke();
     // map pins
     for (let i = 0; i < 3; i++) {
       const px = w * (0.25 + i * 0.25), py = h * 0.78;

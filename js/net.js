@@ -11,7 +11,7 @@ export function initNet(canvas) {
   const edges = [];
   const packets = [];
   const rings = [];
-  const N = window.innerWidth < 760 ? 70 : 130;
+  const N = window.innerWidth < 760 ? 56 : 120;
   const golden = Math.PI * (3 - Math.sqrt(5));
 
   for (let i = 0; i < N; i++) {
@@ -136,7 +136,7 @@ export function initNet(canvas) {
     ctx.restore();
 
     // packets
-    if (!REDUCED && packets.length < (window.innerWidth < 760 ? 50 : 110) && Math.random() < 0.7) spawn();
+    if (!REDUCED && packets.length < (window.innerWidth < 760 ? 34 : 100) && Math.random() < 0.7) spawn();
     ctx.globalCompositeOperation = 'lighter';
     for (let i = packets.length - 1; i >= 0; i--) {
       const p = packets[i];
@@ -210,6 +210,8 @@ export function initNet(canvas) {
       ctx.beginPath(); ctx.arc(r.x, r.y, r.r * 0.6, 0, Math.PI * 2); ctx.stroke();
     }
   }, {
+    dpr: window.innerWidth < 760 ? 1 : Math.min(window.devicePixelRatio || 1, 1.5),
+    fps: window.innerWidth < 760 ? 40 : 60,
     onResize: (s) => {
       const mobile = s.w < 900;
       cx = mobile ? s.w * 0.5 : s.w * 0.7;
