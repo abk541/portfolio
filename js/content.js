@@ -2,6 +2,21 @@
 
 export const UI = {
   en: {
+    navHome: 'Home', navProjects: 'Projects', navCareer: 'Career',
+    roleShort: 'Integration & AI Tech Lead',
+    greet: ['Good morning', 'Good afternoon', 'Good evening'], greetName: 'I’m Abdelkader.',
+    k1: 'Mule APIs in production', k1d: '9 business areas', k2: 'MCP servers for AI agents', k2d: 'since 2025', k3: 'CDI mappings shipped', k3d: '14 source systems', k4: 'countries reached', k4d: 'zero downtime',
+    liveTitle: 'Live integration', liveTag: 'Live', liveSub: 'Business systems flowing through the hub to apps, AI agents and analytics. Hover a system to trace it, click to send a burst.',
+    nowTitle: 'Right now', since: 'Since',
+    jobsTitle: 'Master-data jobs in production', jobsTag: '140 jobs', jobsSub: 'Informatica Business 360 jobs by type. Hover a bar.',
+    careerSub: 'From information-systems security to integration, data and AI.',
+    msgTitle: 'Messages', msgSearch: 'Search', online: 'Usually replies within a day', typeHere: 'Write your message…', send: 'Send',
+    open: 'Open', profile: 'Profile', basedOn: 'Open to', roles: 'Tech Lead · Integration Architect · AI on enterprise data',
+    threads: [
+      { id: 'mail', name: 'Email', icon: 'gmail', handle: 'abdelkader.elazzouzi@gmail.com', href: 'mailto:abdelkader.elazzouzi@gmail.com', preview: 'Fastest way to reach me', msgs: ['Hi, thanks for stopping by 👋', 'I’m open to Tech Lead, Integration Architect and AI-on-enterprise-data roles.', 'Email is the fastest way to reach me. Type below and press Send: it opens your mail app with your message ready.'] },
+      { id: 'in', name: 'LinkedIn', icon: 'linkedin', handle: 'Abdelkader El Azzouzi', href: 'https://www.linkedin.com/in/abdelkader-el-azzouzi-7778a5189', preview: 'Let’s connect', msgs: ['My full background and recommendations are on LinkedIn.', 'Feel free to connect or message me there.'] },
+      { id: 'gh', name: 'GitHub', icon: 'github', handle: '@abk541', href: 'https://github.com/abk541', preview: 'Code and side projects', msgs: ['Public code and side projects live on GitHub.', 'Enterprise work is private, but I’m happy to walk you through it.'] },
+    ],
     navWork: 'Work', navExpertise: 'Expertise', navExperience: 'Experience', navContact: 'Contact',
     lang: 'Language', otherLangs: 'Other languages (automatic)', menu: 'Menu', close: 'Close',
     heroEyebrow: 'Integration & AI Tech Lead · Bouygues Construction IT',
@@ -51,6 +66,21 @@ export const UI = {
     email: 'Email me', footer: 'Hand-built, no templates.',
   },
   fr: {
+    navHome: 'Accueil', navProjects: 'Projets', navCareer: 'Parcours',
+    roleShort: 'Tech Lead Intégration & IA',
+    greet: ['Bonjour', 'Bon après-midi', 'Bonsoir'], greetName: 'je suis Abdelkader.',
+    k1: 'API Mule en production', k1d: '9 domaines métier', k2: 'serveurs MCP pour agents IA', k2d: 'depuis 2025', k3: 'mappings CDI livrés', k3d: '14 systèmes sources', k4: 'pays couverts', k4d: 'zéro interruption',
+    liveTitle: 'Intégration en direct', liveTag: 'Direct', liveSub: 'Les systèmes métier circulent par le hub vers les applications, les agents IA et l’analytique. Survolez un système pour le suivre, cliquez pour envoyer une rafale.',
+    nowTitle: 'En ce moment', since: 'Depuis',
+    jobsTitle: 'Jobs de données de référence en production', jobsTag: '140 jobs', jobsSub: 'Jobs Informatica Business 360 par type. Survolez une barre.',
+    careerSub: 'De la sécurité des systèmes d’information à l’intégration, la donnée et l’IA.',
+    msgTitle: 'Messages', msgSearch: 'Rechercher', online: 'Répond en général sous 24 h', typeHere: 'Écrivez votre message…', send: 'Envoyer',
+    open: 'Ouvrir', profile: 'Profil', basedOn: 'Ouvert à', roles: 'Tech Lead · Architecte d’intégration · IA sur données d’entreprise',
+    threads: [
+      { id: 'mail', name: 'E-mail', icon: 'gmail', handle: 'abdelkader.elazzouzi@gmail.com', href: 'mailto:abdelkader.elazzouzi@gmail.com', preview: 'Le plus rapide pour me joindre', msgs: ['Bonjour, merci de votre visite 👋', 'Je suis ouvert aux postes de Tech Lead, Architecte d’intégration et IA sur données d’entreprise.', 'L’e-mail est le moyen le plus rapide. Écrivez ci-dessous puis Envoyer : votre messagerie s’ouvre avec votre message prêt.'] },
+      { id: 'in', name: 'LinkedIn', icon: 'linkedin', handle: 'Abdelkader El Azzouzi', href: 'https://www.linkedin.com/in/abdelkader-el-azzouzi-7778a5189', preview: 'Restons en contact', msgs: ['Mon parcours complet et mes recommandations sont sur LinkedIn.', 'N’hésitez pas à m’ajouter ou à m’écrire là-bas.'] },
+      { id: 'gh', name: 'GitHub', icon: 'github', handle: '@abk541', href: 'https://github.com/abk541', preview: 'Code et projets perso', msgs: ['Le code public et mes projets perso sont sur GitHub.', 'Les projets d’entreprise sont privés, mais je peux vous les présenter.'] },
+    ],
     navWork: 'Projets', navExpertise: 'Expertise', navExperience: 'Parcours', navContact: 'Contact',
     lang: 'Langue', otherLangs: 'Autres langues (automatique)', menu: 'Menu', close: 'Fermer',
     heroEyebrow: 'Tech Lead Intégration & IA · Bouygues Construction IT',
