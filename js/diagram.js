@@ -180,7 +180,7 @@ function buildPills(domains) {
     const id = b.dataset.d || null;
     pinned = id;
     setFocus(id, id ? domains.find((d) => d.id === id) : null);
-    b.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    els.pills.scrollTo({ left: b.offsetLeft - els.pills.clientWidth / 2 + b.offsetWidth / 2, behavior: 'smooth' });
   }));
 }
 

@@ -290,11 +290,11 @@ export const TIMELINE = [
   { y: '2020', t: 'MSc, Information Systems Security', s: 'ENSA Kénitra · 2020 → 2022' },
   { y: '2022', t: 'MuleSoft Integration Consultant', s: 'Bouygues Construction IT · Mule 3 → 4 migration of ~40 HR interfaces' },
   { y: '2023', t: 'Contract-first APIs & first LLM flows', s: 'Salesforce SAPI, ESRI XAPI, Flowise' },
+  { y: 'Since 2023', t: 'AI-enhanced full-stack', s: 'Building apps with AI as a co-pilot: MDM Beam, HEV Dash, CRM/ERP, WebGL sites' },
   { y: '2024', t: 'Data Integration Consultant, Informatica Cloud', s: 'High-volume CDI mappings, legacy XML / PL/SQL modernisation' },
   { y: 'Jul 2024', t: 'Tech Lead, MuleSoft & API Management', s: '120+ APIs, 9 domains, team of 4' },
   { y: 'Jul 2024', t: 'Tech Lead, Reference-data platform (IDMC MDM)', s: 'Business 360, 3 domains, 14 sources, 3 environments' },
   { y: '2025', t: 'Agentic AI on enterprise data', s: 'MCP Bridge PoC → 30 MCP servers in production' },
-  { y: '2026', t: 'AI-enhanced full-stack', s: 'MDM Beam, HEV Dash, CRM/ERP, WebGL sites' },
 ];
 
 // French: merge the translated fields over the English content.

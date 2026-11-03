@@ -41,6 +41,7 @@ const FR_UI = {
   'See it in 60 seconds': 'Comprendre en 60 secondes', 'Technical deep dive': 'Plongée technique',
   'In plain words: MuleSoft connects the company’s apps so data flows on its own; Informatica keeps one correct version of that data.': 'En clair : MuleSoft connecte les applications de l’entreprise pour que les données circulent toutes seules ; Informatica garde une seule version correcte de ces données.',
   'In plain words: employees ask a question in everyday language and get an answer from trusted company data, without the AI ever seeing passwords.': 'En clair : les collaborateurs posent une question en langage courant et obtiennent une réponse issue de données fiables, sans que l’IA ne voie jamais de mot de passe.',
+  'AI architecture': 'Architecture IA',
   // nav
   'Expertise': 'Expertise', 'AI': 'IA', 'Projects': 'Projets', 'Journey': 'Parcours', 'Contact': 'Contact', 'Home': 'Accueil',
   'Language': 'Langue', 'Other languages (automatic)': 'Autres langues (automatique)',
@@ -52,7 +53,9 @@ const FR_UI = {
   'ENTER · EXPLORE · ENTER · EXPLORE ·': 'ENTRER · EXPLORER · ENTRER · EXPLORER ·',
   // hero
   'Tech Lead · Bouygues Construction IT': 'Tech Lead · Bouygues Construction IT',
-  'Systems that': 'Des systèmes', 'talk.': 'qui parlent.',
+  'Your apps,': 'Vos applis,', 'finally connected.': 'enfin connectées.',
+  'Integration & AI Tech Lead · Bouygues Construction IT': 'Tech Lead Intégration & IA · Bouygues Construction IT',
+  'Scroll to browse': 'Faites défiler pour parcourir', 'Swipe to browse': 'Glissez pour parcourir',
   'I connect enterprise systems with': 'Je connecte les systèmes d’entreprise avec',
   'Full-stack apps': 'des apps full-stack', 'Agentic AI': 'l’IA agentique',
   '120+ APIs in production, a group-wide MDM, and 30 MCP servers that let AI agents use real company data.': 'Plus de 120 API en production, un MDM à l’échelle du groupe et 30 serveurs MCP qui donnent aux agents IA accès aux vraies données de l’entreprise.',

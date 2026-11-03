@@ -70,15 +70,18 @@
     <i class="mf-thumb"></i>
   </div>
 
+  <nav class="rail" id="rail" aria-label="Chapters"></nav>
+
   <main id="top">
     <!-- ============ HERO ============ -->
-    <section class="hero" id="hero" data-section="top">
+    <div class="chapter c-hero" data-chap="top">
+    <section class="hero" id="hero">
       <canvas id="net" aria-hidden="true"></canvas>
       <div class="hero-content">
-        <p class="pill"><span class="live"></span> <span data-i18n>Tech Lead · Bouygues Construction IT</span></p>
+        <p class="pill"><span class="live"></span> <span data-i18n>Integration &amp; AI Tech Lead · Bouygues Construction IT</span></p>
         <h2 class="hero-title">
-          <span class="line"><span class="scramble" data-text="Systems that">Systems that</span></span>
-          <span class="line"><span class="scramble outline" data-text="talk.">talk.</span></span>
+          <span class="line"><span class="scramble" data-text="Your apps,">Your apps,</span></span>
+          <span class="line"><span class="scramble outline" data-text="finally connected.">finally connected.</span></span>
         </h2>
         <p class="hero-role">
           <span data-i18n>I connect enterprise systems with</span>
@@ -95,9 +98,11 @@
 
     <!-- ============ TICKER ============ -->
     <div class="ticker" aria-hidden="true"><div class="ticker-track" id="ticker"></div></div>
+    </div>
 
     <!-- ============ STORY (plain language) ============ -->
-    <section class="block story" id="story" data-section="story">
+    <div class="chapter" data-chap="story" id="story">
+    <section class="block story">
       <div class="head">
         <span class="eyebrow" data-i18n>In 60 seconds</span>
         <h2 class="reveal-title" data-i18n>What I actually do</h2>
@@ -139,18 +144,19 @@
     </section>
 
     <!-- ============ IMPACT ============ -->
-    <section class="block" id="impact" data-section="story">
+    <section class="block" id="impact">
       <div class="head">
         <span class="eyebrow" data-i18n>Impact</span>
         <h2 class="reveal-title" data-i18n>Numbers that run in production</h2>
       </div>
       <div class="stats-grid" id="stats-grid"></div>
     </section>
+    </div>
 
     <!-- ============ EXPERTISE ============ -->
-    <section class="block" id="expertise" data-section="expertise">
+    <section class="block chapter" id="expertise" data-chap="expertise">
       <div class="head">
-        <span class="eyebrow" data-i18n>01 · Expertise</span>
+        <span class="eyebrow" data-i18n>Expertise</span>
         <h2 class="reveal-title" data-i18n>Two platforms. One architect.</h2>
         <p class="lede" data-i18n>Pick a platform to see the architecture I designed, a live demo, key results and skills.</p>
         <p class="plain"><span>💡</span><span data-i18n>In plain words: MuleSoft connects the company’s apps so data flows on its own; Informatica keeps one correct version of that data.</span></p>
@@ -214,9 +220,9 @@
     </section>
 
     <!-- ============ AI ============ -->
-    <section class="block ai" id="ai" data-section="ai">
+    <section class="block ai chapter" id="ai" data-chap="ai">
       <div class="head">
-        <span class="eyebrow" data-i18n>02 · AI architecture</span>
+        <span class="eyebrow" data-i18n>AI architecture</span>
         <h2 class="reveal-title" data-i18n>AI that reads the company, safely</h2>
         <p class="lede" data-i18n>MDM Beam answers questions about company data through governed MCP tools. Pick a question and see what happens behind the scenes.</p>
         <p class="plain"><span>💡</span><span data-i18n>In plain words: employees ask a question in everyday language and get an answer from trusted company data, without the AI ever seeing passwords.</span></p>
@@ -250,33 +256,40 @@
     </section>
 
     <!-- ============ PROJECTS ============ -->
-    <section class="block" id="projects" data-section="projects">
+    <section class="block chapter projects" id="projects" data-chap="projects">
+      <div class="h-pin">
       <div class="head">
-        <span class="eyebrow" data-i18n>03 · Projects</span>
+        <span class="eyebrow" data-i18n>Projects</span>
         <h2 class="reveal-title" data-i18n>Everything I've shipped</h2>
         <p class="lede" data-i18n>Enterprise integration, AI assistants, mobile, CRMs and WebGL sites. Tap any card for details.</p>
       </div>
       <div class="filters" id="filters" role="tablist" aria-label="Filter projects"></div>
-      <div class="grid" id="grid"></div>
+      <div class="track-wrap"><div class="grid track" id="grid"></div></div>
+      <div class="track-ui"><span class="track-bar"><span id="track-fill"></span></span><span class="track-hint" data-i18n>Scroll to browse</span></div>
+      </div>
     </section>
 
     <!-- ============ JOURNEY ============ -->
-    <section class="block" id="journey" data-section="journey">
+    <section class="block chapter" id="journey" data-chap="journey">
       <div class="head">
-        <span class="eyebrow" data-i18n>04 · Journey</span>
+        <span class="eyebrow" data-i18n>Journey</span>
         <h2 class="reveal-title" data-i18n>From security to integration to AI</h2>
       </div>
       <div class="tl" id="tl">
-        <span class="tl-rail" aria-hidden="true"><span id="tl-fill"></span></span>
-        <ol class="tl-list" id="tl-list"></ol>
+        <div class="tl-scroller" id="tl-scroller"><ol class="tl-list" id="tl-list"></ol></div>
+        <div class="tl-ctrl">
+          <button type="button" id="tl-prev" aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+          <span class="tl-rail" aria-hidden="true"><span id="tl-fill"></span></span>
+          <button type="button" id="tl-next" aria-label="Next"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+        </div>
       </div>
     </section>
 
     <!-- ============ CONTACT ============ -->
-    <section class="contact" id="contact" data-section="contact">
+    <section class="contact chapter" id="contact" data-chap="contact">
       <canvas id="contact-fx" aria-hidden="true"></canvas>
       <div class="contact-inner">
-        <span class="eyebrow" data-i18n>05 · Contact</span>
+        <span class="eyebrow" data-i18n>Contact</span>
         <h2 class="contact-title"><span class="scramble" data-text="Let's integrate.">Let's integrate.</span></h2>
         <p class="lede" data-i18n-html="contact.lede">Integration architecture, MDM, agentic AI on enterprise data, or a product that needs to exist by next month. English C2 · French C2/C1 · Arabic native.</p>
         <div class="contact-links">

@@ -103,10 +103,10 @@ export const FR = {
     { t: 'Master en sécurité des systèmes d’information', s: 'ENSA Kénitra · 2020 → 2022' },
     { t: 'Consultant Intégration MuleSoft', s: 'Bouygues Construction IT · migration Mule 3 → 4 d’environ 40 interfaces RH' },
     { t: 'API contrat d’abord et premiers flux LLM', s: 'Salesforce SAPI, ESRI XAPI, Flowise' },
+    { y: 'Depuis 2023', t: 'Full-stack augmenté par l’IA', s: 'Des applications construites avec l’IA comme copilote : MDM Beam, HEV Dash, CRM/ERP, sites WebGL' },
     { t: 'Consultant Data Integration, Informatica Cloud', s: 'Mappings CDI à forte volumétrie, modernisation de flux XML et PL/SQL historiques' },
     { y: 'Juil. 2024', t: 'Tech Lead, Intégration MuleSoft & API Management', s: '120+ API, 9 domaines, équipe de 4' },
     { y: 'Juil. 2024', t: 'Tech Lead, Plateforme de données de référence (IDMC MDM)', s: 'Business 360, 3 domaines, 14 sources, 3 environnements' },
     { t: 'IA agentique sur les données d’entreprise', s: 'PoC MCP Bridge → 30 serveurs MCP en production' },
-    { t: 'Full-stack augmenté par l’IA', s: 'MDM Beam, HEV Dash, CRM/ERP, sites WebGL' },
   ],
 };

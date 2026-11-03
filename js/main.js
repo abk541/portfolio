@@ -6,6 +6,7 @@ import { initAI } from './ai.js';
 import { MOTIFS } from './motifs.js';
 import { initIntro } from './intro.js';
 import { initStory } from './story.js';
+import { initDeck, goToChapter, refreshDeck, chapterTop } from './deck.js';
 import { skillInfo } from './skills.js';
 import { LANG, AUTO_LANG, OTHER_LANGS, t, translateDom } from './lang.js';
 
@@ -56,20 +57,9 @@ function initMagnetic(root = document) {
    ===================================================================== */
 function initNav() {
   const nav = $('#nav'), bar = $('#progress');
-  const sections = $$('[data-section]');
-  const links = $$('[data-nav]');
-  let current = '';
   const update = () => {
     nav.classList.toggle('scrolled', scrollY > 20);
     bar.style.width = `${(scrollY / Math.max(1, document.documentElement.scrollHeight - innerHeight)) * 100}%`;
-    const probe = innerHeight * 0.35;
-    let active = 'top';
-    sections.forEach((s) => { if (s.getBoundingClientRect().top <= probe) active = s.dataset.section; });
-    if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) active = 'contact';
-    if (active !== current) {
-      current = active;
-      links.forEach((l) => l.classList.toggle('active', l.dataset.nav === active));
-    }
   };
   addEventListener('scroll', update, { passive: true });
   addEventListener('resize', update);
@@ -264,7 +254,7 @@ function initExpertise() {
   }));
   const onScroll = () => {
     const p = plats.getBoundingClientRect(), s = sec.getBoundingClientRect();
-    mf.classList.toggle('show', p.bottom < 60 && s.bottom > innerHeight * 0.5);
+    mf.classList.toggle('show', document.documentElement.dataset.chapter === 'expertise' && p.bottom < 60 && s.bottom > innerHeight * 0.5);
   };
   addEventListener('scroll', onScroll, { passive: true });
   const saved = store.get('mode');
@@ -321,11 +311,12 @@ function initProjects() {
   filters.addEventListener('click', (e) => {
     const b = e.target.closest('button'); if (!b) return;
     $$('button', filters).forEach((x) => x.setAttribute('aria-selected', String(x === b)));
-    b.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    filters.scrollTo({ left: b.offsetLeft - filters.clientWidth / 2 + b.offsetWidth / 2, behavior: 'smooth' });
     const f = b.dataset.f;
     const cards = $$('.card', grid);
     const show = cards.filter((c) => f === 'all' || c.dataset.cats.split(' ').includes(f));
     cards.forEach((c) => c.classList.toggle('hide', !show.includes(c)));
+    document.dispatchEvent(new Event('projects-filtered'));
     if (anim) gsap.fromTo(show, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.45, stagger: 0.035, ease: 'power3.out', clearProps: 'transform,opacity' });
     ST && ST.refresh();
   });
@@ -378,20 +369,28 @@ function closeModal() {
    Journey
    ===================================================================== */
 function initJourney() {
-  const list = $('#tl-list');
-  list.innerHTML = TIMELINE.map((t) => `<li class="tl-item"><div class="tl-y">${escapeHtml(t.y)}</div><div class="tl-t">${escapeHtml(t.t)}</div><div class="tl-s">${escapeHtml(t.s)}</div></li>`).join('');
-  const tl = $('#tl'), fill = $('#tl-fill');
+  const list = $('#tl-list'), sc = $('#tl-scroller'), fill = $('#tl-fill');
+  list.innerHTML = TIMELINE.map((t, i) => `<li class="tl-item" style="--i:${i}"><span class="tl-dot"></span><div class="tl-y">${escapeHtml(t.y)}</div><div class="tl-t">${escapeHtml(t.t)}</div><div class="tl-s">${escapeHtml(t.s)}</div></li>`).join('');
   const items = $$('.tl-item', list);
   const update = () => {
-    const r = tl.getBoundingClientRect();
-    const k = Math.max(0, Math.min(1, (innerHeight * 0.6 - r.top) / r.height));
-    fill.style.height = `${k * 100}%`;
-    const reach = k * list.offsetHeight;
-    items.forEach((it) => it.classList.toggle('on', it.offsetTop + 20 < reach));
+    const max = Math.max(1, sc.scrollWidth - sc.clientWidth);
+    const k = sc.scrollLeft / max;
+    fill.style.transform = `scaleX(${Math.max(0.04, k).toFixed(3)})`;
+    const edge = sc.scrollLeft + sc.clientWidth * 0.85;
+    items.forEach((it) => it.classList.toggle('on', it.offsetLeft < edge));
   };
-  addEventListener('scroll', update, { passive: true });
+  sc.addEventListener('scroll', update, { passive: true });
+  addEventListener('resize', update);
+  const step = (d) => { const w = items[0] ? items[0].offsetWidth + 16 : 300; sc.scrollBy({ left: d * w, behavior: REDUCED ? 'auto' : 'smooth' }); };
+  $('#tl-prev').addEventListener('click', () => step(-1));
+  $('#tl-next').addEventListener('click', () => step(1));
+  // mouse drag on desktop
+  let down = false, sx = 0, sl = 0;
+  sc.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') return; down = true; sx = e.clientX; sl = sc.scrollLeft; sc.classList.add('drag'); });
+  addEventListener('pointerup', () => { down = false; sc.classList.remove('drag'); });
+  addEventListener('pointermove', (e) => { if (down) sc.scrollLeft = sl - (e.clientX - sx); });
   update();
-  if (anim && ST) gsap.from(items, { y: 24, opacity: 0, duration: 0.6, stagger: 0.05, ease: 'power3.out', scrollTrigger: { trigger: list, start: 'top 88%' } });
+  if (anim && ST) gsap.from(items, { x: 60, opacity: 0, duration: 0.7, stagger: 0.06, ease: 'expo.out', scrollTrigger: { trigger: sc, start: 'top 85%' } });
 }
 
 /* =====================================================================
@@ -439,18 +438,32 @@ initAI();
 initProjects();
 initJourney();
 initContact();
+initDeck();
 initMagnetic();
 initNet($('#net'));
 initSkillPop();
 initMotion();
-const intro = initIntro({ onEnter: (phase) => { if (phase === 'start') setTimeout(heroIn, 550); } });
+const intro = initIntro({ onEnter: (phase) => { if (phase === 'start') setTimeout(heroIn, 550); if (phase === 'done') refreshDeck(); } });
 initLang();
 let restoreY = null;
 try { restoreY = sessionStorage.getItem('restoreY'); sessionStorage.removeItem('restoreY'); } catch { /* ignore */ }
 if (restoreY !== null) {
   intro.skip();
   heroIn();
-  requestAnimationFrame(() => { scrollTo({ top: +restoreY, behavior: 'instant' }); ST && ST.refresh(); });
+  requestAnimationFrame(() => {
+    refreshDeck();
+    // restore by chapter + fraction, so a longer/shorter language lands in the same place
+    const [chap, frac] = String(restoreY).split('|');
+    let y = +chap;
+    if (frac !== undefined) {
+      const ids = ['top', 'story', 'expertise', 'ai', 'projects', 'journey', 'contact'];
+      const i = ids.indexOf(chap);
+      const a = chapterTop(chap), b = i < ids.length - 1 ? chapterTop(ids[i + 1]) : document.documentElement.scrollHeight;
+      y = a + (+frac) * (b - a);
+    }
+    scrollTo({ top: y, behavior: 'instant' });
+    ST && ST.refresh();
+  });
   if (anim) gsap.from('#top', { opacity: 0, duration: 0.6, ease: 'power2.out' });
 } else intro.show();
 $('#brand').addEventListener('click', (e) => { e.preventDefault(); scrollTo({ top: 0, behavior: 'instant' }); intro.show(); });
@@ -559,7 +572,16 @@ async function switchLang({ lang, auto }, e) {
   try {
     localStorage.setItem('lang', lang);
     if (auto) localStorage.setItem('autoLang', auto); else localStorage.removeItem('autoLang');
-    sessionStorage.setItem('restoreY', String(document.getElementById('intro').hidden ? scrollY : 0));
+    let pos = '0';
+    if (document.getElementById('intro').hidden) {
+      const ids = ['top', 'story', 'expertise', 'ai', 'projects', 'journey', 'contact'];
+      let chap = 'top';
+      ids.forEach((id) => { if (chapterTop(id) <= scrollY + 1) chap = id; });
+      const i = ids.indexOf(chap);
+      const a = chapterTop(chap), b = i < ids.length - 1 ? chapterTop(ids[i + 1]) : document.documentElement.scrollHeight;
+      pos = `${chap}|${((scrollY - a) / Math.max(1, b - a)).toFixed(4)}`;
+    }
+    sessionStorage.setItem('restoreY', pos);
   } catch { /* storage blocked: still reload */ }
   setTransCookie(auto ? `/en/${auto}` : '');
   if (!document.getElementById('intro').hidden) { try { sessionStorage.removeItem('restoreY'); } catch { /* */ } }
@@ -584,6 +606,6 @@ function loadAutoTranslate(code) {
 
 // "Technically: …" links from the plain-language story open the right platform
 document.addEventListener('goto-platform', async (e) => {
-  $('#expertise').scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' });
+  goToChapter('expertise');
   if (e.detail !== currentMode) { await wave(e.detail, innerWidth / 2, innerHeight / 2); setMode(e.detail); }
 });
