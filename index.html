@@ -1,324 +1,160 @@
 <!doctype html>
-<html lang="en" data-mode="mule">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Abdelkader El Azzouzi · Integration Architect</title>
-  <meta name="description" content="Tech Lead MuleSoft & Informatica IDMC, integration architect and AI-enhanced full-stack developer. 120+ Mule APIs, 30 MCP servers, group MDM on Business 360." />
-  <meta property="og:title" content="Abdelkader El Azzouzi · Integration Architect" />
-  <meta property="og:description" content="MuleSoft · Informatica IDMC · Agentic AI · Full-stack" />
-  <meta name="theme-color" content="#06070c" />
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2306070c'/%3E%3Ccircle cx='18' cy='20' r='6' fill='%2300a0df'/%3E%3Ccircle cx='46' cy='20' r='6' fill='%23ff4d00'/%3E%3Ccircle cx='32' cy='46' r='6' fill='%23a78bfa'/%3E%3Cpath d='M18 20L46 20L32 46Z' fill='none' stroke='white' stroke-width='2.5'/%3E%3C/svg%3E" />
+  <title>Abdelkader El Azzouzi · Integration & AI Tech Lead</title>
+  <meta name="description" content="Tech Lead MuleSoft & Informatica IDMC at Bouygues Construction IT. 120+ APIs in production, a group-wide master-data platform and 30 MCP servers for AI agents. AI-enhanced full-stack developer since 2023." />
+  <meta property="og:title" content="Abdelkader El Azzouzi · Integration & AI Tech Lead" />
+  <meta property="og:description" content="I connect the software a company runs on, and make AI useful on top of it." />
+  <meta name="theme-color" content="#f4f1ea" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23141414'/%3E%3Ctext x='32' y='42' font-family='Georgia,serif' font-size='28' fill='%23f4f1ea' text-anchor='middle'%3EAE%3C/text%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/site.css" />
 </head>
-<body class="intro-open">
-  <!-- ============ INTRO ============ -->
-  <div id="intro" role="dialog" aria-label="Welcome">
-    <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
-    <canvas id="intro-links" aria-hidden="true"></canvas>
-    <div id="intro-floaters" aria-hidden="true" translate="no"></div>
-    <div class="lang lang-intro"></div>
-    <canvas id="intro-name" aria-hidden="true"></canvas>
-    <h1 class="sr-only">Abdelkader El Azzouzi</h1>
-    <div class="intro-ui">
-      <p class="intro-tag" data-i18n-html="intro.tag"><span class="serif">I make enterprise systems</span> talk to each other.</p>
-      <p class="intro-sub" data-i18n>Integration architect · MuleSoft · Informatica · AI</p>
-      <button class="intro-enter" id="intro-enter" type="button" aria-label="Enter the site">
-        <svg class="ring" viewBox="0 0 100 100" aria-hidden="true"><defs><path id="circ" d="M50,50 m-38,0 a38,38 0 1,1 76,0 a38,38 0 1,1 -76,0"/></defs><text textLength="232" lengthAdjust="spacing"><textPath href="#circ" textLength="232" lengthAdjust="spacing" data-i18n>ENTER · EXPLORE · ENTER · EXPLORE ·</textPath></text></svg>
-        <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14m0 0l-6-6m6 6l6-6"/></svg>
-      </button>
-      <p class="intro-hint" data-i18n>Touch the letters · tap anywhere · then scroll or press Enter</p>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="top" id="top">
+    <div class="wrap top-in">
+      <a href="#hero" class="mark" aria-label="Abdelkader El Azzouzi, home" translate="no"><span class="mono">AE</span><span class="mark-name">Abdelkader El Azzouzi</span></a>
+      <nav class="links" aria-label="Main">
+        <a href="#work" data-k="navWork"></a>
+        <a href="#expertise" data-k="navExpertise"></a>
+        <a href="#experience" data-k="navExperience"></a>
+        <a href="#contact" data-k="navContact"></a>
+      </nav>
+      <div class="lang" id="lang"></div>
+      <button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="sheet"><span></span><span></span></button>
     </div>
-  </div>
-
-  <div id="glow" aria-hidden="true"></div>
-  <div id="wave" aria-hidden="true"></div>
-
-  <!-- ============ NAV ============ -->
-  <header class="nav" id="nav">
-    <a href="#top" class="brand" id="brand" aria-label="Replay the intro">
-      <span class="brand-mark"><i></i><i></i><i></i></span>
-      <span class="brand-name" translate="no">Abdelkader <span class="brand-last">El Azzouzi</span></span>
-    </a>
-    <nav class="nav-links" aria-label="Sections">
-      <a href="#story" data-nav="story" data-i18n>Overview</a>
-      <a href="#expertise" data-nav="expertise" data-i18n>Expertise</a>
-      <a href="#ai" data-nav="ai" data-i18n>AI</a>
-      <a href="#projects" data-nav="projects" data-i18n>Projects</a>
-      <a href="#journey" data-nav="journey" data-i18n>Journey</a>
-    </nav>
-    <div class="lang lang-nav"></div>
-    <a href="#contact" class="nav-cta" data-nav="contact" data-i18n>Contact</a>
-    <span class="nav-progress" aria-hidden="true"><span id="progress"></span></span>
+    <span class="progress" aria-hidden="true"><i id="progress"></i></span>
   </header>
 
-  <!-- ============ MOBILE TAB BAR ============ -->
-  <nav class="tabbar" aria-label="Sections">
-    <a href="#story" data-nav="story"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l5 3.5-5 3.5z"/></svg><span data-i18n>Overview</span></a>
-    <a href="#expertise" data-nav="expertise"><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8 7l3 9M16 7l-3 9M8.5 6h7"/></svg><span data-i18n>Expertise</span></a>
-    <a href="#ai" data-nav="ai"><svg viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg><span data-i18n>AI</span></a>
-    <a href="#projects" data-nav="projects"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg><span data-i18n>Projects</span></a>
-    <a href="#contact" data-nav="contact"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7l8 6 8-6"/></svg><span data-i18n>Contact</span></a>
-  </nav>
-
-  <div class="mode-float" id="mode-float" role="tablist" aria-label="Platform">
-    <button data-mode="mule" type="button" role="tab"><span data-icon="mulesoft"></span>MuleSoft</button>
-    <button data-mode="infa" type="button" role="tab"><span data-icon="informatica"></span>Informatica</button>
-    <i class="mf-thumb"></i>
+  <div class="sheet" id="sheet" hidden>
+    <nav aria-label="Mobile">
+      <a href="#work" data-k="navWork"></a>
+      <a href="#expertise" data-k="navExpertise"></a>
+      <a href="#experience" data-k="navExperience"></a>
+      <a href="#contact" data-k="navContact"></a>
+    </nav>
   </div>
 
-  <nav class="rail" id="rail" aria-label="Chapters"></nav>
-
-  <main id="top">
-    <!-- ============ HERO ============ -->
-    <div class="chapter c-hero" data-chap="top">
+  <main id="main">
+    <!-- HERO -->
     <section class="hero" id="hero">
-      <canvas id="net" aria-hidden="true"></canvas>
-      <div class="hero-content">
-        <p class="pill"><span class="live"></span> <span data-i18n>Integration &amp; AI Tech Lead · Bouygues Construction IT</span></p>
-        <h2 class="hero-title">
-          <span class="line"><span class="scramble" data-text="Your apps,">Your apps,</span></span>
-          <span class="line"><span class="scramble outline" data-text="finally connected.">finally connected.</span></span>
-        </h2>
-        <p class="hero-role">
-          <span data-i18n>I connect enterprise systems with</span>
-          <span class="rotator" id="rotator"><span>MuleSoft</span><span>Informatica</span><span data-i18n>Agentic AI</span><span data-i18n>Full-stack apps</span></span>
-        </p>
-        <p class="hero-sub" data-i18n>120+ APIs in production, a group-wide MDM, and 30 MCP servers that let AI agents use real company data.</p>
-        <div class="hero-cta">
-          <a href="#story" class="btn primary magnetic"><span data-i18n>See it in 60 seconds</span><svg viewBox="0 0 24 24"><path d="M12 5v14m0 0l-6-6m6 6l6-6"/></svg></a>
-          <a href="#expertise" class="btn ghost magnetic"><span data-i18n>Technical deep dive</span></a>
-        </div>
-      </div>
-      <a href="#impact" class="scroll-cue" aria-label="Scroll down"><span></span></a>
-    </section>
-
-    <!-- ============ TICKER ============ -->
-    <div class="ticker" aria-hidden="true"><div class="ticker-track" id="ticker"></div></div>
-    </div>
-
-    <!-- ============ STORY (plain language) ============ -->
-    <div class="chapter" data-chap="story" id="story">
-    <section class="block story">
-      <div class="head">
-        <span class="eyebrow" data-i18n>In 60 seconds</span>
-        <h2 class="reveal-title" data-i18n>What I actually do</h2>
-        <p class="lede" data-i18n>No jargon. Four short steps, then pick your team to see what it changes day to day.</p>
-      </div>
-      <div class="story-wrap">
-        <div class="panel story-stage">
-          <svg id="story-svg" role="img" aria-label="Animated explanation"></svg>
-          <div class="story-badge-row"><div class="story-badge" id="story-badge" aria-hidden="true"></div></div>
-          <span class="story-swipe" aria-hidden="true" data-i18n>Swipe</span>
-        </div>
-        <div class="story-copy">
-          <div class="story-steps" id="story-steps" role="tablist" aria-label="Steps"></div>
-          <div class="story-text" aria-live="polite">
-            <span class="story-num" id="story-num">01 / 04</span>
-            <h3 id="story-title"></h3>
-            <p id="story-body"></p>
-            <a class="story-tech" id="story-tech" href="#expertise" hidden><span></span><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-          </div>
-          <div class="story-nav">
-            <button id="story-prev" type="button"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
-            <button id="story-play" type="button"></button>
-            <button id="story-next" type="button"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow r" data-k="heroEyebrow"></p>
+          <h1 class="hero-title r" data-kh="heroTitle"></h1>
+          <p class="hero-sub r" data-k="heroSub"></p>
+          <div class="cta r">
+            <a href="#work" class="btn solid" data-k="ctaWork"></a>
+            <a href="#contact" class="btn line" data-k="ctaContact"></a>
           </div>
         </div>
+        <figure class="hero-art r" aria-hidden="true"><svg id="hub" viewBox="0 0 420 420"></svg></figure>
       </div>
-
-      <div class="team">
-        <div class="team-head">
-          <h3 data-i18n>What it changes for your team</h3>
-          <p data-i18n>Pick a team: one action on the left, everything it updates automatically on the right.</p>
-        </div>
-        <div class="team-tabs" id="team-tabs" role="tablist" aria-label="Teams"></div>
-        <div class="panel team-stage">
-          <svg id="team-svg" role="img" aria-label="Data flow"></svg>
-        </div>
-        <div class="team-foot"><div class="team-stat" id="team-stat"></div><p class="team-text" id="team-text"></p></div>
+      <div class="wrap">
+        <dl class="stats" id="stats"></dl>
       </div>
     </section>
 
-    <!-- ============ IMPACT ============ -->
-    <section class="block" id="impact">
-      <div class="head">
-        <span class="eyebrow" data-i18n>Impact</span>
-        <h2 class="reveal-title" data-i18n>Numbers that run in production</h2>
-      </div>
-      <div class="stats-grid" id="stats-grid"></div>
-    </section>
-    </div>
-
-    <!-- ============ EXPERTISE ============ -->
-    <section class="block chapter" id="expertise" data-chap="expertise">
-      <div class="head">
-        <span class="eyebrow" data-i18n>Expertise</span>
-        <h2 class="reveal-title" data-i18n>Two platforms. One architect.</h2>
-        <p class="lede" data-i18n>Pick a platform to see the architecture I designed, a live demo, key results and skills.</p>
-        <p class="plain"><span>💡</span><span data-i18n>In plain words: MuleSoft connects the company’s apps so data flows on its own; Informatica keeps one correct version of that data.</span></p>
-      </div>
-
-      <div class="platforms" role="tablist" aria-label="Platform">
-        <button class="platform mule" role="tab" data-mode="mule" aria-selected="true" type="button">
-          <canvas class="platform-fx" aria-hidden="true"></canvas>
-          <span class="platform-logo" data-icon="mulesoft"></span>
-          <span class="platform-text"><b>MuleSoft</b><small data-i18n>API-led integration · since 2022</small></span>
-          <span class="platform-check" aria-hidden="true"></span>
-        </button>
-        <button class="platform infa" role="tab" data-mode="infa" aria-selected="false" type="button">
-          <canvas class="platform-fx" aria-hidden="true"></canvas>
-          <span class="platform-logo" data-icon="informatica"></span>
-          <span class="platform-text"><b>Informatica</b><small data-i18n>IDMC · Business 360 MDM · since 2024</small></span>
-          <span class="platform-check" aria-hidden="true"></span>
-        </button>
-      </div>
-
-      <div class="stage" id="stage">
-        <div class="stage-head">
-          <h3 id="stage-title"></h3>
-          <p class="plain stage-plain"><span>💡</span><span id="stage-plain"></span></p>
-          <p class="lede" id="stage-lede"></p>
+    <!-- WHAT I DO -->
+    <section class="sec" id="what">
+      <div class="wrap">
+        <header class="sec-head">
+          <p class="eyebrow r" data-k="doEyebrow"></p>
+          <h2 class="r" data-k="doTitle"></h2>
+          <p class="lede r" data-k="doLede"></p>
+        </header>
+        <div class="compare r">
+          <div class="seg" role="tablist" id="compare-seg"></div>
+          <div class="compare-stage"><svg id="compare-svg" viewBox="0 0 640 340" role="img"></svg></div>
+          <p class="compare-cap" id="compare-cap" aria-live="polite"></p>
         </div>
-
-        <div class="panel diagram-wrap">
-          <div class="panel-top">
-            <span class="panel-label" data-i18n>Architecture · live traffic</span>
-            <span class="panel-hint" id="diagram-hint">Select a domain to trace it</span>
-          </div>
-          <div class="diagram-fit" id="diagram-fit">
-            <div class="diagram-inner" id="diagram-inner">
-              <div class="diagram-cols" id="diagram-cols"></div>
-              <div class="diagram" id="diagram">
-                <svg id="diagram-svg" aria-hidden="true"></svg>
-                <canvas id="diagram-fx" aria-hidden="true"></canvas>
-                <div class="diagram-nodes" id="diagram-nodes"></div>
-              </div>
-            </div>
-          </div>
-          <div class="pills" id="domain-pills" aria-label="Domains"></div>
-          <div class="diagram-detail" id="diagram-detail"></div>
-        </div>
-
-        <div class="subtabs" role="tablist" aria-label="More">
-          <button role="tab" data-tab="demo" aria-selected="true" type="button" data-i18n>Live demo</button>
-          <button role="tab" data-tab="results" aria-selected="false" type="button" data-i18n>Key results</button>
-          <button role="tab" data-tab="skills" aria-selected="false" type="button" data-i18n>Skills</button>
-        </div>
-        <div class="tabpanes">
-          <div class="pane panel merge-lab" data-pane="demo" id="merge-lab">
-            <div class="merge-copy"></div>
-            <div class="merge-board" id="merge-board"></div>
-          </div>
-          <div class="pane highlights" data-pane="results" id="highlights" hidden></div>
-          <div class="pane panel skills" data-pane="skills" id="skills" hidden></div>
+        <div class="pillars" id="pillars"></div>
+        <div class="team r">
+          <h3 data-k="teamTitle"></h3>
+          <div class="seg seg-wrap" role="tablist" id="team-seg"></div>
+          <div class="team-board" id="team-board"></div>
         </div>
       </div>
     </section>
 
-    <!-- ============ AI ============ -->
-    <section class="block ai chapter" id="ai" data-chap="ai">
-      <div class="head">
-        <span class="eyebrow" data-i18n>AI architecture</span>
-        <h2 class="reveal-title" data-i18n>AI that reads the company, safely</h2>
-        <p class="lede" data-i18n>MDM Beam answers questions about company data through governed MCP tools. Pick a question and see what happens behind the scenes.</p>
-        <p class="plain"><span>💡</span><span data-i18n>In plain words: employees ask a question in everyday language and get an answer from trusted company data, without the AI ever seeing passwords.</span></p>
-      </div>
-
-      <div class="ai-grid">
-        <div class="panel chat" id="chat">
-          <div class="chat-head">
-            <span class="chat-avatar" data-icon="claude"></span>
-            <div><b>MDM Beam</b><small data-i18n>Company-data assistant</small></div>
-            <span class="chat-status"><i></i> <span data-i18n>online</span></span>
-          </div>
-          <div class="chat-body" id="chat-body"></div>
-          <div class="chat-ask">
-            <span class="chat-try" data-i18n>Try a question</span>
-            <div class="chat-chips" id="chat-chips"></div>
-          </div>
-        </div>
-        <div class="panel route">
-          <div class="panel-top"><span class="panel-label" data-i18n>Behind the scenes</span><span class="route-meta" id="route-meta"></span></div>
-          <ol class="hops" id="hops"></ol>
-        </div>
-      </div>
-
-      <div class="principles">
-        <article class="pr"><span class="pr-ic">🔒</span><h4 data-i18n>Secrets stay on the server</h4><p data-i18n>Tokens and keys never reach the browser. They are cached and refreshed before they expire.</p></article>
-        <article class="pr"><span class="pr-ic">⚡</span><h4 data-i18n>Simple first, AI when needed</h4><p data-i18n>Counts and lookups get an instant server-built answer. The model is used only when a question needs interpretation.</p></article>
-        <article class="pr"><span class="pr-ic">🛡️</span><h4 data-i18n>Every tool is a governed API</h4><p data-i18n>Agent tools sit behind Flex Gateway with API keys, rate limits and Splunk traces, like any other consumer.</p></article>
-        <article class="pr"><span class="pr-ic">⏱️</span><h4 data-i18n>Fast by design</h4><p data-i18n>Warm caches at start-up, parallel tool calls and concurrent pagination.</p></article>
+    <!-- EXPERTISE -->
+    <section class="sec alt" id="expertise">
+      <div class="wrap">
+        <header class="sec-head">
+          <p class="eyebrow r" data-k="exEyebrow"></p>
+          <h2 class="r" data-k="exTitle"></h2>
+          <p class="lede r" data-k="exLede"></p>
+        </header>
+        <div class="xtabs r" role="tablist" id="xtabs"></div>
+        <div class="xpanel" id="xpanel"></div>
       </div>
     </section>
 
-    <!-- ============ PROJECTS ============ -->
-    <section class="block chapter projects" id="projects" data-chap="projects">
-      <div class="h-pin">
-      <div class="head">
-        <span class="eyebrow" data-i18n>Projects</span>
-        <h2 class="reveal-title" data-i18n>Everything I've shipped</h2>
-        <p class="lede" data-i18n>Enterprise integration, AI assistants, mobile, CRMs and WebGL sites. Tap any card for details.</p>
-      </div>
-      <div class="filters" id="filters" role="tablist" aria-label="Filter projects"></div>
-      <div class="track-wrap"><div class="grid track" id="grid"></div></div>
-      <div class="track-ui"><span class="track-bar"><span id="track-fill"></span></span><span class="track-hint" data-i18n>Scroll to browse</span></div>
+    <!-- WORK -->
+    <section class="sec" id="work">
+      <div class="wrap">
+        <header class="sec-head">
+          <p class="eyebrow r" data-k="workEyebrow"></p>
+          <h2 class="r" data-k="workTitle"></h2>
+          <p class="lede r" data-k="workLede"></p>
+        </header>
+        <div class="filters r" role="tablist" id="filters"></div>
+        <ul class="works" id="works"></ul>
       </div>
     </section>
 
-    <!-- ============ JOURNEY ============ -->
-    <section class="block chapter" id="journey" data-chap="journey">
-      <div class="head">
-        <span class="eyebrow" data-i18n>Journey</span>
-        <h2 class="reveal-title" data-i18n>From security to integration to AI</h2>
-      </div>
-      <div class="tl" id="tl">
-        <div class="tl-scroller" id="tl-scroller"><ol class="tl-list" id="tl-list"></ol></div>
-        <div class="tl-ctrl">
-          <button type="button" id="tl-prev" aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
-          <span class="tl-rail" aria-hidden="true"><span id="tl-fill"></span></span>
-          <button type="button" id="tl-next" aria-label="Next"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+    <!-- EXPERIENCE -->
+    <section class="sec alt" id="experience">
+      <div class="wrap">
+        <header class="sec-head">
+          <p class="eyebrow r" data-k="xpEyebrow"></p>
+          <h2 class="r" data-k="xpTitle"></h2>
+        </header>
+        <ol class="cv" id="cv"></ol>
+        <div class="cv-side">
+          <div class="r"><h3 data-k="eduTitle"></h3><ul class="plain-list" id="edu"></ul></div>
+          <div class="r"><h3 data-k="langTitle"></h3><ul class="plain-list" id="langs"></ul></div>
         </div>
       </div>
     </section>
 
-    <!-- ============ CONTACT ============ -->
-    <section class="contact chapter" id="contact" data-chap="contact">
-      <canvas id="contact-fx" aria-hidden="true"></canvas>
-      <div class="contact-inner">
-        <span class="eyebrow" data-i18n>Contact</span>
-        <h2 class="contact-title"><span class="scramble" data-text="Let's integrate.">Let's integrate.</span></h2>
-        <p class="lede" data-i18n-html="contact.lede">Integration architecture, MDM, agentic AI on enterprise data, or a product that needs to exist by next month. English C2 · French C2/C1 · Arabic native.</p>
-        <div class="contact-links">
-          <a class="cl magnetic" href="mailto:abdelkader.elazzouzi@gmail.com"><span data-icon="gmail"></span><b data-i18n>Email me</b><em>abdelkader.elazzouzi@gmail.com</em></a>
-          <a class="cl magnetic" href="https://www.linkedin.com/in/abdelkader-el-azzouzi-7778a5189" target="_blank" rel="noopener"><span data-icon="linkedin"></span><b>LinkedIn</b><em data-i18n>Let's connect</em></a>
-          <a class="cl magnetic" href="https://github.com/abk541" target="_blank" rel="noopener"><span data-icon="github"></span><b>GitHub</b><em>@abk541</em></a>
+    <!-- CONTACT -->
+    <section class="sec contact" id="contact">
+      <div class="wrap">
+        <p class="eyebrow r" data-k="ctEyebrow"></p>
+        <h2 class="contact-title r" data-k="ctTitle"></h2>
+        <p class="lede r" data-k="ctLede"></p>
+        <div class="contact-row r">
+          <a class="btn solid big" href="mailto:abdelkader.elazzouzi@gmail.com"><span data-k="email"></span> <span class="arrow">→</span></a>
+          <a class="social" href="https://www.linkedin.com/in/abdelkader-el-azzouzi-7778a5189" target="_blank" rel="noopener" data-icon="linkedin">LinkedIn</a>
+          <a class="social" href="https://github.com/abk541" target="_blank" rel="noopener" data-icon="github">GitHub</a>
         </div>
       </div>
-      <footer class="foot">
+      <footer class="wrap foot">
         <span>© 2026 Abdelkader El Azzouzi</span>
-        <span data-i18n>Hand-built with Canvas, SVG and GSAP</span>
+        <span data-k="footer"></span>
       </footer>
     </section>
   </main>
 
-  <div class="pop" id="pop" role="dialog" aria-modal="false" hidden><button class="pop-x" type="button" aria-label="Close">×</button><b id="pop-t"></b><p id="pop-what"></p><p class="pop-where"><span data-i18n>Where I used it</span><em id="pop-where"></em></p></div>
-
-  <!-- ============ MODAL ============ -->
-  <div class="modal" id="modal" hidden>
-    <div class="modal-backdrop" data-close></div>
-    <article class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-      <button class="modal-close" data-close type="button" aria-label="Close">×</button>
-      <div class="modal-visual"><canvas id="modal-fx"></canvas></div>
-      <div class="modal-body" id="modal-body"></div>
+  <!-- project drawer -->
+  <div class="drawer" id="drawer" hidden>
+    <div class="drawer-bg" data-close></div>
+    <article class="drawer-card" role="dialog" aria-modal="true" aria-labelledby="dr-title" tabindex="-1">
+      <button class="x" type="button" data-close aria-label="Close">×</button>
+      <div id="drawer-body"></div>
     </article>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  <script type="module" src="js/main.js"></script>
+  <!-- skill popover -->
+  <div class="tip" id="tip" role="tooltip" hidden><b id="tip-t"></b><p id="tip-what"></p><p class="tip-where"><span id="tip-wl"></span><em id="tip-where"></em></p></div>
+
+  <script type="module" src="js/app.js"></script>
 </body>
 </html>

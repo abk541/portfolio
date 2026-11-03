@@ -149,10 +149,9 @@ export const SKILL_INFO = {
   'Gaming': ['Games.', 'Teamfight Tactics, of course.'],
 };
 
-import { LANG } from './lang.js';
 import { SKILL_INFO_FR } from './skills.fr.js';
 
-export function skillInfo(name) {
-  if (LANG === 'fr' && SKILL_INFO_FR[name]) return SKILL_INFO_FR[name];
+export function skillInfo(name, lang = 'en') {
+  if (lang === 'fr' && SKILL_INFO_FR[name]) return SKILL_INFO_FR[name];
   return SKILL_INFO[name] || null;
 }
