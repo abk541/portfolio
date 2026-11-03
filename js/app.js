@@ -2,6 +2,7 @@ import { UI, EXPERTISE, EXPERIENCE, EDUCATION, LANGUAGES } from './content.js';
 import { PROJECTS } from './projects.data.js';
 import { skillInfo } from './skills.js';
 import { ICONS } from '../assets/icons.js';
+import { heroFlow, archFlow, teamFlow, cutover, barChart, donutChart } from './fx.js';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -61,6 +62,29 @@ function initLang() {
   }
 }
 
+const X2 = {
+  en: {
+    targets: ['Business apps', 'AI agents', 'Snowflake BI', 'Partners'], hub: ['Integration', 'hub'],
+    muleChart: 'Platform at a glance', muleBars: [['Mule APIs in production', 120, '+'], ['HR interfaces migrated', 40], ['MCP servers for AI agents', 30], ['Flex Gateway proxies', 25, '+']],
+    infaChart: 'Business 360 jobs in production', infaTotal: 'B360 jobs', infaSegs: ['Exports (egress)', 'Ingestion (ingress)', 'Business events', 'Match & merge', 'Other jobs'],
+    aiChart: 'Response time', aiBars: [['Simple question (no AI)', 0.41, ' s'], ['Question that needs AI', 2.1, ' s']],
+    cutTitle: 'Mule 3 → Mule 4, with zero downtime', cutText: 'Proxy APIs sat in front of every legacy flow, so traffic could move interface by interface across 80+ countries. Drag to replay the cut-over.',
+    cutLabel: 'cut-over', cutMeta: (n) => `${n} / 40 interfaces on Mule 4`, cutDone: 'Mule 3 decommissioned ✓', cutLive: 'zero downtime',
+    cutNodes: { src: 'HR consumers', srcSub: '80+ countries', proxy: 'Proxy API', proxySub: 'routing rule', flows: 'flows' },
+  },
+  fr: {
+    targets: ['Applis métier', 'Agents IA', 'Snowflake BI', 'Partenaires'], hub: ['Hub', 'd’intégration'],
+    muleChart: 'La plateforme en chiffres', muleBars: [['API Mule en production', 120, '+'], ['Interfaces RH migrées', 40], ['Serveurs MCP pour agents IA', 30], ['Proxys Flex Gateway', 25, '+']],
+    infaChart: 'Jobs Business 360 en production', infaTotal: 'jobs B360', infaSegs: ['Exports (egress)', 'Ingestion (ingress)', 'Business events', 'Match and merge', 'Autres jobs'],
+    aiChart: 'Temps de réponse', aiBars: [['Question simple (sans IA)', 0.41, ' s'], ['Question qui demande l’IA', 2.1, ' s']],
+    cutTitle: 'Mule 3 → Mule 4, sans interruption', cutText: 'Des API proxy se plaçaient devant chaque flux historique, pour basculer le trafic interface par interface dans plus de 80 pays. Faites glisser pour rejouer la bascule.',
+    cutLabel: 'bascule', cutMeta: (n) => `${n} / 40 interfaces sur Mule 4`, cutDone: 'Mule 3 décommissionné ✓', cutLive: 'zéro interruption',
+    cutNodes: { src: 'Consommateurs RH', srcSub: '80+ pays', proxy: 'API proxy', proxySub: 'règle de routage', flows: 'flux' },
+  },
+};
+const HERO_SOURCES = ['SAP ERP', 'Salesforce', 'Global HR', 'Informatica MDM', 'Hexagon'];
+let heroCtl = null, archCtl = null, teamCtl = null, cutCtl = null;
+
 /* ------------------------------------------------------------------ static text */
 function fillText() {
   document.documentElement.lang = AUTO || lang;
@@ -73,35 +97,10 @@ function fillText() {
 /* ------------------------------------------------------------------ hero hub */
 const HUB_APPS = { en: ['HR', 'Payroll', 'Finance', 'Sales', 'Job sites', 'IT access'], fr: ['RH', 'Paie', 'Finance', 'Commercial', 'Chantiers', 'Accès IT'] };
 function renderHub() {
-  const svg = $('#hub'); svg.innerHTML = '';
-  const C = 210, R = 160;
-  const pts = HUB_APPS[lang].map((_, i) => { const a = -Math.PI / 2 + (i / 6) * Math.PI * 2; return [C + Math.cos(a) * R, C + Math.sin(a) * R]; });
-  svgEl('circle', { cx: C, cy: C, r: R, class: 'hub-ring', 'stroke-dasharray': '2 6' }, svg);
-  pts.forEach(([x, y], i) => {
-    const p = svgEl('path', { d: `M${x},${y} L${C},${C}`, id: `hl${i}`, class: 'hub-line' }, svg);
-    if (!REDUCED) {
-      const L = Math.hypot(x - C, y - C);
-      p.style.strokeDasharray = L; p.style.strokeDashoffset = L;
-      p.style.transition = `stroke-dashoffset .9s cubic-bezier(.22,.8,.24,1) ${0.15 + i * 0.08}s`;
-      requestAnimationFrame(() => requestAnimationFrame(() => { p.style.strokeDashoffset = 0; }));
-      // one data dot per line, travelling in, then out, staggered
-      const dot = svgEl('circle', { r: 3.5, class: 'hub-dot' }, svg);
-      const am = svgEl('animateMotion', { dur: '3.2s', begin: `-${(i * 0.53).toFixed(2)}s`, repeatCount: 'indefinite', keyPoints: i % 2 ? '1;0' : '0;1', keyTimes: '0;1', calcMode: 'linear' }, dot);
-      svgEl('mpath', { href: `#hl${i}` }, am);
-    }
-  });
-  pts.forEach(([x, y], i) => {
-    const g = svgEl('g', { class: 'hub-node' }, svg);
-    svgEl('circle', { cx: x, cy: y, r: 38 }, g);
-    const tx = svgEl('text', { x, y: y + 4.5, 'text-anchor': 'middle' }, g); tx.textContent = HUB_APPS[lang][i];
-  });
-  const core = svgEl('g', { class: 'hub-core' }, svg);
-  svgEl('circle', { cx: C, cy: C, r: 54 }, core);
-  const lines = T.hubLabel.split(' ');
-  const mid = Math.ceil(lines.length / 2);
-  [lines.slice(0, mid).join(' '), lines.slice(mid).join(' ')].filter(Boolean).forEach((l, k, arr) => {
-    const tx = svgEl('text', { x: C, y: C + 5 + (k - (arr.length - 1) / 2) * 16, 'text-anchor': 'middle' }, core); tx.textContent = l;
-  });
+  if (heroCtl) heroCtl.destroy();
+  const c = $('#hero-flow');
+  const fresh = c.cloneNode(false); c.replaceWith(fresh);
+  heroCtl = heroFlow(fresh, { sources: HERO_SOURCES, targets: X2[lang].targets, hub: X2[lang].hub });
 }
 
 /* ------------------------------------------------------------------ stats */
@@ -197,6 +196,9 @@ function showTeam(i, quiet) {
   const res = t.id === 'mgmt' ? T.teamResultMgmt(t.to.length) : T.teamResult(t.to.length);
   board.innerHTML = `<div class="tb-from"><span>${t.id === 'mgmt' ? '⟵' : '⟶'}</span><b>${esc(t.from)}</b></div>
     <div class="tb-to">${t.to.map((x) => `<div class="tb-item"><i>✓</i><span>${esc(x)}</span></div>`).join('')}<p class="tb-res">${esc(res)}</p></div>`;
+  board.insertAdjacentHTML('afterbegin', '<canvas class="team-fx" aria-hidden="true"></canvas>');
+  if (teamCtl) teamCtl.destroy();
+  teamCtl = teamFlow($('.team-fx', board), board);
   const items = $$('.tb-item, .tb-res', board);
   if (REDUCED || quiet === 'instant') { items.forEach((el) => el.classList.add('in')); return; }
   const run = () => items.forEach((el, k) => teamTimers.push(setTimeout(() => el.classList.add('in'), 80 + k * 110)));
@@ -233,6 +235,7 @@ function renderX() {
     body = `<div class="arch">
       <p class="arch-hint">${esc(T.tapDomain)}</p>
       <div class="arch-grid">
+        <canvas class="arch-fx" aria-hidden="true"></canvas>
         <div class="arch-col"><h4>${esc(L.cols[0])}</h4><div class="chips">${X.systems.map((s) => `<span class="chip" data-s="${esc(s)}" translate="no">${esc(s)}</span>`).join('')}</div></div>
         <div class="pipe"><div class="ln"></div><span>${esc(L.links[0])}</span></div>
         <div class="arch-col"><h4>${esc(L.cols[1])}</h4><div class="doms">${X.domains.map((d) => `<button type="button" class="dom" data-d="${d.id}" aria-pressed="false">${esc(d[lang][0])}</button>`).join('')}</div></div>
@@ -241,19 +244,54 @@ function renderX() {
       </div>
       <div class="arch-detail" id="arch-detail" aria-live="polite"></div>
     </div>`;
+    if (xKey === 'mule') {
+      const C = X2[lang];
+      body += `<div class="cut-box"><div><h4>${esc(C.cutTitle)}</h4><p>${esc(C.cutText)}</p>
+        <label class="cut"><span>${esc(C.cutLabel)}</span><input type="range" min="0" max="100" value="0" id="cut" aria-label="${esc(C.cutLabel)}"><b id="cut-v">0%</b></label>
+        <p class="cut-meta" id="cut-meta">${esc(C.cutMeta(0))} · ${esc(C.cutLive)}</p></div><canvas id="cut-fx" aria-hidden="true"></canvas></div>`;
+    }
   }
   panel.innerHTML = `<div class="x-intro"><h3>${esc(L.title)}</h3><p>${esc(L.text)}</p></div>${body}
     <div class="x-cols">
       <div><h4>${esc(T.results)}</h4><ul class="res">${L.results.map(([k, v]) => `<li><b>${esc(k)}</b><span>${esc(v)}</span></li>`).join('')}</ul></div>
-      <div><h4>${esc(T.skills)}</h4><div class="skills">${X.skills.map((s) => `<button type="button" class="sk" data-skill="${esc(s)}" aria-expanded="false" translate="no">${esc(s)}</button>`).join('')}</div></div>
-    </div>`;
+      <div class="chart" id="x-chart"></div>
+    </div>
+    <div class="x-skills"><h4>${esc(T.skills)}</h4><div class="skills">${X.skills.map((s) => `<button type="button" class="sk" data-skill="${esc(s)}" aria-expanded="false" translate="no">${esc(s)}</button>`).join('')}</div></div>`;
+  renderChart();
+  if (archCtl) { archCtl.destroy(); archCtl = null; }
+  if (cutCtl) { cutCtl.destroy(); cutCtl = null; }
   if (xKey === 'ai') {
     $('#ai-seg').onclick = (e) => { const b = e.target.closest('button'); if (b) playAI(+b.dataset.i); };
     playAI(aiFlow, true);
   } else {
     $$('.dom', panel).forEach((b) => b.addEventListener('click', () => { xDom = xDom === b.dataset.d ? null : b.dataset.d; applyDom(); }));
     applyDom();
+    const grid = $('.arch-grid', panel);
+    archCtl = archFlow($('.arch-fx', panel), grid, () => ({
+      domains: X.domains, color: X.color === '#0a8fcc' ? '#4fd1ff' : '#ff8a5c', selected: () => xDom,
+      sysEls: Object.fromEntries($$('.chip', grid).map((e) => [e.dataset.s, e])),
+      domEls: Object.fromEntries($$('.dom', grid).map((e) => [e.dataset.d, e])),
+      conEls: Object.fromEntries($$('.con', grid).map((e) => [+e.dataset.c, e])),
+    }));
+    if (xKey === 'mule') {
+      const C = X2[lang];
+      cutCtl = cutover($('#cut-fx'), $('#cut'), (k) => {
+        $('#cut-v').textContent = `${Math.round(k * 100)}%`;
+        $('#cut-meta').textContent = `${C.cutMeta(Math.round(k * 40))} · ${k >= 1 ? C.cutDone : C.cutLive}`;
+      }, C.cutNodes);
+    }
   }
+}
+function renderChart() {
+  const host = $('#x-chart'), C = X2[lang];
+  if (xKey === 'mule') { host.innerHTML = ''; host.insertAdjacentHTML('beforeend', `<h5>${esc(C.muleChart)}</h5><div></div>`); barChart(host.lastElementChild, C.muleBars, '#4fd1ff'); }
+  else if (xKey === 'infa') {
+    host.innerHTML = `<h5>${esc(C.infaChart)}</h5><div></div>`;
+    const cols = ['#ff8a5c', '#fbbf24', '#4fd1ff', '#8b9bff', '#475569'];
+    donutChart(host.lastElementChild, [39, 36, 32, 21, 12].map((v, i) => [C.infaSegs[i], v, cols[i]]), C.infaTotal);
+  } else { host.innerHTML = `<h5>${esc(C.aiChart)}</h5><div></div>`; barChart(host.lastElementChild, C.aiBars, '#a78bfa'); }
+  const inner = host.lastElementChild;
+  new IntersectionObserver(([e], o) => { if (e.isIntersecting) { o.disconnect(); host.classList.add('go'); } }, { threshold: 0.3 }).observe(inner);
 }
 function applyDom() {
   const X = EXPERTISE[xKey];
