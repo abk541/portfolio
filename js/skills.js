@@ -8,7 +8,7 @@ export const SKILL_INFO = {
   'Mule 3': ['The previous Mule runtime generation.', 'Legacy HR flows I migrated (~40 interfaces, 80+ countries).'],
   'DataWeave': ['MuleSoft’s language for transforming data between formats.', 'Mapping SAP, Salesforce, HR and MDM payloads in every flow.'],
   'API-led connectivity': ['Architecture splitting APIs into System, Process and Experience layers.', 'The backbone of the whole integration platform.'],
-  'API-led': ['System / Process / Experience API layering.', 'Encoded as rules in the Mule Architect assistant.'],
+  'API-led': ['System / Process / Experience API layering.', 'Encoded as rules in the Mule Design GPT assistant.'],
   'RAML': ['A language to describe an API contract before coding it.', 'Design-first contracts, e.g. the Salesforce SAPI and ESRI XAPI.'],
   'OAS': ['OpenAPI Specification, the industry-standard API contract format.', 'Contracts for APIs consumed outside MuleSoft.'],
   'Anypoint Exchange': ['MuleSoft’s catalogue to publish and reuse APIs and assets.', 'Published contracts, templates and the logging connector.'],
@@ -116,7 +116,7 @@ export const SKILL_INFO = {
   'Azure OpenAI': ['OpenAI models hosted on Azure.', 'The MCP Bridge proof of concept.'],
   'MCP': ['Model Context Protocol: a standard way to give AI agents tools.', '30 MCP servers exposing reference data to agents.'],
   'Anypoint MCP': ['MuleSoft’s support for serving APIs as MCP tools.', 'The bridge MDM Beam calls.'],
-  'Prompt engineering': ['Designing instructions that make AI reliable.', 'The Mule Architect spec-writing assistant.'],
+  'Prompt engineering': ['Designing instructions that make AI reliable.', 'The Mule Design GPT spec-writing assistant.'],
   'LangChain': ['Framework for chaining LLM calls and tools.', 'Early agent experiments in 2023.'],
   'LLMs': ['Large language models.', 'From Flowise experiments to production agents.'],
   // ---- Web & mobile

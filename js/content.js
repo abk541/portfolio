@@ -11,9 +11,9 @@ export const UI = {
     jobsTitle: 'Master-data jobs in production', jobsTag: '140 jobs', jobsSub: 'Informatica Business 360 jobs by type. Hover a bar.',
     careerSub: 'From information-systems security to integration, data and AI.',
     msgTitle: 'Messages', msgSearch: 'Search', online: 'Usually replies within a day', typeHere: 'Write your message…', send: 'Send',
-    open: 'Open', profile: 'Profile', basedOn: 'Open to', roles: 'Tech Lead · Integration Architect · AI on enterprise data',
+    open: 'Open', profile: 'Profile', basedOn: 'Open to', roles: 'Tech Lead · Integration · Data · AI on enterprise data',
     threads: [
-      { id: 'mail', name: 'Email', icon: 'gmail', handle: 'abdelkader.elazzouzi@gmail.com', href: 'mailto:abdelkader.elazzouzi@gmail.com', preview: 'Fastest way to reach me', msgs: ['Hi, thanks for stopping by 👋', 'I’m open to Tech Lead, Integration Architect and AI-on-enterprise-data roles.', 'Email is the fastest way to reach me. Type below and press Send: it opens your mail app with your message ready.'] },
+      { id: 'mail', name: 'Email', icon: 'gmail', handle: 'abdelkader.elazzouzi@gmail.com', href: 'mailto:abdelkader.elazzouzi@gmail.com', preview: 'Fastest way to reach me', msgs: ['Hi, thanks for stopping by 👋', 'I’m open to Tech Lead roles in integration, data and AI.', 'Email is the fastest way to reach me. Type below and press Send: it opens your mail app with your message ready.'] },
       { id: 'in', name: 'LinkedIn', icon: 'linkedin', handle: 'Abdelkader El Azzouzi', href: 'https://www.linkedin.com/in/abdelkader-el-azzouzi-7778a5189', preview: 'Let’s connect', msgs: ['My full background and recommendations are on LinkedIn.', 'Feel free to connect or message me there.'] },
       { id: 'gh', name: 'GitHub', icon: 'github', handle: '@abk541', href: 'https://github.com/abk541', preview: 'Code and side projects', msgs: ['Public code and side projects live on GitHub.', 'Enterprise work is private, but I’m happy to walk you through it.'] },
     ],
@@ -62,7 +62,7 @@ export const UI = {
     eduTitle: 'Education', langTitle: 'Languages',
     // contact
     ctEyebrow: 'Contact', ctTitle: 'Let’s talk about your integration, data or AI project.',
-    ctLede: 'Open to Tech Lead, Integration Architect and AI-on-enterprise-data roles. I usually reply within a day.',
+    ctLede: 'Open to Tech Lead roles in integration, data and AI. I usually reply within a day.',
     email: 'Email me', footer: 'Hand-built, no templates.',
   },
   fr: {
@@ -75,9 +75,9 @@ export const UI = {
     jobsTitle: 'Jobs de données de référence en production', jobsTag: '140 jobs', jobsSub: 'Jobs Informatica Business 360 par type. Survolez une barre.',
     careerSub: 'De la sécurité des systèmes d’information à l’intégration, la donnée et l’IA.',
     msgTitle: 'Messages', msgSearch: 'Rechercher', online: 'Répond en général sous 24 h', typeHere: 'Écrivez votre message…', send: 'Envoyer',
-    open: 'Ouvrir', profile: 'Profil', basedOn: 'Ouvert à', roles: 'Tech Lead · Architecte d’intégration · IA sur données d’entreprise',
+    open: 'Ouvrir', profile: 'Profil', basedOn: 'Ouvert à', roles: 'Tech Lead · Intégration · Data · IA sur données d’entreprise',
     threads: [
-      { id: 'mail', name: 'E-mail', icon: 'gmail', handle: 'abdelkader.elazzouzi@gmail.com', href: 'mailto:abdelkader.elazzouzi@gmail.com', preview: 'Le plus rapide pour me joindre', msgs: ['Bonjour, merci de votre visite 👋', 'Je suis ouvert aux postes de Tech Lead, Architecte d’intégration et IA sur données d’entreprise.', 'L’e-mail est le moyen le plus rapide. Écrivez ci-dessous puis Envoyer : votre messagerie s’ouvre avec votre message prêt.'] },
+      { id: 'mail', name: 'E-mail', icon: 'gmail', handle: 'abdelkader.elazzouzi@gmail.com', href: 'mailto:abdelkader.elazzouzi@gmail.com', preview: 'Le plus rapide pour me joindre', msgs: ['Bonjour, merci de votre visite 👋', 'Je suis ouvert aux postes de Tech Lead en intégration, data et IA.', 'L’e-mail est le moyen le plus rapide. Écrivez ci-dessous puis Envoyer : votre messagerie s’ouvre avec votre message prêt.'] },
       { id: 'in', name: 'LinkedIn', icon: 'linkedin', handle: 'Abdelkader El Azzouzi', href: 'https://www.linkedin.com/in/abdelkader-el-azzouzi-7778a5189', preview: 'Restons en contact', msgs: ['Mon parcours complet et mes recommandations sont sur LinkedIn.', 'N’hésitez pas à m’ajouter ou à m’écrire là-bas.'] },
       { id: 'gh', name: 'GitHub', icon: 'github', handle: '@abk541', href: 'https://github.com/abk541', preview: 'Code et projets perso', msgs: ['Le code public et mes projets perso sont sur GitHub.', 'Les projets d’entreprise sont privés, mais je peux vous les présenter.'] },
     ],
@@ -121,7 +121,7 @@ export const UI = {
     present: 'Aujourd’hui', more: 'Voir le détail', less: 'Masquer le détail',
     eduTitle: 'Formation', langTitle: 'Langues',
     ctEyebrow: 'Contact', ctTitle: 'Parlons de votre projet d’intégration, de données ou d’IA.',
-    ctLede: 'Ouvert aux postes de Tech Lead, Architecte d’intégration et IA sur données d’entreprise. Je réponds en général sous 24 h.',
+    ctLede: 'Ouvert aux postes de Tech Lead en intégration, data et IA. Je réponds en général sous 24 h.',
     email: 'Écrivez-moi', footer: 'Fait main, sans template.',
   },
 };

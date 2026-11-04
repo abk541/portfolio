@@ -242,8 +242,8 @@ export const PROJECTS = [
       "Azure AD"
     ],
     "en": {
-      "title": "Mule Architect GPT",
-      "kicker": "An AI solution architect, prompt-engineered",
+      "title": "Mule Design GPT",
+      "kicker": "An AI assistant for Mule solution design, prompt-engineered",
       "summary": "A specialised assistant that writes detailed API-led technical and functional specifications, constrained by the team's own standards: Flow / Process / System API split, reuse-first, Azure AD everywhere, private SAPIs.",
       "points": [
         "Encodes the house reference architecture as rules",
@@ -252,8 +252,8 @@ export const PROJECTS = [
       ]
     },
     "fr": {
-      "title": "Mule Architect GPT",
-      "kicker": "Un architecte solution IA, guidé par prompt",
+      "title": "Mule Design GPT",
+      "kicker": "Un assistant IA de conception Mule, guidé par prompt",
       "summary": "Un assistant spécialisé qui rédige des spécifications techniques et fonctionnelles API-led détaillées, dans le respect des standards de l’équipe : découpage Flow / Process / System API, réutilisation d’abord, Azure AD partout, SAPI privées.",
       "points": [
         "Encode l’architecture de référence maison sous forme de règles",

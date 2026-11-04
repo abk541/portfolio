@@ -19,6 +19,9 @@ const store = {
   set: (k, v) => { try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch { /* private mode */ } },
 };
 document.documentElement.classList.add('js');
+const PC = { mule: '#22a6f0', infa: '#ff7a3d', ai: '#a78bfa' };
+const CAT_COL = { ai: PC.ai, mule: PC.mule, infa: PC.infa, web: '#34d399', mobile: '#f472b6', data: '#22d3ee', archive: '#fbbf24' };
+const ICON_COL = { mulesoft: PC.mule, informatica: PC.infa, claude: PC.ai };
 
 /* ------------------------------------------------------------------ language */
 const OTHER = [['es', 'Español'], ['de', 'Deutsch'], ['it', 'Italiano'], ['pt', 'Português'], ['nl', 'Nederlands'], ['ar', 'العربية'], ['tr', 'Türkçe'], ['pl', 'Polski'], ['zh-CN', '中文'], ['ja', '日本語']];
@@ -69,7 +72,6 @@ document.addEventListener('click', (e) => {
   if (box && !box.contains(e.target)) { const m = $('.lang-menu', box); if (m && !m.hidden) { m.hidden = true; $('.lang-btn', box).setAttribute('aria-expanded', 'false'); } }
 });
 
-/* ------------------------------------------------------------------ chart & flow strings */
 const X2 = {
   en: {
     targets: ['Business apps', 'AI agents', 'Snowflake BI', 'Partners'], hub: ['Integration', 'hub'],
@@ -96,57 +98,32 @@ const HERO_SOURCES = ['SAP ERP', 'Salesforce', 'Global HR', 'Informatica MDM', '
 const HUB_APPS = { en: ['HR', 'Payroll', 'Finance', 'Sales', 'Job sites', 'IT access'], fr: ['RH', 'Paie', 'Finance', 'Commercial', 'Chantiers', 'Accès IT'] };
 let heroCtl = null, archCtl = null, teamCtl = null, cutCtl = null, ddCtl = null;
 
-/* ------------------------------------------------------------------ text + word-split titles */
-function splitWords(el) {
-  if (AUTO) return; // keep sentences whole so automatic translation can read them
-  let i = 0;
-  const walk = (node) => {
-    [...node.childNodes].forEach((n) => {
-      if (n.nodeType === 3) {
-        const frag = document.createDocumentFragment();
-        n.textContent.split(/(\s+)/).forEach((part) => {
-          if (!part) return;
-          if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(part)); return; }
-          const w = document.createElement('span'); w.className = 'w';
-          const s = document.createElement('span'); s.textContent = part; s.style.setProperty('--d', `${Math.min(i++ * 0.045, 0.7).toFixed(3)}s`);
-          w.appendChild(s); frag.appendChild(w);
-        });
-        n.replaceWith(frag);
-      } else if (n.nodeType === 1) walk(n);
-    });
-  };
-  walk(el);
-  el.classList.add('armed');
-}
+/* ------------------------------------------------------------------ text */
 function fillText() {
   document.documentElement.lang = AUTO || lang;
   $$('[data-k]').forEach((el) => { const v = T[el.dataset.k]; if (typeof v === 'string') el.textContent = v; });
   $$('[data-kh]').forEach((el) => { el.innerHTML = T[el.dataset.kh]; });
   $$('[data-nav]').forEach((el) => { el.textContent = T.nav.find((n) => n[0] === el.dataset.nav)[1]; });
-  $$('.split').forEach(splitWords);
+  $$('[data-icon]').forEach((el) => { if (!el.querySelector('svg')) el.insertAdjacentHTML('afterbegin', icon(el.dataset.icon)); });
   $('#msg').placeholder = T.placeholder;
-  if (matchMedia('(hover: none)').matches) $('[data-k="tryIt"]').textContent = T.tryItTouch;
-  $('.band').setAttribute('aria-label', `${T.from} → ${T.via} → ${T.to}`);
+  $('#try-it').textContent = matchMedia('(hover: none)').matches ? T.tryItTouch : T.tryIt;
 }
 
 /* ------------------------------------------------------------------ nav */
+let current = '';
 function renderNav() {
-  const links = T.nav.map(([id, l], i) => `<a href="#${id}" data-sec="${id}"><span class="n">${pad(i + 1)}</span>${esc(l)}</a>`).join('');
-  $('#nav-links').innerHTML = links;
-  $('#sheet-links').innerHTML = T.nav.map(([id, l], i) => `<a href="#${id}" data-sec="${id}" style="--d:${(0.05 + i * 0.04).toFixed(2)}s"><span class="n">${pad(i + 1)}</span>${esc(l)}</a>`).join('');
+  $('#nav-links').innerHTML = T.nav.map(([id, l]) => `<a href="#${id}" data-sec="${id}">${esc(l)}</a>`).join('');
+  $('#sheet-links').innerHTML = T.nav.map(([id, l]) => `<a href="#${id}" data-sec="${id}">${esc(l)}</a>`).join('');
   markNav();
 }
-let current = '';
-function markNav() {
-  $$('[data-sec]').forEach((a) => { const on = a.dataset.sec === current; a.classList.toggle('on', on); on ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current'); });
-}
+function markNav() { $$('[data-sec]').forEach((a) => { const on = a.dataset.sec === current; a.classList.toggle('on', on); on ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current'); }); }
 function toggleSheet(open) {
   const sheet = $('#sheet'), btn = $('#menu-btn');
   btn.setAttribute('aria-expanded', String(open));
-  $('span', btn).textContent = open ? T.close : T.menu;
+  btn.setAttribute('aria-label', open ? T.close : T.menu);
   document.body.classList.toggle('lock', open);
   if (open) { sheet.hidden = false; requestAnimationFrame(() => requestAnimationFrame(() => sheet.classList.add('open'))); }
-  else { sheet.classList.remove('open'); setTimeout(() => { if (!sheet.classList.contains('open')) sheet.hidden = true; }, REDUCED ? 0 : 350); }
+  else { sheet.classList.remove('open'); setTimeout(() => { if (!sheet.classList.contains('open')) sheet.hidden = true; }, REDUCED ? 0 : 260); }
 }
 
 /* ------------------------------------------------------------------ hero */
@@ -156,29 +133,46 @@ function renderHub() {
   const fresh = c.cloneNode(false); c.replaceWith(fresh);
   heroCtl = heroFlow(fresh, { sources: HERO_SOURCES, targets: X2[lang].targets, hub: X2[lang].hub, compact: PHONE() });
 }
-let numbersDone = false;
-function renderNumbers() {
-  const box = $('#numbers');
-  box.innerHTML = T.numbers.map(([n, sfx, l], i) => `<div class="rv" style="--d:${i * 0.08}s"><dt>${esc(l)}</dt><dd><span data-n="${n}">${numbersDone || REDUCED ? n : 0}</span>${sfx ? `<sup>${sfx}</sup>` : ''}</dd></div>`).join('');
-  if (numbersDone || REDUCED) return;
+const KPI_META = [
+  ['#4f8cff', 'M4 7h16M4 12h16M4 17h10', [8, 14, 12, 22, 30, 42, 60, 78, 96, 120]],
+  [PC.ai, 'M12 3l2.2 5.8L20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2z', [0, 1, 2, 4, 6, 9, 14, 19, 25, 30]],
+  [PC.infa, 'M4 6c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3zm0 0v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6', [10, 22, 30, 52, 70, 88, 104, 118, 130, 140]],
+  ['#34d399', 'M12 3a9 9 0 100 18 9 9 0 000-18zm-9 9h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3', [12, 20, 26, 34, 41, 50, 58, 66, 74, 80]],
+];
+function spark(vals, col, id) {
+  const max = Math.max(...vals), W = 96, H = 36;
+  const pts = vals.map((v, i) => [(i / (vals.length - 1)) * W, H - 3 - (v / max) * (H - 6)]);
+  const d = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+  return `<svg class="spark" viewBox="0 0 ${W} ${H}" aria-hidden="true"><defs><linearGradient id="sg${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".35"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></linearGradient></defs><path d="${d} L${W},${H} L0,${H} Z" fill="url(#sg${id})"/><path class="sp-line" d="${d}" fill="none" stroke="${col}" stroke-width="2" stroke-linecap="round" pathLength="1"/></svg>`;
+}
+let kpiDone = false;
+function renderKpis() {
+  const box = $('#kpis');
+  box.innerHTML = T.kpis.map(([n, sfx, l, d], i) => { const [col, ic, vals] = KPI_META[i]; return `<article class="card kpi" style="--c:${col}">
+      <div class="kpi-top"><span class="kpi-ic"><svg viewBox="0 0 24 24"><path d="${ic}"/></svg></span><span class="kpi-d">${esc(d)}</span></div>
+      <div class="kpi-row"><b class="kpi-v"><span data-n="${n}">${kpiDone || REDUCED ? n : 0}</span>${sfx}</b>${spark(vals, col, i)}</div>
+      <p class="kpi-l">${esc(l)}</p></article>`; }).join('');
+  if (kpiDone || REDUCED) { box.classList.add('go'); return; }
   const io = new IntersectionObserver(([e]) => {
     if (!e.isIntersecting) return;
-    io.disconnect(); numbersDone = true;
+    io.disconnect(); kpiDone = true; box.classList.add('go');
     $$('[data-n]', box).forEach((el, i) => {
-      const target = +el.dataset.n, t0 = performance.now() + 150 + i * 90;
-      const step = (now) => { const k = Math.max(0, Math.min(1, (now - t0) / 1400)); el.textContent = Math.round(target * (1 - Math.pow(1 - k, 4))); if (k < 1) requestAnimationFrame(step); };
+      const target = +el.dataset.n, t0 = performance.now() + i * 80;
+      const step = (now) => { const k = Math.max(0, Math.min(1, (now - t0) / 1200)); el.textContent = Math.round(target * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(step); };
       requestAnimationFrame(step);
     });
-  }, { threshold: 0.4 });
+  }, { threshold: 0.3 });
   io.observe(box);
 }
 
-/* ------------------------------------------------------------------ 01 profile */
-function renderProfile() {
+/* ------------------------------------------------------------------ about */
+const PILLAR_KEYS = ['mule', 'infa', 'ai'];
+function renderAbout() {
   $('#facts').innerHTML = T.facts.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('');
-  $('#pillars').innerHTML = T.pillars.map((p, i) => `<li class="rv" style="--d:${i * 0.1}s"><p class="n mono"><span>${pad(i + 1)}</span><b>${esc(p.p)}</b></p><h3>${esc(p.k)}</h3><p>${esc(p.t)}</p></li>`).join('');
+  $('#pillars').innerHTML = T.pillars.map((p, i) => { const k = PILLAR_KEYS[i]; return `<article class="card pillar rv" style="--c:${PC[k]};--d:${i * 0.08}s">
+      <div class="p-top"><span class="p-ic">${icon(EXPERTISE[k].icon)}</span><div><h3>${esc(p.k)}</h3><small>${esc(p.p)}</small></div></div>
+      <p>${esc(p.t)}</p></article>`; }).join('');
 }
-
 let compareState = 'before', compareAuto = false;
 function renderCompare() {
   const seg = $('#compare-seg');
@@ -195,19 +189,19 @@ function renderCompare() {
     svgEl('path', { d: `M${x1},${y1} Q${(x1 + x2) / 2 + bend},${(y1 + y2) / 2 - bend} ${x2},${y2}`, class: 'cmp-mess' }, gMess);
   });
   const warnTxt = lang === 'fr' ? ['ressaisie', 'copie divergente', 'erreur'] : ['re-typed', 'out of sync', 'error'];
-  [[230, 128], [420, 212], [404, 120]].forEach(([x, y], i) => { const t = svgEl('text', { x, y, class: 'cmp-warn', 'text-anchor': 'middle' }, gMess); t.textContent = '× ' + warnTxt[i]; });
+  [[230, 128], [420, 212], [404, 120]].forEach(([x, y], i) => { const t = svgEl('text', { x, y, class: 'cmp-warn', 'text-anchor': 'middle' }, gMess); t.textContent = '⚠ ' + warnTxt[i]; });
   const gLinks = svgEl('g', { id: 'cmp-links' }, svg);
   P.forEach(([x, y], i) => {
     svgEl('path', { d: `M${x},${y} L${C[0]},${C[1]}`, id: `cl${i}`, class: 'cmp-link' }, gLinks);
     if (!REDUCED) {
-      const d = svgEl('circle', { r: 3, class: 'cmp-dot' }, gLinks);
-      const am = svgEl('animateMotion', { dur: '2.4s', begin: `-${(i * 0.4).toFixed(2)}s`, repeatCount: 'indefinite', keyPoints: i % 2 ? '1;0' : '0;1', keyTimes: '0;1', calcMode: 'linear' }, d);
+      const d = svgEl('circle', { r: 3.5, class: 'cmp-dot' }, gLinks);
+      const am = svgEl('animateMotion', { dur: '2.2s', begin: `-${(i * 0.37).toFixed(2)}s`, repeatCount: 'indefinite', keyPoints: i % 2 ? '1;0' : '0;1', keyTimes: '0;1', calcMode: 'linear' }, d);
       svgEl('mpath', { href: `#cl${i}` }, am);
     }
   });
   const hub = svgEl('g', { class: 'cmp-hub', id: 'cmp-hub' }, svg);
-  svgEl('rect', { x: C[0] - 70, y: C[1] - 20, width: 140, height: 40 }, hub);
-  const ht = svgEl('text', { x: C[0], y: C[1] + 4, 'text-anchor': 'middle' }, hub); ht.textContent = T.hubLabel;
+  svgEl('rect', { x: C[0] - 70, y: C[1] - 22, width: 140, height: 44, rx: 22 }, hub);
+  const ht = svgEl('text', { x: C[0], y: C[1] + 5, 'text-anchor': 'middle' }, hub); ht.textContent = T.hubLabel;
   P.forEach(([x, y], i) => {
     const g = svgEl('g', { class: 'cmp-app' }, svg);
     svgEl('circle', { cx: x, cy: y, r: 34 }, g);
@@ -215,7 +209,7 @@ function renderCompare() {
   });
   setCompare(compareState);
   if (!compareAuto && !REDUCED) {
-    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { io.disconnect(); setTimeout(() => { if (!compareAuto) { compareAuto = true; setCompare('after'); } }, 2000); } }, { threshold: 0.6 });
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { io.disconnect(); setTimeout(() => { if (!compareAuto) { compareAuto = true; setCompare('after'); } }, 1800); } }, { threshold: 0.6 });
     io.observe(svg);
   }
 }
@@ -228,7 +222,6 @@ function setCompare(s) {
   const hub = $('#cmp-hub'); hub.style.opacity = after ? 1 : 0; hub.style.transform = after ? 'scale(1)' : 'scale(.6)';
   $('#compare-cap').textContent = after ? T.afterCaption : T.beforeCaption;
 }
-
 let teamIdx = 0, teamTimers = [];
 function renderTeams() {
   const seg = $('#team-seg');
@@ -244,41 +237,29 @@ function showTeam(i, quiet) {
   $$('#team-seg button').forEach((b, k) => b.setAttribute('aria-selected', String(k === i)));
   const board = $('#team-board');
   const res = t.id === 'mgmt' ? T.teamResultMgmt(t.to.length) : T.teamResult(t.to.length);
-  board.innerHTML = `<canvas class="team-fx" aria-hidden="true"></canvas><div class="tb-from"><span>${t.id === 'mgmt' ? '← 1' : '1 →'}</span><b>${esc(t.from)}</b></div>
+  board.innerHTML = `<canvas class="team-fx" aria-hidden="true"></canvas><div class="tb-from"><span>${t.id === 'mgmt' ? '⟵' : '⟶'}</span><b>${esc(t.from)}</b></div>
     <div class="tb-to">${t.to.map((x) => `<div class="tb-item"><i>✓</i><span>${esc(x)}</span></div>`).join('')}<p class="tb-res">${esc(res)}</p></div>`;
   if (teamCtl) teamCtl.destroy();
-  teamCtl = teamFlow($('.team-fx', board), board, THEME.accent);
+  teamCtl = teamFlow($('.team-fx', board), board, '#34d399');
   const items = $$('.tb-item, .tb-res', board);
   if (REDUCED) { items.forEach((el) => el.classList.add('in')); return; }
-  const run = () => items.forEach((el, k) => teamTimers.push(setTimeout(() => el.classList.add('in'), 120 + k * 120)));
-  if (quiet) {
-    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { io.disconnect(); run(); } }, { threshold: 0.4 });
-    io.observe(board);
-  } else run();
+  const run = () => items.forEach((el, k) => teamTimers.push(setTimeout(() => el.classList.add('in'), 100 + k * 110)));
+  if (quiet) { const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { io.disconnect(); run(); } }, { threshold: 0.4 }); io.observe(board); }
+  else run();
 }
 
-/* ------------------------------------------------------------------ 02 practice */
+/* ------------------------------------------------------------------ expertise */
 let xKey = 'mule', xDom = null, aiFlow = 0, aiTimers = [];
 const xName = (k) => (k === 'ai' ? (lang === 'fr' ? 'IA' : 'AI') : EXPERTISE[k].name);
 function renderXTabs() {
   const tabs = $('#xtabs');
-  tabs.innerHTML = Object.entries(EXPERTISE).map(([k, x], i) => `<button role="tab" type="button" data-x="${k}" aria-controls="xpanel" id="tab-${k}">
-      <span class="pl-top"><span>${pad(i + 1)}</span><span>${esc(T.since[k])}</span></span>
-      <span class="pl-n">${icon(x.icon)}<span translate="no">${esc(xName(k))}</span></span>
-      <span class="pl-d">${esc(x[lang].tab)}</span></button>`).join('');
-  tabs.onclick = (e) => {
-    const b = e.target.closest('button'); if (!b || b.dataset.x === xKey) return;
-    xKey = b.dataset.x; xDom = null; renderX(true);
-    const top = $('#practice .practice').getBoundingClientRect().top;
-    if (top < 0) scrollTo({ top: scrollY + top - (PHONE() ? 120 : 100), behavior: REDUCED ? 'auto' : 'smooth' });
-  };
+  tabs.innerHTML = Object.entries(EXPERTISE).map(([k, x]) => `<button role="tab" type="button" data-x="${k}" id="tab-${k}" aria-controls="xpanel" style="--c:${PC[k]}">
+      <span class="xt-ic">${icon(x.icon)}</span><span><b translate="no">${esc(xName(k))}</b><small>${esc(x[lang].tab)}</small><em>${esc(T.since[k])}</em></span></button>`).join('');
+  tabs.onclick = (e) => { const b = e.target.closest('button'); if (b && b.dataset.x !== xKey) { xKey = b.dataset.x; xDom = null; renderX(true); } };
   tabs.onkeydown = (e) => {
     const keys = Object.keys(EXPERTISE), i = keys.indexOf(xKey);
-    const d = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key];
-    if (!d) return;
-    e.preventDefault();
-    xKey = keys[(i + d + keys.length) % keys.length]; xDom = null; renderX(true);
-    $(`#tab-${xKey}`).focus();
+    const d = { ArrowRight: 1, ArrowLeft: -1 }[e.key]; if (!d) return;
+    e.preventDefault(); xKey = keys[(i + d + keys.length) % keys.length]; xDom = null; renderX(true); $(`#tab-${xKey}`).focus();
   };
   renderX();
 }
@@ -286,19 +267,20 @@ function renderX(swap) {
   $$('#xtabs button').forEach((b) => { const on = b.dataset.x === xKey; b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1; });
   const X = EXPERTISE[xKey], L = X[lang], C = X2[lang];
   const panel = $('#xpanel');
+  panel.style.setProperty('--c', PC[xKey]);
   panel.setAttribute('aria-labelledby', `tab-${xKey}`);
   if (swap) { panel.classList.remove('swap'); void panel.offsetWidth; panel.classList.add('swap'); }
+  const pillar = T.pillars[PILLAR_KEYS.indexOf(xKey)];
   let body = '';
   if (xKey === 'ai') {
-    body = `<div class="blk"><div class="blk-h"><span class="mono">${esc(C.walk)}</span><span class="mono">MDM Beam</span></div><div class="ai-box">
-      <div class="toggle" role="tablist" id="ai-seg">${L.flows.map((f, i) => `<button role="tab" type="button" data-i="${i}">${esc(i ? T.aiSmart : T.aiFast)}</button>`).join('')}</div>
+    body = `<article class="card"><div class="card-h"><h3>${esc(C.walk)} · MDM Beam</h3></div><div class="ai-box">
+      <div class="seg" role="tablist" id="ai-seg">${L.flows.map((f, i) => `<button role="tab" type="button" data-i="${i}">${esc(i ? T.aiSmart : T.aiFast)}</button>`).join('')}</div>
       <div class="ai-q"><p class="bubble" id="ai-q"></p></div>
       <ol class="ai-steps" id="ai-steps"></ol>
-      <div class="ai-a" id="ai-a" aria-live="polite"></div>
-    </div></div>`;
+      <div class="ai-a" id="ai-a" aria-live="polite"></div></div></article>`;
   } else {
     const cons = X.consumers[lang];
-    body = `<div class="blk arch"><div class="blk-h"><span class="mono">${esc(C.arch)}</span><span class="mono">${esc(T.tapDomain)}</span></div>
+    body = `<article class="card"><div class="card-h"><h3>${esc(C.arch)}</h3><span class="arch-hint">👆 ${esc(T.tapDomain)}</span></div>
       <div class="arch-grid">
         <canvas class="arch-fx" aria-hidden="true"></canvas>
         <div class="arch-col"><h4>${esc(L.cols[0])}</h4><div class="chips">${X.systems.map((s) => `<span class="chip" data-s="${esc(s)}" translate="no">${esc(s)}</span>`).join('')}</div></div>
@@ -307,23 +289,25 @@ function renderX(swap) {
         <div class="pipe"><span>${esc(L.links[1])}</span></div>
         <div class="arch-col"><h4>${esc(L.cols[2])}</h4><div class="cons">${cons.map((c, i) => `<div class="con" data-c="${i}">${esc(c)}</div>`).join('')}</div></div>
       </div>
-      <div class="arch-detail" id="arch-detail" aria-live="polite"></div>
-    </div>`;
+      <div class="arch-detail" id="arch-detail" aria-live="polite"></div></article>`;
     if (xKey === 'mule') {
-      body += `<div class="blk"><div class="blk-h"><span class="mono">${esc(C.cutTitle)}</span><span class="mono">2022 – 2024</span></div><div class="cut-box"><div><p>${esc(C.cutText)}</p>
+      body += `<article class="card"><div class="cut-box"><div><h4>${esc(C.cutTitle)}</h4><p>${esc(C.cutText)}</p>
         <label class="cut"><span>${esc(C.cutLabel)}</span><input type="range" min="0" max="100" value="0" id="cut" aria-label="${esc(C.cutLabel)}"><b id="cut-v">0%</b></label>
-        <p class="cut-meta" id="cut-meta">${esc(C.cutMeta(0))} · ${esc(C.cutLive)}</p></div><canvas id="cut-fx" aria-hidden="true"></canvas></div></div>`;
+        <p class="cut-meta" id="cut-meta">${esc(C.cutMeta(0))} · ${esc(C.cutLive)}</p></div><canvas id="cut-fx" aria-hidden="true"></canvas></div></article>`;
     }
   }
-  panel.innerHTML = `<div class="x-intro"><h3>${esc(L.title)}</h3><p>${esc(L.text)}</p></div>${body}
-    <div class="blk"><div class="blk-h"><span class="mono">${esc(T.results)}</span><span class="mono">${esc(C.proof)}</span></div>
-      <div class="x-cols"><ul class="res">${L.results.map(([k, v]) => `<li><b>${esc(k)}</b><span>${esc(v)}</span></li>`).join('')}</ul><div class="chart" id="x-chart"></div></div></div>
-    <div class="blk"><div class="blk-h"><span class="mono">${esc(T.skills)}</span><span class="mono">${X.skills.length}</span></div>
-      <div class="skills">${X.skills.map((s) => `<button type="button" class="sk" data-skill="${esc(s)}" aria-expanded="false" translate="no">${esc(s)}</button>`).join('')}</div></div>`;
+  panel.innerHTML = `<div class="x-top">
+      <article class="card plain-box"><span class="tag">${esc(T.plainLabel)}</span><p>${esc(pillar.t)}</p></article>
+      <article class="card x-intro"><span class="tag">${esc(T.techLabel)}</span><h3>${esc(L.title)}</h3><p>${esc(L.text)}</p></article>
+    </div>${body}
+    <div class="x-cols">
+      <article class="card"><div class="card-h"><h3>${esc(T.results)}</h3></div><ul class="res">${L.results.map(([k, v]) => `<li><b>${esc(k)}</b><span>${esc(v)}</span></li>`).join('')}</ul></article>
+      <article class="card chart" id="x-chart"></article>
+    </div>
+    <article class="card"><div class="card-h"><h3>${esc(T.skills)}</h3><span class="arch-hint">${X.skills.length}</span></div>
+      <div class="skills">${X.skills.map((s) => `<button type="button" class="sk" data-skill="${esc(s)}" aria-expanded="false" translate="no">${esc(s)}</button>`).join('')}</div></article>`;
   renderChart();
-  if (archCtl) { archCtl.destroy(); archCtl = null; }
-  if (cutCtl) { cutCtl.destroy(); cutCtl = null; }
-  if (ddCtl) { ddCtl.destroy(); ddCtl = null; }
+  [archCtl, cutCtl, ddCtl].forEach((c) => c && c.destroy()); archCtl = cutCtl = ddCtl = null;
   if (xKey === 'ai') {
     $('#ai-seg').onclick = (e) => { const b = e.target.closest('button'); if (b) playAI(+b.dataset.i); };
     playAI(aiFlow, true);
@@ -332,7 +316,7 @@ function renderX(swap) {
     applyDom();
     const grid = $('.arch-grid', panel);
     archCtl = archFlow($('.arch-fx', panel), grid, () => ({
-      domains: X.domains, color: THEME.accent, selected: () => xDom,
+      domains: X.domains, color: PC[xKey], selected: () => xDom,
       sysEls: Object.fromEntries($$('.chip', grid).map((e) => [e.dataset.s, e])),
       domEls: Object.fromEntries($$('.dom', grid).map((e) => [e.dataset.d, e])),
       conEls: Object.fromEntries($$('.con', grid).map((e) => [+e.dataset.c, e])),
@@ -346,14 +330,13 @@ function renderX(swap) {
     }
   }
 }
-const MONO_SEGS = [THEME.accent, '#edeae3', '#b9b6ae', '#7c7a74', '#45443f'];
 function renderChart() {
   const host = $('#x-chart'), C = X2[lang];
-  if (xKey === 'mule') { host.innerHTML = `<h5>${esc(C.muleChart)}</h5><div></div>`; barChart(host.lastElementChild, C.muleBars, THEME.accent); }
+  if (xKey === 'mule') { host.innerHTML = `<h5>${esc(C.muleChart)}</h5><div></div>`; barChart(host.lastElementChild, C.muleBars, PC.mule); }
   else if (xKey === 'infa') {
     host.innerHTML = `<h5>${esc(C.infaChart)}</h5><div></div>`;
-    donutChart(host.lastElementChild, [39, 36, 32, 21, 12].map((v, i) => [C.infaSegs[i], v, MONO_SEGS[i]]), C.infaTotal);
-  } else { host.innerHTML = `<h5>${esc(C.aiChart)}</h5><div></div>`; barChart(host.lastElementChild, C.aiBars, THEME.accent); }
+    donutChart(host.lastElementChild, [39, 36, 32, 21, 12].map((v, i) => [C.infaSegs[i], v, [PC.infa, '#fbbf24', PC.mule, PC.ai, '#64748b'][i]]), C.infaTotal);
+  } else { host.innerHTML = `<h5>${esc(C.aiChart)}</h5><div></div>`; barChart(host.lastElementChild, C.aiBars, PC.ai); }
 }
 function applyDom() {
   const X = EXPERTISE[xKey];
@@ -385,10 +368,20 @@ function playAI(i, waitVisible) {
   const lis = $$('li', ol);
   const run = () => {
     if (REDUCED) { lis.forEach((l) => l.classList.add('on')); a.classList.add('in'); return; }
-    lis.forEach((l, k) => aiTimers.push(setTimeout(() => l.classList.add('on'), 150 + k * 280)));
-    aiTimers.push(setTimeout(() => a.classList.add('in'), 300 + lis.length * 280));
+    lis.forEach((l, k) => aiTimers.push(setTimeout(() => l.classList.add('on'), 150 + k * 260)));
+    aiTimers.push(setTimeout(() => a.classList.add('in'), 250 + lis.length * 260));
   };
   if (waitVisible) { const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { io.disconnect(); run(); } }, { threshold: 0.3 }); io.observe(ol); } else run();
+}
+
+/* ------------------------------------------------------------------ skills */
+const yearsSince = (ym) => { const [y, m] = ym.split('-').map(Number); return (Date.now() - new Date(y, m - 1, 1)) / 31557600000; };
+const LAYER_COL = [PC.ai, '#34d399', '#f472b6', PC.mule, PC.infa, '#22d3ee', '#fbbf24'];
+function renderSkills() {
+  barChart($('#years'), T.yearsRows.map(([l, d]) => [l, Math.round(yearsSince(d) * 10) / 10, T.yearsUnit]), '#4f8cff');
+  $('#layers').innerHTML = T.layers.map(([name, desc, techs], i) => `<li style="--lc:${LAYER_COL[i]}">
+      <div class="ly-n"><b>${esc(name)}</b><span>${esc(desc)}</span></div>
+      <div class="skills">${techs.map((s) => `<button type="button" class="sk" data-skill="${esc(s)}" aria-expanded="false" translate="no">${esc(s)}</button>`).join('')}</div></li>`).join('');
 }
 
 /* ------------------------------------------------------------------ skill tooltip */
@@ -421,7 +414,6 @@ function initTip() {
   $('#case').addEventListener('scroll', close, { passive: true, capture: true });
 }
 
-/* ------------------------------------------------------------------ 03 work: schematics */
 const SCH_LBL = {
   en: { mule: 'System → Process → Experience APIs', infa: 'Many records → one golden record', ai: 'Question → governed tools → answer', mobile: 'Vehicle data → dashboard', web: 'Interface · product', data: 'Raw data → insight', archive: 'Early experiment' },
   fr: { mule: 'API système → process → expérience', infa: 'Des fiches multiples → un golden record', ai: 'Question → outils gouvernés → réponse', mobile: 'Données véhicule → tableau de bord', web: 'Interface · produit', data: 'Données brutes → indicateurs', archive: 'Premières expériences' },
@@ -482,77 +474,65 @@ function schematic(cat) {
   return `<svg viewBox="0 0 320 220" preserveAspectRatio="xMidYMid meet" aria-hidden="true">${g}</svg><span class="lbl">${esc(SCH_LBL[lang][cat] || '')}</span>`;
 }
 
-/* ------------------------------------------------------------------ 03 work: cases + index */
+/* ------------------------------------------------------------------ projects */
 const FEATURED = ['mule-platform', 'b360-mdm', 'mdm-beam', 'hev-dash'];
 const yearOf = (p) => (lang === 'fr' && p[lang].year) || p.year;
-const catsOf = (p) => p.cats.map((c) => T.filters[c]).filter(Boolean).join(' · ');
-const mainCat = (p) => p.cats[0];
+const catTags = (p) => p.cats.map((c) => `<span class="tag" style="--c:${CAT_COL[c]}">${esc(T.filters[c])}</span>`).join('');
 let filter = 'all';
-function renderWork() {
-  $('#cases').innerHTML = FEATURED.map((id, k) => {
+function renderProjects() {
+  $('#featured').innerHTML = FEATURED.map((id, k) => {
     const i = PROJECTS.findIndex((p) => p.id === id), p = PROJECTS[i], L = p[lang];
-    return `<article class="cs">
-      <div class="cs-meta rv"><span class="num">${pad(k + 1)}</span><span class="mono">${esc(T.caseLabel)}</span><span class="mono">${esc(catsOf(p))} · ${esc(yearOf(p))}</span></div>
-      <div class="cs-text rv" style="--d:.08s"><h3>${esc(L.title)}</h3><span class="kick">${esc(L.kicker)}</span><p>${esc(L.summary)}</p>
-        <button class="cs-go" type="button" data-p="${i}">${esc(T.read)} <span aria-hidden="true">→</span></button></div>
-      <figure class="cs-fig rv" style="--d:.16s"><div class="schem" data-p="${i}">${schematic(mainCat(p))}</div></figure>
-    </article>`;
+    return `<button type="button" class="card feat rv" data-p="${i}" style="--c:${CAT_COL[p.cats[0]]};--d:${k * 0.06}s">
+      <div class="schem">${schematic(p.cats[0])}</div>
+      <div class="feat-b"><div class="meta-row">${catTags(p)}<span class="yr">${esc(yearOf(p))}</span></div>
+        <h4>${esc(L.title)}</h4><p class="k">${esc(L.kicker)}</p><p>${esc(L.summary)}</p><span class="go-l">${esc(T.read)} →</span></div></button>`;
   }).join('');
-  $('#cases').onclick = (e) => { const b = e.target.closest('[data-p]'); if (b) openCase(+b.dataset.p, b.closest('.cs').querySelector('.cs-go')); };
-
+  $('#featured').onclick = (e) => { const b = e.target.closest('[data-p]'); if (b) openCase(+b.dataset.p, b); };
   const counts = { all: PROJECTS.length };
   PROJECTS.forEach((p) => p.cats.forEach((c) => (counts[c] = (counts[c] || 0) + 1)));
   const fl = $('#filters');
-  fl.innerHTML = Object.keys(T.filters).filter((k) => counts[k]).map((k) => `<button role="tab" type="button" data-f="${k}" aria-selected="${k === filter}">${esc(k === 'all' ? T.all : T.filters[k])}<sup>${counts[k]}</sup></button>`).join('');
+  fl.innerHTML = Object.keys(T.filters).filter((k) => counts[k]).map((k) => `<button role="tab" type="button" data-f="${k}" aria-selected="${k === filter}">${esc(T.filters[k])}<sup>${counts[k]}</sup></button>`).join('');
   fl.onclick = (e) => { const b = e.target.closest('button'); if (!b) return; filter = b.dataset.f; $$('button', fl).forEach((x) => x.setAttribute('aria-selected', String(x === b))); applyFilter(true); };
-  $('#index-list').innerHTML = PROJECTS.map((p, i) => {
+  $('#tiles').innerHTML = PROJECTS.map((p, i) => {
     const L = p[lang];
-    return `<li data-cats="${p.cats.join(' ')}"><button type="button" data-p="${i}">
-      <span class="ix-n">${pad(i + 1)}</span>
-      <span class="ix-t"><b>${esc(L.title)}</b><span>${esc(L.kicker)}</span></span>
-      <span class="ix-c">${esc(catsOf(p))}</span>
-      <span class="ix-y">${esc(yearOf(p))}</span>
-      <span class="ix-a" aria-hidden="true">→</span></button></li>`;
+    return `<li data-cats="${p.cats.join(' ')}"><button type="button" class="tile" data-p="${i}" style="--c:${CAT_COL[p.cats[0]]}">
+      <span class="meta-row">${catTags(p)}<span class="yr">${esc(yearOf(p))}</span></span>
+      <h4>${esc(L.title)}</h4><p>${esc(L.kicker)}</p>
+      <span class="tile-f"><span class="ics">${p.icons.slice(0, 4).map(icon).join('')}</span><span class="more">${esc(T.details)} →</span></span></button></li>`;
   }).join('');
-  $('#index-list').onclick = (e) => { const b = e.target.closest('[data-p]'); if (b) openCase(+b.dataset.p, b); };
+  $('#tiles').onclick = (e) => { const b = e.target.closest('[data-p]'); if (b) openCase(+b.dataset.p, b); };
   applyFilter();
 }
 function applyFilter(anim) {
   let k = 0;
-  $$('#index-list li').forEach((li) => {
+  $$('#tiles li').forEach((li) => {
     const show = filter === 'all' || li.dataset.cats.split(' ').includes(filter);
     li.hidden = !show;
     li.classList.remove('pop');
-    if (show && anim && !REDUCED) { void li.offsetWidth; li.style.setProperty('--d', `${k++ * 35}ms`); li.classList.add('pop'); }
+    if (show && anim && !REDUCED) { void li.offsetWidth; li.style.setProperty('--d', `${k++ * 30}ms`); li.classList.add('pop'); }
   });
 }
-
 let lastFocus = null, caseIdx = -1;
 function openCase(i, from) {
   if (from) lastFocus = from;
   caseIdx = i;
   const p = PROJECTS[i], L = p[lang], d = $('#case');
   const next = (i + 1) % PROJECTS.length;
-  $('#case-meta').textContent = `${T.caseLabel} · ${pad(i + 1)} / ${PROJECTS.length} · ${yearOf(p)}`;
-  $('#case-body').innerHTML = `<p class="mono" style="color:var(--muted)">${esc(catsOf(p))}</p>
-    <h2 class="cb-t" id="case-title" style="margin-top:20px">${esc(L.title)}</h2>
+  $('#case-meta').textContent = `${T.caseLabel} · ${i + 1} / ${PROJECTS.length}`;
+  const body = $('#case-body');
+  body.style.setProperty('--c', CAT_COL[p.cats[0]]);
+  body.innerHTML = `<div class="meta-row">${catTags(p)}<span class="yr">${esc(yearOf(p))}</span></div>
+    <h2 class="cb-t" id="case-title">${esc(L.title)}</h2>
     <p class="cb-k">${esc(L.kicker)}</p>
-    <figure class="cb-fig"><div class="schem">${schematic(mainCat(p))}</div></figure>
-    <div class="cb-g">
-      <div><p class="kicker mono">${esc(T.overview)}</p><p>${esc(L.summary)}</p></div>
-      <div><p class="kicker mono">${esc(T.built)}</p><ol class="cb-pts">${L.points.map((x) => `<li>${esc(x)}</li>`).join('')}</ol></div>
-    </div>
-    <div class="cb-row"><span class="mono">${esc(T.stackL)}</span><div class="skills">${p.stack.map((s) => (skillInfo(s, lang) ? `<button type="button" class="sk" data-skill="${esc(s)}" aria-expanded="false" translate="no">${esc(s)}</button>` : `<span class="sk" translate="no">${esc(s)}</span>`)).join('')}</div></div>
-    <div class="cb-row"><span class="mono">${esc(T.year)}</span><span>${esc(yearOf(p))}</span></div>
-    <div class="cb-act">${p.link ? `<a class="btn solid" href="${p.link}" target="_blank" rel="noopener">${esc(p.link.includes('github.com') ? T.viewCode : T.openSite)} <span class="arr" aria-hidden="true">↗</span></a>` : `<p class="cb-private">${esc(T.privateRepo)}</p>`}</div>
-    <button class="cb-next" type="button" data-next="${next}"><span class="mono">${lang === 'fr' ? 'Projet suivant' : 'Next project'} · ${pad(next + 1)}</span><b>${esc(PROJECTS[next][lang].title)} →</b></button>`;
-  $('.x span', d).textContent = T.close;
+    <div class="schem">${schematic(p.cats[0])}</div>
+    <div class="cb-sec"><h3>${esc(T.overview)}</h3><p>${esc(L.summary)}</p></div>
+    <div class="cb-sec"><h3>${esc(T.built)}</h3><ul class="cb-pts">${L.points.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>
+    <div class="cb-sec"><h3>${esc(T.stackL)}</h3><div class="skills">${p.stack.map((s) => (skillInfo(s, lang) ? `<button type="button" class="sk" data-skill="${esc(s)}" aria-expanded="false" translate="no">${esc(s)}</button>` : `<span class="sk" translate="no">${esc(s)}</span>`)).join('')}</div></div>
+    <div class="cb-act">${p.link ? `<a class="btn primary" href="${p.link}" target="_blank" rel="noopener">${esc(p.link.includes('github.com') ? T.viewCode : T.openSite)} ↗</a>` : `<p class="cb-private">🔒 ${esc(T.privateRepo)}</p>`}</div>
+    <button class="cb-next" type="button" data-next="${next}"><span><small>${esc(T.next)}</small><b>${esc(PROJECTS[next][lang].title)}</b></span><span aria-hidden="true">→</span></button>`;
+  $('.x', d).setAttribute('aria-label', T.close);
   const card = $('.case-card', d);
-  if (d.hidden) {
-    d.hidden = false;
-    document.body.classList.add('lock');
-    requestAnimationFrame(() => requestAnimationFrame(() => d.classList.add('open')));
-  }
+  if (d.hidden) { d.hidden = false; document.body.classList.add('lock'); requestAnimationFrame(() => requestAnimationFrame(() => d.classList.add('open'))); }
   card.scrollTop = 0;
   card.focus({ preventScroll: true });
 }
@@ -561,38 +541,43 @@ function closeCase() {
   if (d.hidden) return;
   d.classList.remove('open');
   document.body.classList.remove('lock');
-  setTimeout(() => { d.hidden = true; }, REDUCED ? 0 : 450);
+  setTimeout(() => { d.hidden = true; }, REDUCED ? 0 : 400);
   lastFocus && lastFocus.focus({ preventScroll: true });
 }
 
-/* ------------------------------------------------------------------ 04 stack */
-function renderLayers() {
-  $('#layers').innerHTML = T.layers.map(([name, desc, techs], i) => `<li class="rv" style="--d:${(i * 0.05).toFixed(2)}s">
-      <span class="ly-i">L${T.layers.length - i}</span>
-      <div class="ly-n"><b>${esc(name)}</b><span>${esc(desc)}</span></div>
-      <div class="skills">${techs.map((s) => `<button type="button" class="sk" data-skill="${esc(s)}" aria-expanded="false" translate="no">${esc(s)}</button>`).join('')}</div>
-    </li>`).join('');
-}
-
-/* ------------------------------------------------------------------ 05 path */
+/* ------------------------------------------------------------------ experience */
 const openRows = new Set([0]);
 function fmtDate(ym) {
   const [y, m] = ym.split('-').map(Number);
   return new Date(y, m - 1, 1).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-GB', { month: 'short', year: 'numeric' });
 }
+const yf = (ym) => { const [y, m] = ym.split('-').map(Number); return y + (m - 1) / 12; };
+function renderGantt() {
+  const now = new Date(), nowF = now.getFullYear() + now.getMonth() / 12;
+  const Y0 = 2019, Y1 = Math.ceil(nowF + 0.01), span = Y1 - Y0;
+  const rows = [
+    ...EDUCATION.slice().reverse().map((e) => { const [a, b] = e.years.split('–').map((s) => +s.trim()); return { l: e[lang][0], s: e[lang][1], f: a + 0.67, t: b + 0.5, c: '#64748b' }; }),
+    ...EXPERIENCE.slice().sort((a, b) => a.from.localeCompare(b.from)).map((x) => ({ l: x[lang].role, s: (lang === 'fr' && x.orgFr) || x.org, f: yf(x.from), t: x.to ? yf(x.to) : nowF, c: ICON_COL[x.icon] || '#4f8cff', on: !x.to })),
+  ];
+  const g = $('#gantt');
+  g.style.setProperty('--gl', '300px'); g.style.setProperty('--yrs', span); g.style.setProperty('--n', ((nowF - Y0) / span).toFixed(4));
+  g.innerHTML = `<div class="g-axis" style="grid-template-columns:repeat(${span},1fr)">${Array.from({ length: span }, (_, i) => `<span>${Y0 + i}</span>`).join('')}</div>
+    ${rows.map((r, i) => `<div class="g-row"><div class="g-lab">${esc(r.l)}<small>${esc(r.s)}</small></div><div class="g-track"><span class="g-bar${r.on ? ' on' : ''}" style="--x:${((r.f - Y0) / span) * 100}%;--w:${((r.t - r.f) / span) * 100}%;--c:${r.c};--d:${i * 0.08}s" title="${esc(r.l)}"></span></div></div>`).join('')}
+    <span class="g-now" aria-hidden="true"><span>${esc(T.now)}</span></span>`;
+  if (REDUCED) { g.classList.add('go'); return; }
+  const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { io.disconnect(); g.classList.add('go'); } }, { threshold: 0.3 });
+  io.observe(g);
+}
 function renderCV() {
   $('#cv').innerHTML = EXPERIENCE.map((x, i) => {
     const L = x[lang];
     const org = (lang === 'fr' && x.orgFr) || x.org;
-    return `<li class="cv-row rv${x.to ? '' : ' now'}${openRows.has(i) ? ' open' : ''}" data-i="${i}">
-      <div class="cv-when">${x.to ? `${fmtDate(x.from)} – ${fmtDate(x.to)}` : `${fmtDate(x.from)} –<span class="now-t">${esc(T.present)}</span>`}</div>
-      <div class="cv-body">
-        <h3 class="cv-role">${esc(L.role)}</h3>
-        <p class="cv-org">${icon(x.icon)}<span>${esc(org)}</span></p>
-        <p class="cv-sum">${esc(L.sum)}</p>
-        <div class="cv-pts" id="cvp${i}"><ul>${L.pts.map((p) => `<li>${esc(p)}</li>`).join('')}</ul></div>
-        <button type="button" class="cv-more" aria-expanded="${openRows.has(i)}" aria-controls="cvp${i}"><i aria-hidden="true">+</i><span>${esc(openRows.has(i) ? T.less : T.more)}</span></button>
-      </div></li>`;
+    return `<li class="cv-row rv${openRows.has(i) ? ' open' : ''}" data-i="${i}" style="--c:${ICON_COL[x.icon] || '#4f8cff'}">
+      <div class="cv-top"><p class="cv-org">${icon(x.icon)}<span>${esc(org)}</span></p><span class="cv-when">${x.to ? `${fmtDate(x.from)} – ${fmtDate(x.to)}` : `${fmtDate(x.from)} –<span class="now-t">${esc(T.present)}</span>`}</span></div>
+      <h3 class="cv-role">${esc(L.role)}</h3>
+      <p class="cv-sum">${esc(L.sum)}</p>
+      <div class="cv-pts" id="cvp${i}"><ul>${L.pts.map((p) => `<li>${esc(p)}</li>`).join('')}</ul></div>
+      <button type="button" class="cv-more" aria-expanded="${openRows.has(i)}" aria-controls="cvp${i}"><i aria-hidden="true">+</i><span>${esc(openRows.has(i) ? T.less : T.more)}</span></button></li>`;
   }).join('');
   $('#cv').onclick = (e) => {
     const b = e.target.closest('.cv-more'); if (!b) return;
@@ -607,7 +592,7 @@ function renderCV() {
   $('#langs').innerHTML = LANGUAGES[lang].map(([a, b]) => `<li><span>${esc(a)}</span><span>${esc(b)}</span></li>`).join('');
 }
 
-/* ------------------------------------------------------------------ 06 contact */
+/* ------------------------------------------------------------------ contact */
 function initContact() {
   $('#compose').onsubmit = (e) => {
     e.preventDefault();
@@ -616,34 +601,13 @@ function initContact() {
   };
 }
 
-/* ------------------------------------------------------------------ reveal, scroll, sections */
+/* ------------------------------------------------------------------ reveal + chrome */
 let revealIO;
-function observeReveal(root = document) {
-  const els = $$('.rv:not(.in), .split:not(.in)', root);
+function observeReveal() {
+  const els = $$('.rv:not(.in)');
   if (REDUCED || !('IntersectionObserver' in window)) { els.forEach((el) => el.classList.add('in')); return; }
-  if (!revealIO) revealIO = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); revealIO.unobserve(e.target); } }), { rootMargin: '0px 0px -10% 0px' });
+  if (!revealIO) revealIO = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); revealIO.unobserve(e.target); } }), { rootMargin: '0px 0px -8% 0px' });
   els.forEach((el) => revealIO.observe(el));
-}
-function initScroll() {
-  const nav = $('#nav'), prog = $('#progress'), fill = $('#route-fill');
-  let ticking = false;
-  const update = () => {
-    ticking = false;
-    const max = document.documentElement.scrollHeight - innerHeight;
-    prog.style.setProperty('--p', max > 0 ? (scrollY / max).toFixed(4) : 0);
-    nav.classList.toggle('scrolled', scrollY > 12);
-    const r = $('.route-wrap').getBoundingClientRect();
-    if (r.top < innerHeight && r.bottom > 0) fill.style.setProperty('--f', Math.max(0, Math.min(1, (innerHeight * 0.62 - r.top) / r.height)).toFixed(4));
-  };
-  addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
-  addEventListener('resize', update, { passive: true });
-  update();
-  const secs = $$('.sec');
-  const io = new IntersectionObserver((es) => {
-    es.forEach((e) => { if (e.isIntersecting) { current = e.target.id; e.target.classList.add('on'); markNav(); } else e.target.classList.remove('on'); });
-    if (scrollY < innerHeight * 0.5) { current = ''; markNav(); }
-  }, { rootMargin: '-40% 0px -55% 0px' });
-  secs.forEach((s) => io.observe(s));
 }
 function initChrome() {
   $('#menu-btn').addEventListener('click', () => toggleSheet($('#menu-btn').getAttribute('aria-expanded') !== 'true'));
@@ -657,7 +621,6 @@ function initChrome() {
     if (!$('#case').hidden) closeCase();
     else if ($('#menu-btn').getAttribute('aria-expanded') === 'true') { toggleSheet(false); $('#menu-btn').focus(); }
   });
-  // keep keyboard focus inside the open case study
   $('#case').addEventListener('keydown', (e) => {
     if (e.key !== 'Tab') return;
     const f = $$('#case button, #case a[href]').filter((el) => el.offsetParent !== null);
@@ -666,6 +629,11 @@ function initChrome() {
     if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
     else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
   });
+  const io = new IntersectionObserver((es) => {
+    es.forEach((e) => { if (e.isIntersecting) { current = e.target.id; markNav(); } });
+    if (scrollY < innerHeight * 0.4) { current = ''; markNav(); }
+  }, { rootMargin: '-35% 0px -60% 0px' });
+  $$('.sec').forEach((s) => io.observe(s));
   let w = innerWidth;
   addEventListener('resize', () => { if ((w < 760) !== (innerWidth < 760)) renderHub(); w = innerWidth; });
 }
@@ -676,13 +644,14 @@ function renderAll() {
   fillText();
   renderNav();
   renderHub();
-  renderNumbers();
-  renderProfile();
+  renderKpis();
+  renderAbout();
   renderCompare();
   renderTeams();
   renderXTabs();
-  renderWork();
-  renderLayers();
+  renderSkills();
+  renderProjects();
+  renderGantt();
   renderCV();
   if (caseIdx >= 0 && !$('#case').hidden) openCase(caseIdx);
   observeReveal();
@@ -693,4 +662,3 @@ initTip();
 initContact();
 renderAll();
 initLang();
-initScroll();
