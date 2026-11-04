@@ -2,6 +2,9 @@
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const PHONE = innerWidth < 760;
 const NS = 'http://www.w3.org/2000/svg';
+/** Shared palette for every canvas: graphite, bone and a single signal accent. */
+export const THEME = { ink: '#0d0e0c', raised: '#151613', bone: '#edeae3', bone2: '#b9b6ae', muted: '#7c7a74', accent: '#d4f25a', sans: '"Instrument Sans", system-ui, sans-serif', mono: '"JetBrains Mono", ui-monospace, monospace' };
+const K = THEME;
 
 /* ------------------------------------------------------------------ helpers */
 export function bez(p0, p1, p2, p3, t) {
@@ -62,85 +65,87 @@ export function loop(canvas, draw, { onResize } = {}) {
 }
 
 /* ------------------------------------------------------------------ hero: systems → hub → consumers */
-export function heroFlow(canvas, { sources, targets, hub, compact = false, hubColor = ['#a9b5ff', '#5b6cf0'], cols }) {
-  const COLS = cols || ['#4fd1ff', '#8b9bff', '#34d399', '#f472b6', '#fbbf24'];
-  const FONT = compact ? '500 11.5px Inter, sans-serif' : '500 12.5px Inter, sans-serif', PH = compact ? 26 : 30, HR = compact ? 30 : 36;
+export function heroFlow(canvas, { sources, targets, hub, compact = false }) {
+  const FONT = compact ? `500 11.5px ${K.sans}` : `500 13px ${K.sans}`, PH = compact ? 24 : 28, HFONT = `600 ${compact ? 9 : 9.5}px ${K.mono}`;
+  let HR = compact ? 26 : 34;
   let nodesL = [], nodesR = [], H = [0, 0], routes = [], packets = [], hover = -1;
-  const pill = (ctx, x, y, label, align, hot, col) => {
+  const tag = (ctx, x, y, label, align, hot) => {
     ctx.font = FONT;
-    const w = ctx.measureText(label).width + 30, h = PH;
+    const w = ctx.measureText(label).width + 20, h = PH;
     const x0 = align === 'l' ? x : x - w;
-    ctx.fillStyle = hot ? rgba(col, 0.18) : 'rgba(16,19,27,.95)';
-    ctx.strokeStyle = hot ? col : 'rgba(255,255,255,.14)';
-    ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.roundRect(x0, y - h / 2, w, h, 15); ctx.fill(); ctx.stroke();
-    ctx.fillStyle = col; ctx.beginPath(); ctx.arc(x0 + 13, y, 3.5, 0, 6.283); ctx.fill();
-    ctx.fillStyle = hot ? '#fff' : '#dfe3ec'; ctx.fillText(label, x0 + 22, y + 4.5);
-    return [x0, x0 + w];
+    ctx.fillStyle = K.ink; ctx.fillRect(x0, y - h / 2, w, h);
+    ctx.strokeStyle = hot ? K.accent : 'rgba(237,234,227,.16)'; ctx.lineWidth = 1;
+    ctx.strokeRect(x0 + 0.5, y - h / 2 + 0.5, w - 1, h - 1);
+    ctx.fillStyle = hot ? K.accent : K.muted;
+    ctx.fillRect(align === 'l' ? x0 + 8 : x0 + w - 11, y - 1.5, 3, 3);
+    ctx.fillStyle = hot ? K.bone : K.bone2;
+    ctx.fillText(label, align === 'l' ? x0 + 16 : x0 + 6, y + 4.5);
   };
   const ctl = loop(canvas, draw, {
     onResize: (s) => {
-      const padY = 26;
-      const ys = (n) => Array.from({ length: n }, (_, i) => padY + 18 + (i * (s.h - 2 * padY - 36)) / Math.max(1, n - 1));
+      const padY = compact ? 18 : 26;
+      const ys = (n) => Array.from({ length: n }, (_, i) => (n === 1 ? s.h / 2 : padY + 14 + (i * (s.h - 2 * padY - 28)) / (n - 1)));
       H = [s.w * 0.5, s.h * 0.5];
       const yl = ys(sources.length), yr = ys(targets.length);
-      nodesL = sources.map((l, i) => ({ l, x: 4, y: yl[i], c: COLS[i % COLS.length] }));
-      nodesR = targets.map((l, i) => ({ l, x: s.w - 4, y: yr[i] }));
-      // edges measured roughly by label length
-      const ctx = s.ctx; ctx.font = FONT;
-      nodesL.forEach((n) => { n.e = n.x + ctx.measureText(n.l).width + 30; });
-      nodesR.forEach((n) => { n.e = n.x - ctx.measureText(n.l).width - 30; });
+      nodesL = sources.map((l, i) => ({ l, x: 1, y: yl[i] }));
+      nodesR = targets.map((l, i) => ({ l, x: s.w - 1, y: yr[i] }));
+      const ctx = s.ctx;
+      ctx.font = HFONT; HR = Math.max(compact ? 26 : 34, Math.max(...hub.map((l) => ctx.measureText(l.toUpperCase()).width)) / 2 + 9);
+      ctx.font = FONT;
+      nodesL.forEach((n) => { n.e = n.x + ctx.measureText(n.l).width + 20; });
+      nodesR.forEach((n) => { n.e = n.x - ctx.measureText(n.l).width - 20; });
       routes = [];
       nodesL.forEach((a, i) => nodesR.forEach((b, j) => {
-        routes.push({ i, j, r: sampleRoute([hcurve([a.e, a.y], [H[0] - HR, H[1]], 0.55), hcurve([H[0] + HR, H[1]], [b.e, b.y], 0.55)]) });
+        routes.push({ i, j, r: sampleRoute([hcurve([a.e, a.y], [H[0] - HR, H[1]], 0.6), hcurve([H[0] + HR, H[1]], [b.e, b.y], 0.6)]) });
       }));
     },
   });
-  canvas.addEventListener('pointermove', (e) => {
+  const track = (e) => {
     const r = canvas.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
     hover = -1;
-    nodesL.forEach((n, i) => { if (x < n.e + 10 && Math.abs(y - n.y) < PH / 2 + 2) hover = i; });
+    nodesL.forEach((n, i) => { if (x < n.e + 10 && Math.abs(y - n.y) < PH / 2 + 3) hover = i; });
     canvas.style.cursor = hover >= 0 ? 'pointer' : '';
-  });
+    ctl.kick();
+  };
+  canvas.addEventListener('pointermove', track);
+  canvas.addEventListener('pointerdown', track);
   canvas.addEventListener('pointerleave', () => { hover = -1; });
-  canvas.addEventListener('click', () => { if (hover >= 0) for (let k = 0; k < 8; k++) spawn(hover, k * 0.06); });
-  function spawn(i = (Math.random() * nodesL.length) | 0, delay = 0) {
+  canvas.addEventListener('click', () => { if (hover >= 0) for (let k = 0; k < 8; k++) spawn(hover, k * 0.06, true); });
+  function spawn(i = (Math.random() * nodesL.length) | 0, delay = 0, hot = false) {
     const cand = routes.filter((r) => r.i === i);
     const r = cand[(Math.random() * cand.length) | 0];
-    if (r) packets.push({ r: r.r, s: -delay * 200, v: 150 + Math.random() * 90, c: nodesL[i].c });
+    if (r) packets.push({ r: r.r, s: -delay * 200, v: 150 + Math.random() * 90, i, hot: hot || Math.random() < 0.12 });
   }
   function draw(s, dt) {
     const { ctx, w, h, t } = s;
     ctx.clearRect(0, 0, w, h);
     if (!nodesL.length) return;
-    // links
-    ctx.lineWidth = 1.2;
-    nodesL.forEach((a, i) => { ctx.strokeStyle = hover === i ? rgba(a.c, 0.7) : rgba(a.c, hover >= 0 ? 0.08 : 0.22); strokeCurve(ctx, hcurve([a.e, a.y], [H[0] - HR, H[1]], 0.55)); });
-    nodesR.forEach((b) => { ctx.strokeStyle = 'rgba(139,155,255,.25)'; strokeCurve(ctx, hcurve([H[0] + HR, H[1]], [b.e, b.y], 0.55)); });
-    // packets
-    if (!REDUCED && packets.length < (PHONE ? 22 : 40) && Math.random() < (hover >= 0 ? 0.35 : 0.18)) spawn(hover >= 0 && Math.random() < 0.7 ? hover : undefined);
+    ctx.lineWidth = 1;
+    nodesL.forEach((a, i) => { ctx.strokeStyle = hover === i ? 'rgba(212,242,90,.75)' : `rgba(237,234,227,${hover >= 0 ? 0.05 : 0.14})`; strokeCurve(ctx, hcurve([a.e, a.y], [H[0] - HR, H[1]], 0.6)); });
+    nodesR.forEach((b) => { ctx.strokeStyle = 'rgba(237,234,227,.14)'; strokeCurve(ctx, hcurve([H[0] + HR, H[1]], [b.e, b.y], 0.6)); });
+    if (!REDUCED && packets.length < (PHONE ? 20 : 36) && Math.random() < (hover >= 0 ? 0.35 : 0.16)) spawn(hover >= 0 && Math.random() < 0.7 ? hover : undefined, 0, hover >= 0);
     for (let k = packets.length - 1; k >= 0; k--) {
       const p = packets[k];
       p.s += p.v * dt;
       if (p.s > p.r.L) { packets.splice(k, 1); continue; }
       if (p.s < 0) continue;
-      const [x, y] = at(p.r, p.s), [x2, y2] = at(p.r, p.s - 14);
-      ctx.strokeStyle = rgba(p.c, 0.5); ctx.lineWidth = 2;
+      const hot = p.hot || p.i === hover;
+      const [x, y] = at(p.r, p.s), [x2, y2] = at(p.r, p.s - 16);
+      ctx.strokeStyle = hot ? 'rgba(212,242,90,.45)' : 'rgba(237,234,227,.3)'; ctx.lineWidth = 1.5;
       ctx.beginPath(); ctx.moveTo(x2, y2); ctx.lineTo(x, y); ctx.stroke();
-      ctx.fillStyle = p.c; ctx.beginPath(); ctx.arc(x, y, 2.6, 0, 6.283); ctx.fill();
+      ctx.fillStyle = hot ? K.accent : K.bone; ctx.beginPath(); ctx.arc(x, y, 2.2, 0, 6.283); ctx.fill();
     }
-    // hub
-    const pulse = REDUCED ? 0 : (t % 2.4) / 2.4;
-    ctx.strokeStyle = `rgba(139,155,255,${0.5 * (1 - pulse)})`; ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.arc(H[0], H[1], HR + pulse * 22, 0, 6.283); ctx.stroke();
-    const g = ctx.createRadialGradient(H[0], H[1] - 10, 4, H[0], H[1], HR + 4);
-    g.addColorStop(0, hubColor[0]); g.addColorStop(1, hubColor[1]);
-    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(H[0], H[1], HR, 0, 6.283); ctx.fill();
-    ctx.fillStyle = '#07080b'; ctx.font = '600 11px Inter, sans-serif'; ctx.textAlign = 'center';
-    hub.forEach((l, i) => ctx.fillText(l, H[0], H[1] + 4 + (i - (hub.length - 1) / 2) * 13));
+    const pulse = REDUCED ? 0 : (t % 2.6) / 2.6;
+    ctx.strokeStyle = `rgba(212,242,90,${0.45 * (1 - pulse)})`; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(H[0], H[1], HR + pulse * 26, 0, 6.283); ctx.stroke();
+    ctx.strokeStyle = 'rgba(237,234,227,.18)';
+    ctx.beginPath(); ctx.arc(H[0], H[1], HR + 7, 0, 6.283); ctx.stroke();
+    ctx.fillStyle = K.accent; ctx.beginPath(); ctx.arc(H[0], H[1], HR, 0, 6.283); ctx.fill();
+    ctx.fillStyle = K.ink; ctx.font = HFONT; ctx.textAlign = 'center';
+    hub.forEach((l, i) => ctx.fillText(l.toUpperCase(), H[0], H[1] + 3.5 + (i - (hub.length - 1) / 2) * 12));
     ctx.textAlign = 'left';
-    nodesL.forEach((n, i) => pill(ctx, n.x, n.y, n.l, 'l', hover === i, n.c));
-    nodesR.forEach((n) => pill(ctx, n.x, n.y, n.l, 'r', false, '#8b9bff'));
+    nodesL.forEach((n, i) => tag(ctx, n.x, n.y, n.l, 'l', hover === i));
+    nodesR.forEach((n) => tag(ctx, n.x, n.y, n.l, 'r', false));
   }
   return ctl;
 }
@@ -172,7 +177,7 @@ export function archFlow(canvas, grid, getModel) {
     ctx.lineWidth = 1.2;
     paths.forEach((p) => {
       const on = !sel || p.d === sel;
-      ctx.strokeStyle = on ? rgba(col, sel ? 0.75 : 0.22) : 'rgba(255,255,255,.04)';
+      ctx.strokeStyle = on ? rgba(col, sel ? 0.75 : 0.2) : 'rgba(237,234,227,.04)';
       strokeCurve(ctx, p.c);
     });
     const pool = sel ? paths.filter((p) => p.d === sel) : paths;
@@ -186,23 +191,23 @@ export function archFlow(canvas, grid, getModel) {
       q.s += q.v * dt;
       if (q.s > q.p.r.L) { packets.splice(k, 1); continue; }
       const [x, y] = at(q.p.r, q.s), [x2, y2] = at(q.p.r, q.s - 12);
-      ctx.strokeStyle = rgba(col, 0.6); ctx.lineWidth = 2;
+      ctx.strokeStyle = rgba(col, 0.6); ctx.lineWidth = 1.5;
       ctx.beginPath(); ctx.moveTo(x2, y2); ctx.lineTo(x, y); ctx.stroke();
-      ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(x, y, 2.2, 0, 6.283); ctx.fill();
+      ctx.fillStyle = K.bone; ctx.beginPath(); ctx.arc(x, y, 2.2, 0, 6.283); ctx.fill();
     }
   }
   return { ...ctl, rebuild: () => { build(); ctl.st.visible || draw(ctl.st, 0); } };
 }
 
 /* ------------------------------------------------------------------ team: one action → many apps */
-export function teamFlow(canvas, board, color = '#8b9bff') {
+export function teamFlow(canvas, board, color = THEME.accent) {
   let paths = [], packets = [];
   const build = () => {
     paths = [];
     const from = board.querySelector('.tb-from'), items = [...board.querySelectorAll('.tb-item')];
     if (!from || !items.length) return;
     const g = board.getBoundingClientRect(), f = from.getBoundingClientRect();
-    const stacked = innerWidth <= 700;
+    const stacked = innerWidth < 760;
     items.forEach((it) => {
       const r = it.querySelector('i').getBoundingClientRect();
       const a = stacked ? [f.left - g.left + 24, f.bottom - g.top] : [f.right - g.left, f.top - g.top + f.height / 2];
@@ -216,7 +221,7 @@ export function teamFlow(canvas, board, color = '#8b9bff') {
     const { ctx, w, h } = s;
     ctx.clearRect(0, 0, w, h);
     ctx.lineWidth = 1.2;
-    paths.forEach((p) => { const on = p.el.classList.contains('in'); ctx.strokeStyle = rgba(color, on ? 0.35 : 0.07); strokeCurve(ctx, p.c); });
+    paths.forEach((p) => { const on = p.el.classList.contains('in'); ctx.strokeStyle = rgba(color, on ? 0.3 : 0.06); strokeCurve(ctx, p.c); });
     const live = paths.filter((p) => p.el.classList.contains('in'));
     if (!REDUCED && live.length && packets.length < 14 && Math.random() < 0.25) packets.push({ p: live[(Math.random() * live.length) | 0], s: 0, v: 170 + Math.random() * 60 });
     for (let k = packets.length - 1; k >= 0; k--) {
@@ -224,7 +229,7 @@ export function teamFlow(canvas, board, color = '#8b9bff') {
       q.s += q.v * dt;
       if (q.s > q.p.r.L) { packets.splice(k, 1); continue; }
       const [x, y] = at(q.p.r, q.s);
-      ctx.fillStyle = color; ctx.beginPath(); ctx.arc(x, y, 2.6, 0, 6.283); ctx.fill();
+      ctx.fillStyle = color; ctx.beginPath(); ctx.arc(x, y, 2.2, 0, 6.283); ctx.fill();
     }
   }
   return { ...ctl, rebuild: build };
@@ -242,9 +247,9 @@ export function cutover(canvas, input, onChange, labels) {
     const A = [bw / 2 + 2, h / 2], P = [w * 0.48, h / 2], M3 = [w - bw / 2 - 2, h * 0.24], M4 = [w - bw / 2 - 2, h * 0.76];
     const c1 = hcurve([A[0] + bw / 2, A[1]], [P[0] - bw / 2, P[1]]), c3 = hcurve([P[0] + bw / 2, P[1]], [M3[0] - bw / 2, M3[1]]), c4 = hcurve([P[0] + bw / 2, P[1]], [M4[0] - bw / 2, M4[1]]);
     ctx.lineWidth = 1.5;
-    ctx.strokeStyle = 'rgba(255,255,255,.18)'; strokeCurve(ctx, c1);
-    ctx.strokeStyle = `rgba(148,163,184,${0.12 + 0.5 * (1 - cut)})`; strokeCurve(ctx, c3);
-    ctx.strokeStyle = `rgba(79,209,255,${0.12 + 0.6 * cut})`; strokeCurve(ctx, c4);
+    ctx.strokeStyle = 'rgba(237,234,227,.2)'; strokeCurve(ctx, c1);
+    ctx.strokeStyle = `rgba(124,122,116,${0.12 + 0.6 * (1 - cut)})`; strokeCurve(ctx, c3);
+    ctx.strokeStyle = `rgba(212,242,90,${0.12 + 0.6 * cut})`; strokeCurve(ctx, c4);
     if (!REDUCED && Math.random() < 0.55 && packets.length < 40) packets.push({ t: 0, seg: 0, to4: Math.random() < cut, v: 0.8 + Math.random() * 0.4 });
     for (let k = packets.length - 1; k >= 0; k--) {
       const p = packets[k];
@@ -252,24 +257,24 @@ export function cutover(canvas, input, onChange, labels) {
       if (p.t >= 1) { if (p.seg === 0) { p.seg = 1; p.t = 0; } else { packets.splice(k, 1); continue; } }
       const c = p.seg === 0 ? c1 : p.to4 ? c4 : c3;
       const [x, y] = bez(c[0], c[1], c[2], c[3], p.t);
-      ctx.fillStyle = p.seg === 0 ? '#e6e9f0' : p.to4 ? '#4fd1ff' : '#94a3b8';
+      ctx.fillStyle = p.seg === 0 ? K.bone : p.to4 ? K.accent : K.muted;
       ctx.beginPath(); ctx.arc(x, y, 2.5, 0, 6.283); ctx.fill();
     }
     const box = (pt, l, sub, stroke, alpha = 1) => {
       ctx.globalAlpha = alpha;
-      ctx.fillStyle = '#10131b'; ctx.strokeStyle = stroke; ctx.lineWidth = 1.2;
-      ctx.beginPath(); ctx.roundRect(pt[0] - bw / 2, pt[1] - bh / 2, bw, bh, 12); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = K.raised; ctx.strokeStyle = stroke; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.roundRect(pt[0] - bw / 2, pt[1] - bh / 2, bw, bh, 2); ctx.fill(); ctx.stroke();
       ctx.textAlign = 'center';
-      let fs = 13; ctx.font = `600 ${fs}px Inter, sans-serif`;
-      while (fs > 9 && ctx.measureText(l).width > bw - 12) { fs -= 0.5; ctx.font = `600 ${fs}px Inter, sans-serif`; }
-      ctx.fillStyle = '#f2f4f8'; ctx.fillText(l, pt[0], pt[1] - 2);
-      ctx.font = '11px Inter, sans-serif'; ctx.fillStyle = '#8a91a3'; ctx.fillText(sub, pt[0], pt[1] + 13);
+      let fs = 13; ctx.font = `600 ${fs}px ${K.sans}`;
+      while (fs > 9 && ctx.measureText(l).width > bw - 12) { fs -= 0.5; ctx.font = `600 ${fs}px ${K.sans}`; }
+      ctx.fillStyle = K.bone; ctx.fillText(l, pt[0], pt[1] - 2);
+      ctx.font = `11px ${K.mono}`; ctx.fillStyle = K.muted; ctx.fillText(sub, pt[0], pt[1] + 13);
       ctx.textAlign = 'left'; ctx.globalAlpha = 1;
     };
-    box(A, labels.src, labels.srcSub, 'rgba(255,255,255,.3)');
-    box(P, labels.proxy, labels.proxySub, '#8b9bff');
-    box(M3, 'Mule 3', `${40 - Math.round(cut * 40)} ${labels.flows}`, '#64748b', 0.4 + 0.6 * (1 - cut));
-    box(M4, 'Mule 4', `${Math.round(cut * 40)} ${labels.flows}`, '#4fd1ff');
+    box(A, labels.src, labels.srcSub, 'rgba(237,234,227,.3)');
+    box(P, labels.proxy, labels.proxySub, K.bone);
+    box(M3, 'Mule 3', `${40 - Math.round(cut * 40)} ${labels.flows}`, K.muted, 0.4 + 0.6 * (1 - cut));
+    box(M4, 'Mule 4', `${Math.round(cut * 40)} ${labels.flows}`, K.accent);
   }
   // auto-play once on first view
   if (!REDUCED) {
@@ -310,11 +315,11 @@ export function donutChart(host, data, totalLabel) {
   const wrap = document.createElement('div'); wrap.className = 'donut';
   const s = svg('svg', { viewBox: '0 0 200 200', role: 'img' });
   const R = 78, C = 2 * Math.PI * R;
-  svg('circle', { cx: 100, cy: 100, r: R, fill: 'none', stroke: 'rgba(255,255,255,.06)', 'stroke-width': 22 }, s);
+  svg('circle', { cx: 100, cy: 100, r: R, fill: 'none', stroke: 'rgba(237,234,227,.07)', 'stroke-width': 14 }, s);
   let acc = 0;
   const segs = data.map(([l, v, c], i) => {
     const len = (v / total) * C;
-    const seg = svg('circle', { cx: 100, cy: 100, r: R, fill: 'none', stroke: c, 'stroke-width': 22, 'stroke-dasharray': `0 ${C}`, transform: `rotate(${-90 + (acc / total) * 360} 100 100)`, class: 'dseg', tabindex: 0 }, s);
+    const seg = svg('circle', { cx: 100, cy: 100, r: R, fill: 'none', stroke: c, 'stroke-width': 14, 'stroke-dasharray': `0 ${C}`, transform: `rotate(${-90 + (acc / total) * 360} 100 100)`, class: 'dseg', tabindex: 0 }, s);
     seg.dataset.len = Math.max(0, len - 2); seg.dataset.i = i;
     acc += v;
     return seg;

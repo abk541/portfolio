@@ -6,144 +6,170 @@
   <title>Abdelkader El Azzouzi · Integration & AI Tech Lead</title>
   <meta name="description" content="Tech Lead MuleSoft & Informatica IDMC at Bouygues Construction IT. 120+ APIs in production, a group-wide master-data platform and 30 MCP servers for AI agents. AI-enhanced full-stack developer since 2023." />
   <meta property="og:title" content="Abdelkader El Azzouzi · Integration & AI Tech Lead" />
-  <meta property="og:description" content="I connect the software a company runs on, and make AI useful on top of it." />
-  <meta name="theme-color" content="#07080d" />
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ffb36b'/%3E%3Cstop offset='1' stop-color='%23f0663a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23g)'/%3E%3Ctext x='32' y='41' font-family='Arial' font-weight='700' font-size='24' fill='white' text-anchor='middle'%3EAE%3C/text%3E%3C/svg%3E" />
+  <meta property="og:description" content="I make the software a company runs on work as one, then put AI to work on top of it." />
+  <meta name="theme-color" content="#0d0e0c" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230d0e0c'/%3E%3Cpath d='M10 40h14l8-16 8 16h14' fill='none' stroke='%23edeae3' stroke-width='3'/%3E%3Ccircle cx='32' cy='24' r='5' fill='%23d4f25a'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/site.css" />
-  <link rel="stylesheet" href="css/glass.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
 
-  <div class="scene" aria-hidden="true"><i></i><i></i><i></i><b></b></div>
-
-  <!-- top bar -->
-  <header class="top" id="top">
-    <div class="top-l">
-      <button class="glass-ic" type="button" data-go="home" aria-label="Home"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h16"/></svg></button>
-      <a href="#home" class="who" data-go="home" translate="no"><span class="avatar">AE</span><span class="who-t"><b>Abdelkader El Azzouzi</b><small data-k="roleShort"></small></span></a>
-    </div>
-    <nav class="pills" id="pills" aria-label="Main"></nav>
-    <div class="top-r">
+  <header class="nav" id="nav">
+    <a class="mark" href="#top" translate="no" aria-label="Abdelkader El Azzouzi, back to top">
+      <svg viewBox="0 0 40 24" aria-hidden="true"><path d="M1 17h10l9-11 9 11h10"/><circle cx="20" cy="6" r="3.2"/></svg>
+      <span>Abdelkader El Azzouzi</span>
+    </a>
+    <nav class="nav-links" id="nav-links" aria-label="Sections"></nav>
+    <div class="nav-r">
       <div class="lang" id="lang"></div>
-      <a class="glass-ic" href="mailto:abdelkader.elazzouzi@gmail.com" aria-label="Email"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7l8 6 8-6"/></svg></a>
-      <a class="glass-ic" href="https://www.linkedin.com/in/abdelkader-el-azzouzi-7778a5189" target="_blank" rel="noopener" aria-label="LinkedIn" data-icon="linkedin"></a>
-      <span class="avatar sm status" aria-hidden="true">AE</span>
+      <button class="menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="sheet"><span data-k="menu"></span><i aria-hidden="true"></i></button>
     </div>
+    <span class="progress" id="progress" aria-hidden="true"></span>
   </header>
 
-  <!-- dock -->
-  <nav class="dock" id="dock" aria-label="Screens"></nav>
+  <div class="sheet" id="sheet" hidden>
+    <nav class="sheet-links" id="sheet-links" aria-label="Sections"></nav>
+    <div class="sheet-foot">
+      <a href="mailto:abdelkader.elazzouzi@gmail.com" translate="no">abdelkader.elazzouzi@gmail.com</a>
+      <a href="https://www.linkedin.com/in/abdelkader-el-azzouzi-7778a5189" target="_blank" rel="noopener">LinkedIn ↗</a>
+      <a href="https://github.com/abk541" target="_blank" rel="noopener">GitHub ↗</a>
+    </div>
+  </div>
 
-  <main id="main" class="screens">
-    <!-- HOME -->
-    <section class="view" data-view="home" id="v-home">
-      <header class="vh">
-        <div>
-          <h1 class="vh-t" id="greet"></h1>
-          <p class="vh-s" data-kh="heroTitle"></p>
+  <main id="main">
+    <!-- HERO -->
+    <section class="hero" id="top" aria-labelledby="hero-t">
+      <div class="wrap">
+        <div class="hero-meta rv">
+          <span class="hm-name"><span data-k="folio"></span> — 2026</span>
+          <span class="hm-role"><span data-k="heroRole"></span> <span class="sl">/</span> <span translate="no" data-k="heroOrg"></span></span>
+          <span class="hm-status"><i aria-hidden="true"></i><span data-k="status"></span></span>
         </div>
-        <div class="vh-a">
-          <a class="gbtn primary" href="#projects" data-go="projects" data-k="ctaWork"></a>
-          <a class="gbtn" href="#contact" data-go="contact" data-k="ctaContact"></a>
+        <h1 class="hero-t split" id="hero-t" data-kh="heroTitle"></h1>
+        <div class="hero-foot">
+          <p class="lede rv" data-k="heroLede"></p>
+          <div class="hero-cta rv">
+            <a class="btn solid" href="#work"><span data-k="ctaWork"></span><span class="arr" aria-hidden="true">↓</span></a>
+            <a class="btn line" href="#contact"><span data-k="ctaContact"></span><span class="arr" aria-hidden="true">→</span></a>
+          </div>
         </div>
-      </header>
-      <div class="kpis" id="stats"></div>
-      <div class="row r2">
-        <article class="g card flow-card">
-          <div class="ch"><h2 data-k="liveTitle"></h2><span class="live-pill"><i></i><span data-k="liveTag"></span></span></div>
-          <p class="cs" data-k="liveSub"></p>
-          <div class="flow-box"><canvas id="hero-flow" aria-label="Data flowing from business systems through an integration hub to apps and AI agents"></canvas></div>
-        </article>
-        <article class="g card now-card">
-          <div class="ch"><h2 data-k="nowTitle"></h2></div>
-          <p class="cs" id="now-date"></p>
-          <ul class="now" id="now"></ul>
-        </article>
       </div>
-      <div class="platforms" id="platforms"></div>
-      <div class="row r3">
-        <article class="g card jobs-card">
-          <div class="ch"><h2 data-k="jobsTitle"></h2><span class="tag-pill" data-k="jobsTag"></span></div>
-          <p class="cs" data-k="jobsSub"></p>
-          <div class="vbars" id="vbars"></div>
-        </article>
-        <article class="g card plain-card">
-          <div class="ch"><h2 data-k="doTitle"></h2><div class="seg" role="tablist" id="compare-seg"></div></div>
-          <div class="compare-stage"><svg id="compare-svg" viewBox="0 0 640 340" role="img"></svg></div>
-          <p class="compare-cap" id="compare-cap" aria-live="polite"></p>
-        </article>
-      </div>
-      <div class="pillars" id="pillars"></div>
-      <article class="g card team">
-        <div class="ch"><h2 data-k="teamTitle"></h2><div class="seg seg-wrap" role="tablist" id="team-seg"></div></div>
-        <div class="team-board" id="team-board"></div>
-      </article>
+      <figure class="band rv" aria-label="">
+        <div class="wrap band-legend" aria-hidden="true"><span data-k="from"></span><span data-k="via"></span><span data-k="to"></span></div>
+        <div class="band-stage"><canvas id="hero-flow" aria-label="Data flowing from business systems through an integration hub to apps, AI agents and analytics"></canvas></div>
+        <figcaption class="wrap band-cap"><span class="mono" data-k="tryIt"></span></figcaption>
+      </figure>
+      <div class="wrap"><dl class="numbers" id="numbers"></dl></div>
     </section>
 
-    <!-- EXPERTISE -->
-    <section class="view" data-view="expertise" id="v-expertise" hidden>
-      <header class="vh">
-        <div><h1 class="vh-t" data-k="exTitle"></h1><p class="vh-s" data-k="exLede"></p></div>
-        <div class="xtabs seg" role="tablist" id="xtabs"></div>
-      </header>
-      <div class="xpanel" id="xpanel"></div>
-    </section>
+    <!-- 01 PROFILE -->
+    <section class="sec" id="profile" aria-labelledby="profile-t">
+      <div class="wrap">
+        <header class="sec-h"><p class="sec-i"><span class="st"></span><span class="mono">01</span><span class="mono" data-nav="profile"></span></p><h2 class="sec-t split" id="profile-t" data-kh="profileTitle"></h2></header>
+        <div class="profile">
+          <p class="profile-text rv" data-k="profileText"></p>
+          <dl class="facts rv" id="facts"></dl>
+        </div>
+        <ol class="pillars" id="pillars"></ol>
 
-    <!-- PROJECTS -->
-    <section class="view" data-view="projects" id="v-projects" hidden>
-      <header class="vh">
-        <div><h1 class="vh-t" data-k="workTitle"></h1><p class="vh-s" data-k="workLede"></p></div>
-        <div class="filters seg" role="tablist" id="filters"></div>
-      </header>
-      <ul class="tiles" id="works"></ul>
-    </section>
+        <div class="plain">
+          <div class="plain-l rv">
+            <p class="kicker mono" data-k="plainTitle"></p>
+            <h3 class="h3" data-k="doTitle"></h3>
+            <p class="muted-p" data-k="doLede"></p>
+            <div class="toggle" role="tablist" id="compare-seg"></div>
+            <p class="compare-cap" id="compare-cap" aria-live="polite"></p>
+          </div>
+          <div class="plain-r rv"><svg id="compare-svg" viewBox="0 0 640 340" role="img"></svg></div>
+        </div>
 
-    <!-- CAREER -->
-    <section class="view" data-view="career" id="v-career" hidden>
-      <header class="vh">
-        <div><h1 class="vh-t" data-k="xpTitle"></h1><p class="vh-s" data-k="careerSub"></p></div>
-      </header>
-      <div class="career">
-        <article class="g card"><ol class="cv" id="cv"></ol></article>
-        <div class="career-side">
-          <article class="g card"><div class="ch"><h2 data-k="eduTitle"></h2></div><ul class="plain-list" id="edu"></ul></article>
-          <article class="g card"><div class="ch"><h2 data-k="langTitle"></h2></div><ul class="plain-list" id="langs"></ul></article>
+        <div class="team">
+          <div class="team-h rv"><h3 class="h3" data-k="teamTitle"></h3><div class="toggle" role="tablist" id="team-seg"></div></div>
+          <div class="team-board rv" id="team-board"></div>
         </div>
       </div>
     </section>
 
-    <!-- CONTACT -->
-    <section class="view" data-view="contact" id="v-contact" hidden>
-      <header class="vh">
-        <div><h1 class="vh-t" data-k="msgTitle"></h1><p class="vh-s" data-k="ctLede"></p></div>
-      </header>
-      <div class="msg-app">
-        <aside class="g card msg-list" id="msg-list"></aside>
-        <article class="g card msg-thread">
-          <div class="mt-head" id="mt-head"></div>
-          <div class="mt-body" id="mt-body" aria-live="polite"></div>
-          <form class="mt-compose" id="mt-compose">
-            <input id="mt-input" type="text" autocomplete="off" />
-            <button class="gbtn primary" type="submit" id="mt-send"></button>
+    <!-- 02 PRACTICE -->
+    <section class="sec" id="practice" aria-labelledby="practice-t">
+      <div class="wrap">
+        <header class="sec-h"><p class="sec-i"><span class="st"></span><span class="mono">02</span><span class="mono" data-nav="practice"></span></p><div><h2 class="sec-t split" id="practice-t" data-kh="practiceTitle"></h2><p class="sec-l rv" data-k="practiceLede"></p></div></header>
+        <div class="practice">
+          <div class="prac-list" role="tablist" id="xtabs" aria-orientation="vertical"></div>
+          <div class="xpanel" id="xpanel" role="tabpanel"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 WORK -->
+    <section class="sec" id="work" aria-labelledby="work-t">
+      <div class="wrap">
+        <header class="sec-h"><p class="sec-i"><span class="st"></span><span class="mono">03</span><span class="mono" data-nav="work"></span></p><div><h2 class="sec-t split" id="work-t" data-k="workTitle"></h2><p class="sec-l rv" data-k="workLede"></p></div></header>
+        <div class="cases" id="cases"></div>
+        <div class="index">
+          <div class="index-h rv"><h3 class="h3" data-k="indexTitle"></h3><div class="filters" role="tablist" id="filters"></div></div>
+          <ul class="index-list" id="index-list"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04 STACK -->
+    <section class="sec" id="stack" aria-labelledby="stack-t">
+      <div class="wrap">
+        <header class="sec-h"><p class="sec-i"><span class="st"></span><span class="mono">04</span><span class="mono" data-nav="stack"></span></p><div><h2 class="sec-t split" id="stack-t" data-kh="stackTitle"></h2><p class="sec-l rv" data-k="stackLede"></p></div></header>
+        <ol class="layers" id="layers"></ol>
+      </div>
+    </section>
+
+    <!-- 05 PATH -->
+    <section class="sec" id="path" aria-labelledby="path-t">
+      <div class="wrap">
+        <header class="sec-h"><p class="sec-i"><span class="st"></span><span class="mono">05</span><span class="mono" data-nav="path"></span></p><div><h2 class="sec-t split" id="path-t" data-k="pathTitle"></h2><p class="sec-l rv" data-k="careerSub"></p></div></header>
+        <div class="route-wrap"><span class="route-rail" aria-hidden="true"><i id="route-fill"></i></span><ol class="route" id="cv"></ol></div>
+        <div class="path-side">
+          <div class="rv"><h3 class="kicker mono" data-k="eduTitle"></h3><ul class="plain-list" id="edu"></ul></div>
+          <div class="rv"><h3 class="kicker mono" data-k="langTitle"></h3><ul class="plain-list" id="langs"></ul></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 CONTACT -->
+    <section class="sec contact" id="contact" aria-labelledby="contact-t">
+      <div class="wrap">
+        <header class="sec-h"><p class="sec-i"><span class="st"></span><span class="mono">06</span><span class="mono" data-nav="contact"></span></p></header>
+        <h2 class="contact-t split" id="contact-t" data-kh="contactTitle"></h2>
+        <div class="contact-g">
+          <form class="compose rv" id="compose">
+            <p class="sec-l" data-k="contactLede"></p>
+            <label class="sr" for="msg" data-k="typeHere"></label>
+            <textarea id="msg" rows="4"></textarea>
+            <button class="btn solid" type="submit"><span data-k="send"></span><span class="arr" aria-hidden="true">→</span></button>
           </form>
-        </article>
-        <aside class="g card msg-profile" id="msg-profile"></aside>
+          <div class="direct rv">
+            <p class="kicker mono" data-k="orFind"></p>
+            <a class="dl" href="mailto:abdelkader.elazzouzi@gmail.com"><span class="mono">Email</span><b translate="no">abdelkader.elazzouzi@gmail.com</b><i aria-hidden="true">↗</i></a>
+            <a class="dl" href="https://www.linkedin.com/in/abdelkader-el-azzouzi-7778a5189" target="_blank" rel="noopener"><span class="mono">LinkedIn</span><b translate="no">Abdelkader El Azzouzi</b><i aria-hidden="true">↗</i></a>
+            <a class="dl" href="https://github.com/abk541" target="_blank" rel="noopener"><span class="mono">GitHub</span><b translate="no">@abk541</b><i aria-hidden="true">↗</i></a>
+          </div>
+        </div>
       </div>
-      <footer class="foot"><span>© 2026 Abdelkader El Azzouzi</span><span data-k="footer"></span></footer>
+      <footer class="foot wrap">
+        <span translate="no">© 2026 Abdelkader El Azzouzi</span>
+        <span data-k="footer"></span>
+        <a href="#top" data-k="top"></a>
+      </footer>
     </section>
   </main>
 
-  <!-- project sheet -->
-  <div class="drawer" id="drawer" hidden>
-    <div class="drawer-bg" data-close></div>
-    <article class="drawer-card g" role="dialog" aria-modal="true" aria-labelledby="dr-title" tabindex="-1">
-      <button class="x" type="button" data-close aria-label="Close">×</button>
-      <div id="drawer-body"></div>
-    </article>
+  <!-- case study -->
+  <div class="case" id="case" hidden>
+    <div class="case-card" role="dialog" aria-modal="true" aria-labelledby="case-title" tabindex="-1">
+      <div class="case-bar"><span class="mono" id="case-meta"></span><button class="x" type="button" data-close><span data-k="close"></span><i aria-hidden="true"></i></button></div>
+      <div class="case-body" id="case-body"></div>
+    </div>
   </div>
 
   <div class="tip" id="tip" role="tooltip" hidden><b id="tip-t"></b><p id="tip-what"></p><p class="tip-where"><span id="tip-wl"></span><em id="tip-where"></em></p></div>
