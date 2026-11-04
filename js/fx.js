@@ -62,12 +62,13 @@ export function loop(canvas, draw, { onResize } = {}) {
 }
 
 /* ------------------------------------------------------------------ hero: systems → hub → consumers */
-export function heroFlow(canvas, { sources, targets, hub }) {
-  const COLS = ['#4fd1ff', '#8b9bff', '#34d399', '#f472b6', '#fbbf24'];
+export function heroFlow(canvas, { sources, targets, hub, compact = false, hubColor = ['#a9b5ff', '#5b6cf0'], cols }) {
+  const COLS = cols || ['#4fd1ff', '#8b9bff', '#34d399', '#f472b6', '#fbbf24'];
+  const FONT = compact ? '500 11.5px Inter, sans-serif' : '500 12.5px Inter, sans-serif', PH = compact ? 26 : 30, HR = compact ? 30 : 36;
   let nodesL = [], nodesR = [], H = [0, 0], routes = [], packets = [], hover = -1;
   const pill = (ctx, x, y, label, align, hot, col) => {
-    ctx.font = '500 12.5px Inter, sans-serif';
-    const w = ctx.measureText(label).width + 30, h = 30;
+    ctx.font = FONT;
+    const w = ctx.measureText(label).width + 30, h = PH;
     const x0 = align === 'l' ? x : x - w;
     ctx.fillStyle = hot ? rgba(col, 0.18) : 'rgba(16,19,27,.95)';
     ctx.strokeStyle = hot ? col : 'rgba(255,255,255,.14)';
@@ -86,19 +87,19 @@ export function heroFlow(canvas, { sources, targets, hub }) {
       nodesL = sources.map((l, i) => ({ l, x: 4, y: yl[i], c: COLS[i % COLS.length] }));
       nodesR = targets.map((l, i) => ({ l, x: s.w - 4, y: yr[i] }));
       // edges measured roughly by label length
-      const ctx = s.ctx; ctx.font = '500 12.5px Inter, sans-serif';
+      const ctx = s.ctx; ctx.font = FONT;
       nodesL.forEach((n) => { n.e = n.x + ctx.measureText(n.l).width + 30; });
       nodesR.forEach((n) => { n.e = n.x - ctx.measureText(n.l).width - 30; });
       routes = [];
       nodesL.forEach((a, i) => nodesR.forEach((b, j) => {
-        routes.push({ i, j, r: sampleRoute([hcurve([a.e, a.y], [H[0] - 36, H[1]], 0.55), hcurve([H[0] + 36, H[1]], [b.e, b.y], 0.55)]) });
+        routes.push({ i, j, r: sampleRoute([hcurve([a.e, a.y], [H[0] - HR, H[1]], 0.55), hcurve([H[0] + HR, H[1]], [b.e, b.y], 0.55)]) });
       }));
     },
   });
   canvas.addEventListener('pointermove', (e) => {
     const r = canvas.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
     hover = -1;
-    nodesL.forEach((n, i) => { if (x < n.e + 10 && Math.abs(y - n.y) < 17) hover = i; });
+    nodesL.forEach((n, i) => { if (x < n.e + 10 && Math.abs(y - n.y) < PH / 2 + 2) hover = i; });
     canvas.style.cursor = hover >= 0 ? 'pointer' : '';
   });
   canvas.addEventListener('pointerleave', () => { hover = -1; });
@@ -114,8 +115,8 @@ export function heroFlow(canvas, { sources, targets, hub }) {
     if (!nodesL.length) return;
     // links
     ctx.lineWidth = 1.2;
-    nodesL.forEach((a, i) => { ctx.strokeStyle = hover === i ? rgba(a.c, 0.7) : rgba(a.c, hover >= 0 ? 0.08 : 0.22); strokeCurve(ctx, hcurve([a.e, a.y], [H[0] - 36, H[1]], 0.55)); });
-    nodesR.forEach((b) => { ctx.strokeStyle = 'rgba(139,155,255,.25)'; strokeCurve(ctx, hcurve([H[0] + 36, H[1]], [b.e, b.y], 0.55)); });
+    nodesL.forEach((a, i) => { ctx.strokeStyle = hover === i ? rgba(a.c, 0.7) : rgba(a.c, hover >= 0 ? 0.08 : 0.22); strokeCurve(ctx, hcurve([a.e, a.y], [H[0] - HR, H[1]], 0.55)); });
+    nodesR.forEach((b) => { ctx.strokeStyle = 'rgba(139,155,255,.25)'; strokeCurve(ctx, hcurve([H[0] + HR, H[1]], [b.e, b.y], 0.55)); });
     // packets
     if (!REDUCED && packets.length < (PHONE ? 22 : 40) && Math.random() < (hover >= 0 ? 0.35 : 0.18)) spawn(hover >= 0 && Math.random() < 0.7 ? hover : undefined);
     for (let k = packets.length - 1; k >= 0; k--) {
@@ -131,10 +132,10 @@ export function heroFlow(canvas, { sources, targets, hub }) {
     // hub
     const pulse = REDUCED ? 0 : (t % 2.4) / 2.4;
     ctx.strokeStyle = `rgba(139,155,255,${0.5 * (1 - pulse)})`; ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.arc(H[0], H[1], 36 + pulse * 26, 0, 6.283); ctx.stroke();
-    const g = ctx.createRadialGradient(H[0], H[1] - 10, 4, H[0], H[1], 40);
-    g.addColorStop(0, '#a9b5ff'); g.addColorStop(1, '#5b6cf0');
-    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(H[0], H[1], 36, 0, 6.283); ctx.fill();
+    ctx.beginPath(); ctx.arc(H[0], H[1], HR + pulse * 22, 0, 6.283); ctx.stroke();
+    const g = ctx.createRadialGradient(H[0], H[1] - 10, 4, H[0], H[1], HR + 4);
+    g.addColorStop(0, hubColor[0]); g.addColorStop(1, hubColor[1]);
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(H[0], H[1], HR, 0, 6.283); ctx.fill();
     ctx.fillStyle = '#07080b'; ctx.font = '600 11px Inter, sans-serif'; ctx.textAlign = 'center';
     hub.forEach((l, i) => ctx.fillText(l, H[0], H[1] + 4 + (i - (hub.length - 1) / 2) * 13));
     ctx.textAlign = 'left';

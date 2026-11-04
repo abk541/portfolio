@@ -83,7 +83,7 @@ const X2 = {
   },
 };
 const HERO_SOURCES = ['SAP ERP', 'Salesforce', 'Global HR', 'Informatica MDM', 'Hexagon'];
-let heroCtl = null, archCtl = null, teamCtl = null, cutCtl = null;
+let heroCtl = null, archCtl = null, teamCtl = null, cutCtl = null, ddCtl = null;
 
 /* ------------------------------------------------------------------ static text */
 function fillText() {
@@ -132,6 +132,26 @@ function renderStats() {
     const step = (now) => { const k = Math.max(0, Math.min(1, (now - t0) / 1100)); el.textContent = Math.round(target * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(step); };
     requestAnimationFrame(step);
   });
+}
+
+/* ------------------------------------------------------------------ platform cards (Home) */
+const PLAT = { mule: ['#2f8cff', '#4fd1ff'], infa: ['#ff7a3d', '#ffb36b'], ai: ['#8b6cff', '#c4b5fd'] };
+function renderPlatforms() {
+  const C = X2[lang];
+  const host = $('#platforms');
+  host.innerHTML = ['mule', 'infa', 'ai'].map((k) => {
+    const X = EXPERTISE[k], L = X[lang];
+    return `<article class="g card plat" style="--c:${PLAT[k][0]};--c2:${PLAT[k][1]}">
+      <div class="plat-h"><span class="plat-logo">${icon(X.icon)}</span><div><b>${esc(X.name === 'AI' ? (lang === 'fr' ? 'IA' : 'AI') : X.name)}</b><small>${esc(L.tab)}</small></div></div>
+      <p class="plat-t">${esc(L.title)}</p>
+      <div class="plat-chart" id="pc-${k}"></div>
+      <ul class="plat-res">${L.results.slice(0, 2).map(([n, t]) => `<li><b>${esc(n)}</b><span>${esc(t.split(/[:,(]/)[0])}</span></li>`).join('')}</ul>
+      <a class="gbtn plat-go" href="#expertise" data-go="expertise" data-x="${k}">${esc(T.explore)} →</a>
+    </article>`;
+  }).join('');
+  barChart($('#pc-mule'), C.muleBars, '#4fd1ff');
+  donutChart($('#pc-infa'), [39, 36, 32, 21, 12].map((v, i) => [C.infaSegs[i], v, ['#ff8a5c', '#fbbf24', '#4fd1ff', '#8b9bff', '#64748b'][i]]), C.infaTotal);
+  barChart($('#pc-ai'), C.aiBars, '#a78bfa');
 }
 
 /* ------------------------------------------------------------------ home extras */
@@ -332,8 +352,16 @@ function applyDom() {
   $$('.chip').forEach((c) => { const hit = d && d.sys.includes(c.dataset.s); c.classList.toggle('hit', !!hit); c.classList.toggle('dim', !!d && !hit); });
   $$('.con').forEach((c) => { const hit = d && d.use.includes(+c.dataset.c); c.classList.toggle('hit', !!hit); c.classList.toggle('dim', !!d && !hit); });
   const det = $('#arch-detail');
-  if (d) det.innerHTML = `<b>${esc(d[lang][0])}</b><p>${esc(d[lang][1])}</p>`;
-  else det.innerHTML = `<b>${esc(T.all)}</b><p>${esc(X[lang].text)}</p>`;
+  const txt = d ? `<b>${esc(d[lang][0])}</b><p>${esc(d[lang][1])}</p>` : `<b>${esc(T.all)}</b><p>${esc(X[lang].text)}</p>`;
+  const cons = X.consumers[lang].map((c) => c.split(' (')[0]);
+  const srcs = (d ? d.sys : X.systems).slice(0, 6);
+  const tgts = d ? d.use.map((u) => cons[u]) : cons;
+  const n = Math.max(srcs.length, tgts.length);
+  det.innerHTML = `<div class="dd-t">${txt}</div><div class="dd-flow" style="height:${Math.max(170, n * 38 + 40)}px"><canvas aria-hidden="true"></canvas></div>`;
+  if (ddCtl) ddCtl.destroy();
+  const mule = xKey === 'mule';
+  ddCtl = heroFlow($('.dd-flow canvas', det), { sources: srcs, targets: tgts, hub: [mule ? 'API' : 'MDM'], compact: true,
+    hubColor: mule ? ['#9fd4ff', '#2f8cff'] : ['#ffd0a8', '#ff7a3d'], cols: mule ? ['#4fd1ff', '#7fb0ff', '#9cc0ff', '#38bdf8', '#60a5fa', '#93c5fd'] : ['#ffb36b', '#ff8a5c', '#fbbf24', '#fdba74', '#f97316', '#fcd34d'] });
 }
 function playAI(i, waitVisible) {
   aiFlow = i;
@@ -564,7 +592,7 @@ function show(id, push) {
 function enter(el) {
   el.classList.remove('in'); void el.offsetWidth; el.classList.add('in');
   // canvases measure their box when they become visible
-  requestAnimationFrame(() => { [heroCtl, archCtl, cutCtl, teamCtl].forEach((c) => c && c.resize && c.resize()); });
+  requestAnimationFrame(() => { [heroCtl, archCtl, cutCtl, teamCtl, ddCtl].forEach((c) => c && c.resize && c.resize()); });
   document.title = `${view === 'home' ? '' : `${T[VIEWS.find((v) => v[0] === view)[1]]} · `}Abdelkader El Azzouzi`;
 }
 function initChrome() {
@@ -572,6 +600,7 @@ function initChrome() {
     const a = e.target.closest('[data-go]');
     if (!a) return;
     e.preventDefault();
+    if (a.dataset.x && a.dataset.x !== xKey) { xKey = a.dataset.x; xDom = null; renderX(); }
     show(a.dataset.go, true);
   });
   addEventListener('popstate', () => show(location.hash.slice(1) || 'home'));
@@ -589,6 +618,7 @@ function renderAll() {
   renderHub();
   renderStats();
   renderVBars();
+  renderPlatforms();
   renderContact();
   renderCompare();
   renderPillars();

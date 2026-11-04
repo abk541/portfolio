@@ -368,3 +368,64 @@ body { background: transparent !important; }
 }
 .drawer-card { background: linear-gradient(160deg, rgba(70,66,80,.94), rgba(40,38,48,.96)) !important; }
 @media (max-width: 760px) { .foot { margin-bottom: 70px; } }
+
+/* ==========================================================================
+   v2: dark glow backdrop, platform cards, area flows
+   ========================================================================== */
+html { background: #07080d; }
+.scene { background: #07080d; }
+.scene::after { display: none; }
+.scene i { position: absolute; border-radius: 50%; will-change: transform; animation: orb 28s ease-in-out infinite alternate; }
+.scene i:nth-child(1) { width: 70vmax; height: 70vmax; left: -22vmax; top: -26vmax; background: radial-gradient(closest-side, rgba(47,140,255,.42), rgba(47,140,255,0)); }
+.scene i:nth-child(2) { width: 60vmax; height: 60vmax; right: -20vmax; top: 4vmax; background: radial-gradient(closest-side, rgba(255,122,61,.32), rgba(255,122,61,0)); animation-delay: -9s; }
+.scene i:nth-child(3) { width: 70vmax; height: 70vmax; left: 18vmax; bottom: -38vmax; background: radial-gradient(closest-side, rgba(139,108,255,.36), rgba(139,108,255,0)); animation-delay: -18s; }
+.scene b { position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,.07) 1px, transparent 1px); background-size: 26px 26px; mask-image: radial-gradient(ellipse at 50% 40%, #000 20%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse at 50% 40%, #000 20%, transparent 75%); }
+@keyframes orb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(4vmax, 3vmax) scale(1.08); } }
+@media (prefers-reduced-motion: reduce) { .scene i { animation: none; } }
+.g, .pillar, .pillar + .pillar, .x-intro, .arch, .ai-box, .cut-box, .chart, .x-cols > div:first-child, .x-skills, .tile button {
+  background: linear-gradient(160deg, rgba(255,255,255,.09), rgba(255,255,255,.03)), rgba(14,16,24,.55) !important;
+  border-color: rgba(255,255,255,.12) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 24px 60px -30px rgba(0,0,0,.8) !important;
+}
+.top.scrolled { background: rgba(7,8,13,.6); }
+
+/* platform cards */
+.platforms { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 14px; }
+@media (max-width: 1100px) { .platforms { grid-template-columns: 1fr; } }
+.plat { display: flex; flex-direction: column; gap: 14px; overflow: hidden; }
+.plat::before { content: ""; position: absolute; width: 260px; height: 260px; right: -90px; top: -110px; border-radius: 50%; background: radial-gradient(closest-side, color-mix(in srgb, var(--c) 45%, transparent), transparent); pointer-events: none; }
+.plat-h { display: flex; align-items: center; gap: 12px; position: relative; }
+.plat-logo { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; background: color-mix(in srgb, var(--c) 30%, transparent); border: 1px solid color-mix(in srgb, var(--c) 60%, transparent); box-shadow: 0 0 30px -6px var(--c); }
+.plat-logo svg { width: 24px; height: 24px; fill: var(--c2); }
+.plat-h b { display: block; font-size: 19px; }
+.plat-h small { color: var(--muted); font-size: 13px; }
+.plat-t { margin: 0; font-size: 15px; color: var(--ink-2); position: relative; }
+.plat-chart { min-height: 150px; }
+.plat-chart .bar { grid-template-columns: minmax(110px, 1fr) 1.1fr 54px; gap: 10px; }
+.plat-chart .bar-l { font-size: 13px; }
+.plat-chart .bar-v { font-size: 16px; }
+.plat-chart .donut { grid-template-columns: 140px 1fr; gap: 14px; }
+.plat-chart .donut svg { max-width: 140px; }
+.plat-chart .legend li { padding: 4px 8px; font-size: 12.5px; }
+@media (max-width: 420px) { .plat-chart .donut { grid-template-columns: 1fr; } }
+.plat-res { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.plat-res li { display: grid; grid-template-columns: 54px 1fr; gap: 10px; align-items: baseline; padding: 10px 12px; border-radius: 12px; background: rgba(255,255,255,.05); font-size: 13.5px; color: var(--ink-2); }
+.plat-res b { color: var(--c2); font-size: 18px; }
+.plat-go { margin-top: auto; align-self: flex-start; background: color-mix(in srgb, var(--c) 30%, transparent); border-color: color-mix(in srgb, var(--c) 60%, transparent); }
+.plat-go:hover { background: color-mix(in srgb, var(--c) 50%, transparent); }
+
+/* business-area flow inside the detail panel */
+.arch-detail { display: grid; grid-template-columns: minmax(220px, 1fr) 1.3fr; gap: 18px; align-items: center; min-height: 0; }
+.dd-flow { position: relative; width: 100%; }
+.dd-flow canvas { width: 100%; height: 100%; display: block; }
+@media (max-width: 900px) { .arch-detail { grid-template-columns: 1fr; } }
+.plat-chart.go .bar-track i { width: var(--w); }
+/* phones: the area flow already shows systems and consumers, so keep only the area picker + the flow */
+@media (max-width: 900px) {
+  .arch .arch-grid > .arch-col:first-of-type, .arch .arch-grid > .arch-col:last-child, .arch .pipe { display: none; }
+  .arch .doms { display: flex; flex-wrap: wrap; gap: 8px; }
+  .arch .dom { padding: 8px 14px; border-radius: 999px; font-size: 14px; }
+  .arch .dom::after { display: none; }
+  .arch .arch-col h4 { display: none; }
+}
+.scene i { animation: none !important; will-change: auto; }
