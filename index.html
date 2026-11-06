@@ -7,134 +7,143 @@
   <meta name="description" content="Tech Lead MuleSoft & Informatica IDMC at Bouygues Construction IT. 120+ APIs in production, a group-wide master-data platform and 30 MCP servers for AI agents. AI-enhanced full-stack developer since 2023." />
   <meta property="og:title" content="Abdelkader El Azzouzi · Integration & AI Tech Lead" />
   <meta property="og:description" content="I connect the software a company runs on, and make AI useful on top of it." />
-  <meta name="theme-color" content="#0b1120" />
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ff7a1a'/%3E%3Ctext x='32' y='42' font-family='Arial' font-weight='700' font-size='26' fill='white' text-anchor='middle'%3EAE%3C/text%3E%3C/svg%3E" />
+  <meta name="theme-color" content="#05070f" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpolygon points='32,2 58,17 58,47 32,62 6,47 6,17' fill='%2305070f' stroke='%2338e1ff' stroke-width='4'/%3E%3Ctext x='32' y='41' font-family='Arial' font-weight='700' font-size='22' fill='%23eaf0ff' text-anchor='middle'%3EAE%3C/text%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" />
+  <link rel="modulepreload" href="vendor/three.module.min.js" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
 
+  <div class="boot" id="boot" aria-hidden="true">
+    <div class="boot-in">
+      <span class="hex big">AE</span>
+      <p class="boot-t"><span data-k="boot"></span> <b id="boot-n">0</b>%</p>
+      <div class="boot-bar"><i id="boot-bar"></i></div>
+      <p class="boot-s" data-k="skip"></p>
+    </div>
+  </div>
+
+  <div class="bg" aria-hidden="true"></div>
+
   <header class="nav" id="nav">
-    <div class="nav-in">
-      <a class="brand" href="#top" translate="no"><span class="logo">AE</span><span class="brand-t"><b>Abdelkader El Azzouzi</b><small data-k="roleShort"></small></span></a>
-      <nav class="nav-links" id="nav-links" aria-label="Sections"></nav>
-      <div class="nav-r">
-        <div class="lang" id="lang"></div>
-        <a class="btn primary sm nav-cta" href="#contact" data-k="ctaContact"></a>
-        <button class="menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="sheet" aria-label="Menu"><i></i><i></i></button>
-      </div>
+    <a class="brand" href="#top" translate="no" aria-label="Abdelkader El Azzouzi, back to top"><span class="hex">AE</span><span class="brand-t"><b>Abdelkader El Azzouzi</b><small data-k="klass"></small></span></a>
+    <nav class="nav-links" id="nav-links" aria-label="Sections"></nav>
+    <div class="nav-r">
+      <div class="xp" aria-hidden="true"><span class="xp-l" id="xp-l">LVL 1</span><span class="xp-bar"><i id="xp-bar"></i></span></div>
+      <div class="lang" id="lang"></div>
+      <button class="menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="sheet" aria-label="Menu"><i></i><i></i><i></i></button>
     </div>
   </header>
 
   <div class="sheet" id="sheet" hidden>
     <nav class="sheet-links" id="sheet-links" aria-label="Sections"></nav>
-    <div class="sheet-foot">
-      <a class="btn primary" href="mailto:abdelkader.elazzouzi@gmail.com" translate="no">abdelkader.elazzouzi@gmail.com</a>
-    </div>
+    <a class="btn primary wide" href="mailto:abdelkader.elazzouzi@gmail.com" translate="no">abdelkader.elazzouzi@gmail.com</a>
   </div>
 
   <main id="main">
-    <!-- HERO -->
-    <section class="hero wrap" id="top">
-      <div class="hero-l">
-        <span class="status"><i></i><span data-k="status"></span></span>
-        <p class="hello" data-k="hello"></p>
-        <h1 class="hero-t" data-kh="heroTitle"></h1>
-        <p class="lede" data-k="heroLede"></p>
-        <div class="hero-cta">
-          <a class="btn primary" href="#projects"><span data-k="ctaProjects"></span> <span aria-hidden="true">→</span></a>
-          <a class="btn" href="#contact" data-k="ctaContact"></a>
-          <a class="btn icon" href="https://www.linkedin.com/in/abdelkader-el-azzouzi-7778a5189" target="_blank" rel="noopener" aria-label="LinkedIn" data-icon="linkedin"></a>
-          <a class="btn icon" href="https://github.com/abk541" target="_blank" rel="noopener" aria-label="GitHub" data-icon="github"></a>
+    <!-- START SCREEN -->
+    <section class="hero" id="top">
+      <canvas class="universe" id="universe" aria-label="3D universe of skills orbiting an integration core. Click a skill for details."></canvas>
+      <div class="hero-shade" aria-hidden="true"></div>
+      <div class="hero-in wrap">
+        <div class="hero-txt">
+          <span class="chip-status"><i></i><span data-k="status"></span></span>
+          <p class="p1">PLAYER 1</p>
+          <h1 class="hero-name" translate="no"><span class="glitch" data-text="ABDELKADER">ABDELKADER</span><span class="glitch" data-text="EL AZZOUZI">EL AZZOUZI</span></h1>
+          <p class="hero-class"><b data-k="klass"></b> <span class="sep">//</span> <span translate="no" data-k="guild"></span></p>
+          <p class="hero-pitch" data-k="heroPitch"></p>
+          <div class="hero-cta">
+            <a class="btn primary" href="#player"><span class="tri" aria-hidden="true"></span><span data-k="start"></span></a>
+            <a class="btn" href="#quests" data-k="questsBtn"></a>
+          </div>
         </div>
+        <div class="hud" id="hud"></div>
       </div>
-      <article class="card flow-card">
-        <div class="card-h"><h2 data-k="flowTitle"></h2><span class="live"><i></i><span data-k="flowTag"></span></span></div>
-        <p class="card-s" data-k="flowSub"></p>
-        <div class="flow-box"><canvas id="hero-flow" aria-label="Data flowing from business systems through an integration hub to apps, AI agents and analytics"></canvas></div>
-        <p class="hint" id="try-it"></p>
-      </article>
+      <div class="hero-legend wrap" id="legend"></div>
     </section>
-    <div class="wrap"><div class="kpis" id="kpis"></div></div>
 
-    <!-- ABOUT -->
-    <section class="sec wrap" id="about">
-      <header class="sec-h"><p class="eyebrow" data-nav="about"></p><h2 data-k="aboutTitle"></h2><p data-k="aboutSub"></p></header>
-      <div class="grid g-about">
-        <article class="card rv"><div class="card-h"><h3 data-k="inShort"></h3></div><p class="prose" data-k="profileText"></p></article>
-        <article class="card rv"><div class="card-h"><h3 data-k="keyFacts"></h3></div><dl class="facts" id="facts"></dl></article>
+    <!-- 01 PLAYER -->
+    <section class="sec wrap" id="player">
+      <header class="sh"><p class="kick"><span class="kn">01</span><span data-k="playerKicker"></span></p><h2 data-k="playerTitle"></h2><p class="sh-s" data-k="playerSub"></p></header>
+      <div class="player-grid">
+        <article class="panel player-card rv">
+          <div class="pc-top">
+            <div class="avatar"><span class="hex xl">AE</span><svg class="av-ring" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="56"/></svg></div>
+            <div><h3 translate="no">Abdelkader El Azzouzi</h3><p class="pc-class" data-k="klass"></p><span class="chip-status sm"><i></i><span data-k="status"></span></span></div>
+          </div>
+          <div class="lvl"><div class="lvl-badge"><small data-k="level"></small><b id="lvl-n">4</b></div><div class="lvl-x"><div class="xpb"><i id="lvl-bar"></i></div><p id="lvl-note"></p></div></div>
+          <p class="pc-text" data-k="profileText"></p>
+          <dl class="facts" id="facts"></dl>
+        </article>
+        <article class="panel rv"><h3 class="ph" data-k="attrTitle"></h3><div class="radar-box"><svg id="radar" viewBox="0 0 400 360" role="img"></svg></div></article>
+        <article class="panel ach-panel rv"><h3 class="ph" data-k="achTitle"></h3><ul class="ach" id="ach"></ul></article>
       </div>
-      <div class="pillars" id="pillars"></div>
-      <div class="grid g-plain">
-        <article class="card rv">
-          <div class="card-h"><h3 data-k="doTitle"></h3><div class="seg" role="tablist" id="compare-seg"></div></div>
-          <p class="card-s" data-k="doLede"></p>
+      <h3 class="sub-h"><span data-k="missionTitle"></span> <small data-k="missionSub"></small></h3>
+      <div class="mission">
+        <article class="panel rv">
+          <div class="ph-row"><h3 class="ph" data-k="doTitle"></h3><div class="seg" role="tablist" id="compare-seg"></div></div>
+          <p class="muted" data-k="doLede"></p>
           <svg id="compare-svg" viewBox="0 0 640 340" role="img"></svg>
           <p class="cap" id="compare-cap" aria-live="polite"></p>
         </article>
-        <article class="card rv">
-          <div class="card-h"><h3 data-k="teamTitle"></h3></div>
-          <div class="seg seg-wrap" role="tablist" id="team-seg"></div>
+        <article class="panel rv">
+          <h3 class="ph" data-k="teamTitle"></h3>
+          <div class="seg" role="tablist" id="team-seg"></div>
           <div class="team-board" id="team-board"></div>
         </article>
       </div>
     </section>
 
-    <!-- EXPERTISE -->
-    <section class="sec wrap" id="expertise">
-      <header class="sec-h"><p class="eyebrow" data-nav="expertise"></p><h2 data-k="expTitle"></h2><p data-k="expSub"></p></header>
+    <!-- 02 SKILL TREE -->
+    <section class="sec wrap" id="tree">
+      <header class="sh"><p class="kick"><span class="kn">02</span><span data-k="treeKicker"></span></p><h2 data-k="treeTitle"></h2><p class="sh-s" data-k="treeSub"></p></header>
+      <div class="seg tree-seg" role="tablist" id="tree-seg"></div>
+      <div class="panel tree-panel">
+        <div class="tree" id="skilltree"></div>
+      </div>
+    </section>
+
+    <!-- 03 WORLDS -->
+    <section class="sec wrap" id="worlds">
+      <header class="sh"><p class="kick"><span class="kn">03</span><span data-k="worldsKicker"></span></p><h2 data-k="worldsTitle"></h2><p class="sh-s" data-k="worldsSub"></p></header>
       <div class="xtabs" role="tablist" id="xtabs"></div>
       <div class="xpanel" id="xpanel" role="tabpanel"></div>
     </section>
 
-    <!-- SKILLS -->
-    <section class="sec wrap" id="skills">
-      <header class="sec-h"><p class="eyebrow" data-nav="skills"></p><h2 data-k="skillsTitle"></h2><p data-k="skillsSub"></p></header>
-      <div class="grid g-skills">
-        <article class="card rv"><div class="card-h"><h3 data-k="yearsTitle"></h3></div><div class="chart" id="years"></div></article>
-        <article class="card rv"><div class="card-h"><h3 data-k="layersTitle"></h3></div><ol class="layers" id="layers"></ol></article>
-      </div>
-    </section>
-
-    <!-- PROJECTS -->
-    <section class="sec wrap" id="projects">
-      <header class="sec-h"><p class="eyebrow" data-nav="projects"></p><h2 data-k="projectsTitle"></h2><p data-k="projectsSub"></p></header>
-      <h3 class="sub-h" data-k="featured"></h3>
-      <div class="featured" id="featured"></div>
-      <div class="sub-row"><h3 class="sub-h" data-k="allProjects"></h3><div class="filters" role="tablist" id="filters"></div></div>
+    <!-- 04 QUESTS -->
+    <section class="sec wrap" id="quests">
+      <header class="sh"><p class="kick"><span class="kn">04</span><span data-k="questsKicker"></span></p><h2 data-k="questsTitle"></h2><p class="sh-s" data-k="questsSub"></p></header>
+      <h3 class="sub-h" data-k="legendaryTitle"></h3>
+      <div class="legend-q" id="featured"></div>
+      <div class="log-h"><h3 class="sub-h" data-k="logTitle"></h3><div class="filters" role="tablist" id="filters"></div></div>
       <ul class="tiles" id="tiles"></ul>
     </section>
 
-    <!-- EXPERIENCE -->
-    <section class="sec wrap" id="experience">
-      <header class="sec-h"><p class="eyebrow" data-nav="experience"></p><h2 data-k="xpTitle"></h2><p data-k="xpSub"></p></header>
-      <article class="card rv"><div class="card-h"><h3 data-k="timeline"></h3></div><div class="gantt" id="gantt"></div></article>
-      <div class="grid g-xp">
-        <ol class="cv" id="cv"></ol>
-        <div class="xp-side">
-          <article class="card rv"><div class="card-h"><h3 data-k="eduTitle"></h3></div><ul class="plain-list" id="edu"></ul></article>
-          <article class="card rv"><div class="card-h"><h3 data-k="langTitle"></h3></div><ul class="plain-list" id="langs"></ul></article>
-        </div>
-      </div>
+    <!-- 05 JOURNEY -->
+    <section class="sec wrap" id="journey">
+      <header class="sh"><p class="kick"><span class="kn">05</span><span data-k="journeyKicker"></span></p><h2 data-k="journeyTitle"></h2><p class="sh-s" data-k="journeySub"></p></header>
+      <div class="panel map-panel rv"><div class="map" id="map"></div></div>
+      <article class="panel level-detail" id="level-detail" aria-live="polite"></article>
     </section>
 
-    <!-- CONTACT -->
+    <!-- 06 CONTACT -->
     <section class="sec wrap" id="contact">
-      <div class="card contact-card rv">
-        <div class="contact-l">
-          <p class="eyebrow" data-nav="contact"></p>
-          <h2 data-k="contactTitle"></h2>
-          <p class="lede" data-k="contactLede"></p>
+      <div class="panel contact rv">
+        <div>
+          <p class="kick"><span class="kn">06</span><span data-k="contactKicker"></span></p>
+          <h2 class="contact-t" data-k="contactTitle"></h2>
+          <p class="muted lg" data-k="contactLede"></p>
           <form class="compose" id="compose">
             <label class="sr" for="msg" data-k="typeHere"></label>
             <textarea id="msg" rows="4"></textarea>
-            <button class="btn primary" type="submit"><span data-k="send"></span> <span aria-hidden="true">→</span></button>
+            <button class="btn primary" type="submit"><span class="tri" aria-hidden="true"></span><span data-k="send"></span></button>
           </form>
         </div>
-        <div class="contact-r">
+        <div class="links">
           <p class="mini" data-k="orFind"></p>
           <a class="link-row" href="mailto:abdelkader.elazzouzi@gmail.com"><span class="li-ic" data-icon="gmail"></span><span><small>Email</small><b translate="no">abdelkader.elazzouzi@gmail.com</b></span><i aria-hidden="true">↗</i></a>
           <a class="link-row" href="https://www.linkedin.com/in/abdelkader-el-azzouzi-7778a5189" target="_blank" rel="noopener"><span class="li-ic" data-icon="linkedin"></span><span><small>LinkedIn</small><b translate="no">Abdelkader El Azzouzi</b></span><i aria-hidden="true">↗</i></a>
@@ -145,16 +154,16 @@
     </section>
   </main>
 
-  <!-- case study -->
   <div class="case" id="case" hidden>
     <div class="case-bg" data-close></div>
     <div class="case-card" role="dialog" aria-modal="true" aria-labelledby="case-title" tabindex="-1">
-      <div class="case-bar"><span class="mini" id="case-meta"></span><button class="x" type="button" data-close aria-label="Close">×</button></div>
+      <div class="case-bar"><span class="mini" id="case-meta"></span><button class="x" type="button" data-close aria-label="Close">✕</button></div>
       <div class="case-body" id="case-body"></div>
     </div>
   </div>
 
   <div class="tip" id="tip" role="tooltip" hidden><b id="tip-t"></b><p id="tip-what"></p><p class="tip-where"><span id="tip-wl"></span><em id="tip-where"></em></p></div>
+  <div class="toasts" id="toasts" aria-live="polite"></div>
 
   <script type="module" src="js/app.js"></script>
 </body>

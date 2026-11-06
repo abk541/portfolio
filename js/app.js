@@ -1,5 +1,5 @@
 import { UI, EXPERTISE, EXPERIENCE, EDUCATION, LANGUAGES } from './content.js';
-import { COPY } from './copy.js';
+import { COPY, TREE } from './copy.js';
 import { PROJECTS } from './projects.data.js';
 import { skillInfo } from './skills.js';
 import { ICONS } from '../assets/icons.js';
@@ -18,10 +18,16 @@ const store = {
   get: (k) => { try { return localStorage.getItem(k); } catch { return null; } },
   set: (k, v) => { try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch { /* private mode */ } },
 };
+const onView = (el, fn, threshold = 0.25) => {
+  if (REDUCED || !('IntersectionObserver' in window)) { fn(); return; }
+  const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { io.disconnect(); fn(); } }, { threshold });
+  io.observe(el);
+};
 document.documentElement.classList.add('js');
-const PC = { mule: '#22a6f0', infa: '#ff7a3d', ai: '#a78bfa' };
-const CAT_COL = { ai: PC.ai, mule: PC.mule, infa: PC.infa, web: '#34d399', mobile: '#f472b6', data: '#22d3ee', archive: '#fbbf24' };
+const PC = { mule: '#38bdf8', infa: '#ffa53b', ai: '#a78bfa', web: '#3dffa8', ops: '#ff5fa2' };
+const CAT_COL = { ai: PC.ai, mule: PC.mule, infa: PC.infa, web: PC.web, mobile: '#ff5fa2', data: '#38e1ff', archive: '#ffcf4a' };
 const ICON_COL = { mulesoft: PC.mule, informatica: PC.infa, claude: PC.ai };
+const PILLAR_KEYS = ['mule', 'infa', 'ai'];
 
 /* ------------------------------------------------------------------ language */
 const OTHER = [['es', 'Español'], ['de', 'Deutsch'], ['it', 'Italiano'], ['pt', 'Português'], ['nl', 'Nederlands'], ['ar', 'العربية'], ['tr', 'Türkçe'], ['pl', 'Polski'], ['zh-CN', '中文'], ['ja', '日本語']];
@@ -72,6 +78,7 @@ document.addEventListener('click', (e) => {
   if (box && !box.contains(e.target)) { const m = $('.lang-menu', box); if (m && !m.hidden) { m.hidden = true; $('.lang-btn', box).setAttribute('aria-expanded', 'false'); } }
 });
 
+/* ------------------------------------------------------------------ chart & flow strings */
 const X2 = {
   en: {
     targets: ['Business apps', 'AI agents', 'Snowflake BI', 'Partners'], hub: ['Integration', 'hub'],
@@ -96,83 +103,122 @@ const X2 = {
 };
 const HERO_SOURCES = ['SAP ERP', 'Salesforce', 'Global HR', 'Informatica MDM', 'Hexagon'];
 const HUB_APPS = { en: ['HR', 'Payroll', 'Finance', 'Sales', 'Job sites', 'IT access'], fr: ['RH', 'Paie', 'Finance', 'Commercial', 'Chantiers', 'Accès IT'] };
-let heroCtl = null, archCtl = null, teamCtl = null, cutCtl = null, ddCtl = null;
+let archCtl = null, teamCtl = null, cutCtl = null, ddCtl = null, sceneCtl = null;
+
+/* ------------------------------------------------------------------ boot */
+function boot() {
+  const el = $('#boot');
+  let seen = false; try { seen = sessionStorage.getItem('booted') === '1'; } catch { /* ignore */ }
+  if (REDUCED || seen) { el.classList.add('done'); zap(); return; }
+  try { sessionStorage.setItem('booted', '1'); } catch { /* ignore */ }
+  const t0 = performance.now(), D = 1100;
+  let done = false;
+  const finish = () => { if (done) return; done = true; el.classList.add('done'); removeEventListener('keydown', finish); el.removeEventListener('click', finish); setTimeout(zap, 250); };
+  addEventListener('keydown', finish); el.addEventListener('click', finish);
+  const step = (now) => {
+    const k = Math.min(1, (now - t0) / D), v = Math.round(100 * (1 - Math.pow(1 - k, 2)));
+    $('#boot-n').textContent = v; $('#boot-bar').style.width = v + '%';
+    if (k < 1 && !done) requestAnimationFrame(step); else setTimeout(finish, 180);
+  };
+  requestAnimationFrame(step);
+}
+function zap() {
+  const n = $('.hero-name');
+  if (REDUCED || !n) return;
+  const go = () => { n.classList.remove('zap'); void n.offsetWidth; n.classList.add('zap'); };
+  go(); setInterval(() => { if (!document.hidden && scrollY < innerHeight) go(); }, 7000);
+}
 
 /* ------------------------------------------------------------------ text */
 function fillText() {
   document.documentElement.lang = AUTO || lang;
   $$('[data-k]').forEach((el) => { const v = T[el.dataset.k]; if (typeof v === 'string') el.textContent = v; });
-  $$('[data-kh]').forEach((el) => { el.innerHTML = T[el.dataset.kh]; });
-  $$('[data-nav]').forEach((el) => { el.textContent = T.nav.find((n) => n[0] === el.dataset.nav)[1]; });
   $$('[data-icon]').forEach((el) => { if (!el.querySelector('svg')) el.insertAdjacentHTML('afterbegin', icon(el.dataset.icon)); });
   $('#msg').placeholder = T.placeholder;
-  $('#try-it').textContent = matchMedia('(hover: none)').matches ? T.tryItTouch : T.tryIt;
 }
 
 /* ------------------------------------------------------------------ nav */
 let current = '';
 function renderNav() {
-  $('#nav-links').innerHTML = T.nav.map(([id, l]) => `<a href="#${id}" data-sec="${id}">${esc(l)}</a>`).join('');
-  $('#sheet-links').innerHTML = T.nav.map(([id, l]) => `<a href="#${id}" data-sec="${id}">${esc(l)}</a>`).join('');
+  const html = T.nav.map(([id, l], i) => `<a href="#${id}" data-sec="${id}"><span class="n">${pad(i + 1)}</span>${esc(l)}</a>`).join('');
+  $('#nav-links').innerHTML = html;
+  $('#sheet-links').innerHTML = html;
   markNav();
 }
-function markNav() { $$('[data-sec]').forEach((a) => { const on = a.dataset.sec === current; a.classList.toggle('on', on); on ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current'); }); }
+function markNav() {
+  $$('[data-sec]').forEach((a) => { const on = a.dataset.sec === current; a.classList.toggle('on', on); on ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current'); });
+  const i = T.nav.findIndex((n) => n[0] === current);
+  $('#xp-l').textContent = `LVL ${i + 2}`;
+}
 function toggleSheet(open) {
   const sheet = $('#sheet'), btn = $('#menu-btn');
   btn.setAttribute('aria-expanded', String(open));
   btn.setAttribute('aria-label', open ? T.close : T.menu);
   document.body.classList.toggle('lock', open);
   if (open) { sheet.hidden = false; requestAnimationFrame(() => requestAnimationFrame(() => sheet.classList.add('open'))); }
-  else { sheet.classList.remove('open'); setTimeout(() => { if (!sheet.classList.contains('open')) sheet.hidden = true; }, REDUCED ? 0 : 260); }
+  else { sheet.classList.remove('open'); sheet.hidden = true; }
 }
 
 /* ------------------------------------------------------------------ hero */
-function renderHub() {
-  if (heroCtl) heroCtl.destroy();
-  const c = $('#hero-flow');
-  const fresh = c.cloneNode(false); c.replaceWith(fresh);
-  heroCtl = heroFlow(fresh, { sources: HERO_SOURCES, targets: X2[lang].targets, hub: X2[lang].hub, compact: PHONE() });
+async function initUniverse() {
+  if (sceneCtl) return;
+  try {
+    const { initScene } = await import('./scene.js');
+    sceneCtl = initScene($('#universe'), { onSkill: (name, x, y) => showTip(name, null, x, y) });
+  } catch (e) { console.warn('3D scene unavailable', e); }
 }
-const KPI_META = [
-  ['#4f8cff', 'M4 7h16M4 12h16M4 17h10', [8, 14, 12, 22, 30, 42, 60, 78, 96, 120]],
-  [PC.ai, 'M12 3l2.2 5.8L20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2z', [0, 1, 2, 4, 6, 9, 14, 19, 25, 30]],
-  [PC.infa, 'M4 6c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3zm0 0v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6', [10, 22, 30, 52, 70, 88, 104, 118, 130, 140]],
-  ['#34d399', 'M12 3a9 9 0 100 18 9 9 0 000-18zm-9 9h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3', [12, 20, 26, 34, 41, 50, 58, 66, 74, 80]],
-];
-function spark(vals, col, id) {
-  const max = Math.max(...vals), W = 96, H = 36;
-  const pts = vals.map((v, i) => [(i / (vals.length - 1)) * W, H - 3 - (v / max) * (H - 6)]);
-  const d = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
-  return `<svg class="spark" viewBox="0 0 ${W} ${H}" aria-hidden="true"><defs><linearGradient id="sg${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".35"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></linearGradient></defs><path d="${d} L${W},${H} L0,${H} Z" fill="url(#sg${id})"/><path class="sp-line" d="${d}" fill="none" stroke="${col}" stroke-width="2" stroke-linecap="round" pathLength="1"/></svg>`;
-}
-let kpiDone = false;
-function renderKpis() {
-  const box = $('#kpis');
-  box.innerHTML = T.kpis.map(([n, sfx, l, d], i) => { const [col, ic, vals] = KPI_META[i]; return `<article class="card kpi" style="--c:${col}">
-      <div class="kpi-top"><span class="kpi-ic"><svg viewBox="0 0 24 24"><path d="${ic}"/></svg></span><span class="kpi-d">${esc(d)}</span></div>
-      <div class="kpi-row"><b class="kpi-v"><span data-n="${n}">${kpiDone || REDUCED ? n : 0}</span>${sfx}</b>${spark(vals, col, i)}</div>
-      <p class="kpi-l">${esc(l)}</p></article>`; }).join('');
-  if (kpiDone || REDUCED) { box.classList.add('go'); return; }
-  const io = new IntersectionObserver(([e]) => {
-    if (!e.isIntersecting) return;
-    io.disconnect(); kpiDone = true; box.classList.add('go');
-    $$('[data-n]', box).forEach((el, i) => {
-      const target = +el.dataset.n, t0 = performance.now() + i * 80;
-      const step = (now) => { const k = Math.max(0, Math.min(1, (now - t0) / 1200)); el.textContent = Math.round(target * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(step); };
-      requestAnimationFrame(step);
-    });
-  }, { threshold: 0.3 });
-  io.observe(box);
+let hudDone = false;
+function renderHero() {
+  const hud = $('#hud');
+  hud.innerHTML = T.hud.map(([n, s, l]) => `<div class="hud-i"><b><span data-n="${n}">${hudDone || REDUCED ? n : 0}</span>${s ? `<sup>${s}</sup>` : ''}</b><span>${esc(l)}</span></div>`).join('');
+  $('#legend').innerHTML = T.legend.map(([k, l]) => `<span class="lg" style="--c:${PC[k]}"><i></i>${esc(l)}</span>`).join('') + `<span class="hint">${esc(T.orbitHint)}</span>`;
+  if (hudDone || REDUCED) return;
+  hudDone = true;
+  setTimeout(() => $$('[data-n]', hud).forEach((el, i) => {
+    const target = +el.dataset.n, t0 = performance.now() + i * 120;
+    const st = (now) => { const k = Math.max(0, Math.min(1, (now - t0) / 1400)); el.textContent = Math.round(target * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(st); };
+    requestAnimationFrame(st);
+  }), 900);
 }
 
-/* ------------------------------------------------------------------ about */
-const PILLAR_KEYS = ['mule', 'infa', 'ai'];
-function renderAbout() {
+/* ------------------------------------------------------------------ player */
+const ACH_IC = {
+  api: 'M8 9l-4 3 4 3M16 9l4 3-4 3M13 6l-2 12', zero: 'M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6zM9 12l2 2 4-4', agent: 'M12 3l2.2 5.8L20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2z',
+  gold: 'M12 3l2.6 5.6 6 .6-4.5 4 1.3 6L12 16.3 6.6 19.2l1.3-6-4.5-4 6-.6z', gate: 'M5 11V8a7 7 0 0114 0v3M4 11h16v10H4zM12 15v2', party: 'M9 11a3 3 0 100-6 3 3 0 000 6zM17 11a2.5 2.5 0 100-5M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M15 14c3 0 6 2 6 5',
+  ship: 'M5 15l7-12 7 12M8 15v4h8v-4M12 9v3', lang: 'M4 5h10M9 3v2M6 5c1 4 4 7 8 8M13 5c-1 4-4 7-8 8M14 21l4-9 4 9M15.5 18h5',
+};
+const ACH_COL = ['#38bdf8', '#3dffa8', '#a78bfa', '#ffa53b', '#ff5fa2', '#ffcf4a', '#38e1ff', '#9b7bff'];
+function renderPlayer() {
+  const yrs = (Date.now() - new Date(2022, 0, 1)) / 31557600000;
+  $('#lvl-n').textContent = Math.floor(yrs);
+  $('#lvl-note').textContent = T.xpNote(Math.floor(yrs));
   $('#facts').innerHTML = T.facts.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('');
-  $('#pillars').innerHTML = T.pillars.map((p, i) => { const k = PILLAR_KEYS[i]; return `<article class="card pillar rv" style="--c:${PC[k]};--d:${i * 0.08}s">
-      <div class="p-top"><span class="p-ic">${icon(EXPERTISE[k].icon)}</span><div><h3>${esc(p.k)}</h3><small>${esc(p.p)}</small></div></div>
-      <p>${esc(p.t)}</p></article>`; }).join('');
+  onView($('.lvl'), () => { $('#lvl-bar').style.width = `${Math.round((yrs % 1) * 100)}%`; });
+  $('#ach').innerHTML = T.ach.map(([k, t, d], i) => `<li style="--c:${ACH_COL[i]}"><span class="ach-ic"><svg viewBox="0 0 24 24"><path d="${ACH_IC[k]}"/></svg></span><span><b>${esc(t)}</b><span>${esc(d)}</span></span></li>`).join('');
+  const lis = $$('#ach li');
+  onView($('#ach'), () => lis.forEach((li, i) => setTimeout(() => li.classList.add('on'), REDUCED ? 0 : 150 + i * 140)), 0.3);
+  renderRadar();
 }
+function renderRadar() {
+  const svg = $('#radar'); svg.innerHTML = '';
+  const cx = 200, cy = 185, R = 120, A = T.attrs, n = A.length;
+  const pt = (i, r) => { const a = -Math.PI / 2 + (i / n) * Math.PI * 2; return [cx + Math.cos(a) * r, cy + Math.sin(a) * r]; };
+  [0.25, 0.5, 0.75, 1].forEach((k) => svgEl('polygon', { points: A.map((_, i) => pt(i, R * k).join(',')).join(' '), class: 'rd-grid' }, svg));
+  A.forEach((_, i) => { const [x, y] = pt(i, R); svgEl('line', { x1: cx, y1: cy, x2: x, y2: y, class: 'rd-axis' }, svg); });
+  svgEl('polygon', { points: A.map(([, v], i) => pt(i, (R * v) / 100).join(',')).join(' '), class: 'rd-shape' }, svg);
+  A.forEach(([l, v], i) => {
+    const [x, y] = pt(i, (R * v) / 100); svgEl('circle', { cx: x, cy: y, r: 4.5, class: 'rd-dot' }, svg);
+    const [lx, ly] = pt(i, R + 26);
+    const anchor = Math.abs(lx - cx) < 10 ? 'middle' : lx > cx ? 'start' : 'end';
+    const t = svgEl('text', { x: lx, y: ly, 'text-anchor': anchor, class: 'rd-lab' }, svg); t.textContent = l;
+    const vt = svgEl('text', { x: lx, y: ly + 16, 'text-anchor': anchor, class: 'rd-val' }, svg); vt.textContent = v;
+  });
+  svg.setAttribute('aria-label', A.map(([l, v]) => `${l} ${v}`).join(', '));
+  svg.parentElement.classList.remove('go');
+  onView(svg, () => svg.parentElement.classList.add('go'), 0.35);
+}
+
+/* ------------------------------------------------------------------ mission briefing */
 let compareState = 'before', compareAuto = false;
 function renderCompare() {
   const seg = $('#compare-seg');
@@ -240,7 +286,7 @@ function showTeam(i, quiet) {
   board.innerHTML = `<canvas class="team-fx" aria-hidden="true"></canvas><div class="tb-from"><span>${t.id === 'mgmt' ? '⟵' : '⟶'}</span><b>${esc(t.from)}</b></div>
     <div class="tb-to">${t.to.map((x) => `<div class="tb-item"><i>✓</i><span>${esc(x)}</span></div>`).join('')}<p class="tb-res">${esc(res)}</p></div>`;
   if (teamCtl) teamCtl.destroy();
-  teamCtl = teamFlow($('.team-fx', board), board, '#34d399');
+  teamCtl = teamFlow($('.team-fx', board), board, '#3dffa8');
   const items = $$('.tb-item, .tb-res', board);
   if (REDUCED) { items.forEach((el) => el.classList.add('in')); return; }
   const run = () => items.forEach((el, k) => teamTimers.push(setTimeout(() => el.classList.add('in'), 100 + k * 110)));
@@ -248,13 +294,13 @@ function showTeam(i, quiet) {
   else run();
 }
 
-/* ------------------------------------------------------------------ expertise */
+/* ------------------------------------------------------------------ worlds */
 let xKey = 'mule', xDom = null, aiFlow = 0, aiTimers = [];
 const xName = (k) => (k === 'ai' ? (lang === 'fr' ? 'IA' : 'AI') : EXPERTISE[k].name);
 function renderXTabs() {
   const tabs = $('#xtabs');
-  tabs.innerHTML = Object.entries(EXPERTISE).map(([k, x]) => `<button role="tab" type="button" data-x="${k}" id="tab-${k}" aria-controls="xpanel" style="--c:${PC[k]}">
-      <span class="xt-ic">${icon(x.icon)}</span><span><b translate="no">${esc(xName(k))}</b><small>${esc(x[lang].tab)}</small><em>${esc(T.since[k])}</em></span></button>`).join('');
+  tabs.innerHTML = Object.entries(EXPERTISE).map(([k, x]) => `<button role="tab" type="button" class="wtab" data-x="${k}" id="tab-${k}" aria-controls="xpanel" style="--c:${PC[k]}">
+      <span class="wt-ic">${icon(x.icon)}</span><span><b translate="no">${esc(xName(k))}</b><small>${esc(x[lang].tab)}</small><em>${esc(T.since[k])}</em></span><span class="entered">▶ ON</span></button>`).join('');
   tabs.onclick = (e) => { const b = e.target.closest('button'); if (b && b.dataset.x !== xKey) { xKey = b.dataset.x; xDom = null; renderX(true); } };
   tabs.onkeydown = (e) => {
     const keys = Object.keys(EXPERTISE), i = keys.indexOf(xKey);
@@ -273,14 +319,14 @@ function renderX(swap) {
   const pillar = T.pillars[PILLAR_KEYS.indexOf(xKey)];
   let body = '';
   if (xKey === 'ai') {
-    body = `<article class="card"><div class="card-h"><h3>${esc(C.walk)} · MDM Beam</h3></div><div class="ai-box">
+    body = `<article class="panel"><div class="ph-row"><h3 class="ph">${esc(C.walk)} · MDM Beam</h3></div><div class="ai-box">
       <div class="seg" role="tablist" id="ai-seg">${L.flows.map((f, i) => `<button role="tab" type="button" data-i="${i}">${esc(i ? T.aiSmart : T.aiFast)}</button>`).join('')}</div>
       <div class="ai-q"><p class="bubble" id="ai-q"></p></div>
       <ol class="ai-steps" id="ai-steps"></ol>
       <div class="ai-a" id="ai-a" aria-live="polite"></div></div></article>`;
   } else {
     const cons = X.consumers[lang];
-    body = `<article class="card"><div class="card-h"><h3>${esc(C.arch)}</h3><span class="arch-hint">👆 ${esc(T.tapDomain)}</span></div>
+    body = `<article class="panel"><div class="ph-row"><h3 class="ph">${esc(C.arch)}</h3><span class="hint-s">👆 ${esc(T.tapDomain)}</span></div>
       <div class="arch-grid">
         <canvas class="arch-fx" aria-hidden="true"></canvas>
         <div class="arch-col"><h4>${esc(L.cols[0])}</h4><div class="chips">${X.systems.map((s) => `<span class="chip" data-s="${esc(s)}" translate="no">${esc(s)}</span>`).join('')}</div></div>
@@ -291,20 +337,20 @@ function renderX(swap) {
       </div>
       <div class="arch-detail" id="arch-detail" aria-live="polite"></div></article>`;
     if (xKey === 'mule') {
-      body += `<article class="card"><div class="cut-box"><div><h4>${esc(C.cutTitle)}</h4><p>${esc(C.cutText)}</p>
+      body += `<article class="panel"><div class="cut-box"><div><h4>${esc(C.cutTitle)}</h4><p>${esc(C.cutText)}</p>
         <label class="cut"><span>${esc(C.cutLabel)}</span><input type="range" min="0" max="100" value="0" id="cut" aria-label="${esc(C.cutLabel)}"><b id="cut-v">0%</b></label>
         <p class="cut-meta" id="cut-meta">${esc(C.cutMeta(0))} · ${esc(C.cutLive)}</p></div><canvas id="cut-fx" aria-hidden="true"></canvas></div></article>`;
     }
   }
   panel.innerHTML = `<div class="x-top">
-      <article class="card plain-box"><span class="tag">${esc(T.plainLabel)}</span><p>${esc(pillar.t)}</p></article>
-      <article class="card x-intro"><span class="tag">${esc(T.techLabel)}</span><h3>${esc(L.title)}</h3><p>${esc(L.text)}</p></article>
+      <article class="panel plain-box"><span class="tag" style="--c:#3dffa8">${esc(T.plainLabel)}</span><p>${esc(pillar.t)}</p></article>
+      <article class="panel x-intro"><span class="tag">${esc(T.techLabel)}</span><h3>${esc(L.title)}</h3><p>${esc(L.text)}</p></article>
     </div>${body}
     <div class="x-cols">
-      <article class="card"><div class="card-h"><h3>${esc(T.results)}</h3></div><ul class="res">${L.results.map(([k, v]) => `<li><b>${esc(k)}</b><span>${esc(v)}</span></li>`).join('')}</ul></article>
-      <article class="card chart" id="x-chart"></article>
+      <article class="panel"><div class="ph-row"><h3 class="ph">${esc(T.results)}</h3></div><ul class="res">${L.results.map(([k, v]) => `<li><b>${esc(k)}</b><span>${esc(v)}</span></li>`).join('')}</ul></article>
+      <article class="panel chart" id="x-chart"></article>
     </div>
-    <article class="card"><div class="card-h"><h3>${esc(T.skills)}</h3><span class="arch-hint">${X.skills.length}</span></div>
+    <article class="panel"><div class="ph-row"><h3 class="ph">${esc(T.skills)}</h3><span class="hint-s">${X.skills.length}</span></div>
       <div class="skills">${X.skills.map((s) => `<button type="button" class="sk" data-skill="${esc(s)}" aria-expanded="false" translate="no">${esc(s)}</button>`).join('')}</div></article>`;
   renderChart();
   [archCtl, cutCtl, ddCtl].forEach((c) => c && c.destroy()); archCtl = cutCtl = ddCtl = null;
@@ -374,40 +420,35 @@ function playAI(i, waitVisible) {
   if (waitVisible) { const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { io.disconnect(); run(); } }, { threshold: 0.3 }); io.observe(ol); } else run();
 }
 
-/* ------------------------------------------------------------------ skills */
-const yearsSince = (ym) => { const [y, m] = ym.split('-').map(Number); return (Date.now() - new Date(y, m - 1, 1)) / 31557600000; };
-const LAYER_COL = [PC.ai, '#34d399', '#f472b6', PC.mule, PC.infa, '#22d3ee', '#fbbf24'];
-function renderSkills() {
-  barChart($('#years'), T.yearsRows.map(([l, d]) => [l, Math.round(yearsSince(d) * 10) / 10, T.yearsUnit]), '#4f8cff');
-  $('#layers').innerHTML = T.layers.map(([name, desc, techs], i) => `<li style="--lc:${LAYER_COL[i]}">
-      <div class="ly-n"><b>${esc(name)}</b><span>${esc(desc)}</span></div>
-      <div class="skills">${techs.map((s) => `<button type="button" class="sk" data-skill="${esc(s)}" aria-expanded="false" translate="no">${esc(s)}</button>`).join('')}</div></li>`).join('');
-}
-
+let showTip = () => {};
 /* ------------------------------------------------------------------ skill tooltip */
 function initTip() {
   const tip = $('#tip');
   let cur = null;
   const close = () => { if (cur) cur.setAttribute('aria-expanded', 'false'); cur = null; tip.hidden = true; };
-  document.addEventListener('click', (e) => {
-    const b = e.target.closest('[data-skill]');
-    if (!b) { if (!tip.contains(e.target)) close(); return; }
-    if (cur === b) { close(); return; }
-    const info = skillInfo(b.dataset.skill, lang);
+  showTip = (name, b, px, py) => {
+    const info = skillInfo(name, lang);
     if (!info) return;
     close();
-    cur = b; b.setAttribute('aria-expanded', 'true');
-    $('#tip-t').textContent = b.dataset.skill;
+    if (b) { cur = b; b.setAttribute('aria-expanded', 'true'); }
+    $('#tip-t').textContent = name;
     $('#tip-what').textContent = info[0];
     $('#tip-wl').textContent = T.whereUsed;
     $('#tip-where').textContent = info[1];
     tip.hidden = false;
     if (innerWidth > 760) {
-      const r = b.getBoundingClientRect();
+      const r = b ? b.getBoundingClientRect() : { left: px, right: px, top: py, bottom: py, width: 0 };
       const w = tip.offsetWidth, h = tip.offsetHeight;
       tip.style.left = `${Math.min(Math.max(12, r.left + r.width / 2 - w / 2), innerWidth - w - 12)}px`;
       tip.style.top = `${r.bottom + 10 + h > innerHeight - 12 ? r.top - h - 10 : r.bottom + 10}px`;
     }
+  };
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('#universe')) return;
+    const b = e.target.closest('[data-skill]');
+    if (!b) { if (!tip.contains(e.target)) close(); return; }
+    if (cur === b) { close(); return; }
+    showTip(b.dataset.skill, b);
   });
   addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
   addEventListener('scroll', () => { if (!tip.hidden && innerWidth > 760) close(); }, { passive: true });
@@ -474,33 +515,65 @@ function schematic(cat) {
   return `<svg viewBox="0 0 320 220" preserveAspectRatio="xMidYMid meet" aria-hidden="true">${g}</svg><span class="lbl">${esc(SCH_LBL[lang][cat] || '')}</span>`;
 }
 
-/* ------------------------------------------------------------------ projects */
+/* ------------------------------------------------------------------ skill tree */
+const BR_IC = { mule: 'mulesoft', infa: 'informatica', ai: 'claude', web: 'react', ops: 'github' };
+let treeSel = 'mule';
+function renderTree() {
+  const host = $('#skilltree');
+  const cols = T.branches.map(([k, name, sub]) => {
+    const tiers = TREE[k];
+    const count = tiers.flat().length;
+    return `<div class="br${k === treeSel ? ' sel' : ''}" data-b="${k}" style="--c:${PC[k]}">
+      <div class="br-h"><span class="br-ic">${icon(BR_IC[k])}</span><span><b>${esc(name)}</b><small>${esc(sub)}</small></span><em>${count}</em></div>
+      ${tiers.map((list, ti) => `<div class="tier"><span class="tier-l">${esc(T.tiers[ti])}</span>${list.map((s) => `<button type="button" class="node" data-skill="${esc(s)}" aria-expanded="false" translate="no">${esc(s)}</button>`).join('')}</div>`).join('')}
+    </div>`;
+  }).join('');
+  host.innerHTML = `<div class="tree-root"><div class="root-node"><span class="hex">AE</span>${esc(T.rootLabel)}</div></div><div class="tree-cols">${cols}</div>`;
+  const seg = $('#tree-seg');
+  seg.innerHTML = T.branches.map(([k, name]) => `<button role="tab" type="button" data-b="${k}" aria-selected="${k === treeSel}">${esc(name)}</button>`).join('');
+  seg.onclick = (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    treeSel = b.dataset.b;
+    $$('button', seg).forEach((x) => x.setAttribute('aria-selected', String(x === b)));
+    $$('.br', host).forEach((c) => c.classList.toggle('sel', c.dataset.b === treeSel));
+    $$(`.br[data-b="${treeSel}"] .node`, host).forEach((n, i) => { n.classList.remove('flash'); void n.offsetWidth; n.style.animationDelay = `${i * 40}ms`; n.classList.add('flash'); });
+  };
+  // unlock the nodes tier by tier, all branches in parallel
+  const unlock = () => {
+    $$('.br', host).forEach((br) => $$('.node', br).forEach((n, i) => setTimeout(() => n.classList.add('on'), REDUCED ? 0 : 200 + i * 90)));
+  };
+  onView(host, unlock, 0.15);
+}
+
+/* ------------------------------------------------------------------ quests */
 const FEATURED = ['mule-platform', 'b360-mdm', 'mdm-beam', 'hev-dash'];
 const yearOf = (p) => (lang === 'fr' && p[lang].year) || p.year;
+const rarity = (p) => (FEATURED.includes(p.id) || p.featured ? 'legendary' : p.cats.includes('archive') ? 'common' : (p.cats.includes('mule') || p.cats.includes('infa')) ? 'epic' : 'rare');
+const RAR_COL = { legendary: '#ffcf4a', epic: '#a78bfa', rare: '#38e1ff', common: '#8a98b8' };
+const rarTag = (p) => { const r = rarity(p); return `<span class="tag rar ${r}" style="--c:${RAR_COL[r]}">★ ${esc(T[r])}</span>`; };
 const catTags = (p) => p.cats.map((c) => `<span class="tag" style="--c:${CAT_COL[c]}">${esc(T.filters[c])}</span>`).join('');
 let filter = 'all';
-function renderProjects() {
+function renderQuests() {
   $('#featured').innerHTML = FEATURED.map((id, k) => {
     const i = PROJECTS.findIndex((p) => p.id === id), p = PROJECTS[i], L = p[lang];
-    return `<button type="button" class="card feat rv" data-p="${i}" style="--c:${CAT_COL[p.cats[0]]};--d:${k * 0.06}s">
+    return `<button type="button" class="lq rv" data-p="${i}" style="--sc:${CAT_COL[p.cats[0]]};--d:${k * 0.08}s">
       <div class="schem">${schematic(p.cats[0])}</div>
-      <div class="feat-b"><div class="meta-row">${catTags(p)}<span class="yr">${esc(yearOf(p))}</span></div>
-        <h4>${esc(L.title)}</h4><p class="k">${esc(L.kicker)}</p><p>${esc(L.summary)}</p><span class="go-l">${esc(T.read)} →</span></div></button>`;
+      <div class="lq-b"><div class="meta-row">${rarTag(p)}${catTags(p)}<span class="yr">${esc(yearOf(p))}</span></div>
+        <h4>${esc(L.title)}</h4><p class="k">${esc(L.kicker)}</p><p>${esc(L.summary)}</p><span class="go-l">${esc(T.read)} ▸</span></div></button>`;
   }).join('');
-  $('#featured').onclick = (e) => { const b = e.target.closest('[data-p]'); if (b) openCase(+b.dataset.p, b); };
   const counts = { all: PROJECTS.length };
   PROJECTS.forEach((p) => p.cats.forEach((c) => (counts[c] = (counts[c] || 0) + 1)));
   const fl = $('#filters');
   fl.innerHTML = Object.keys(T.filters).filter((k) => counts[k]).map((k) => `<button role="tab" type="button" data-f="${k}" aria-selected="${k === filter}">${esc(T.filters[k])}<sup>${counts[k]}</sup></button>`).join('');
   fl.onclick = (e) => { const b = e.target.closest('button'); if (!b) return; filter = b.dataset.f; $$('button', fl).forEach((x) => x.setAttribute('aria-selected', String(x === b))); applyFilter(true); };
   $('#tiles').innerHTML = PROJECTS.map((p, i) => {
-    const L = p[lang];
-    return `<li data-cats="${p.cats.join(' ')}"><button type="button" class="tile" data-p="${i}" style="--c:${CAT_COL[p.cats[0]]}">
-      <span class="meta-row">${catTags(p)}<span class="yr">${esc(yearOf(p))}</span></span>
+    const L = p[lang], r = rarity(p);
+    return `<li data-cats="${p.cats.join(' ')}"><button type="button" class="tile" data-p="${i}" style="--c:${RAR_COL[r]}">
+      <span class="meta-row">${rarTag(p)}<span class="yr">${esc(yearOf(p))}</span></span>
       <h4>${esc(L.title)}</h4><p>${esc(L.kicker)}</p>
-      <span class="tile-f"><span class="ics">${p.icons.slice(0, 4).map(icon).join('')}</span><span class="more">${esc(T.details)} →</span></span></button></li>`;
+      <span class="meta-row" style="margin:12px 0 0">${catTags(p)}</span>
+      <span class="tile-f"><span class="ics">${p.icons.slice(0, 4).map(icon).join('')}</span><span class="more">${esc(T.read)} ▸</span></span></button></li>`;
   }).join('');
-  $('#tiles').onclick = (e) => { const b = e.target.closest('[data-p]'); if (b) openCase(+b.dataset.p, b); };
   applyFilter();
 }
 function applyFilter(anim) {
@@ -509,7 +582,7 @@ function applyFilter(anim) {
     const show = filter === 'all' || li.dataset.cats.split(' ').includes(filter);
     li.hidden = !show;
     li.classList.remove('pop');
-    if (show && anim && !REDUCED) { void li.offsetWidth; li.style.setProperty('--d', `${k++ * 30}ms`); li.classList.add('pop'); }
+    if (show && anim && !REDUCED) { void li.offsetWidth; li.style.setProperty('--d', `${k++ * 35}ms`); li.classList.add('pop'); }
   });
 }
 let lastFocus = null, caseIdx = -1;
@@ -518,10 +591,10 @@ function openCase(i, from) {
   caseIdx = i;
   const p = PROJECTS[i], L = p[lang], d = $('#case');
   const next = (i + 1) % PROJECTS.length;
-  $('#case-meta').textContent = `${T.caseLabel} · ${i + 1} / ${PROJECTS.length}`;
+  $('#case-meta').textContent = `${T.caseLabel} ${i + 1} / ${PROJECTS.length}`;
   const body = $('#case-body');
-  body.style.setProperty('--c', CAT_COL[p.cats[0]]);
-  body.innerHTML = `<div class="meta-row">${catTags(p)}<span class="yr">${esc(yearOf(p))}</span></div>
+  body.style.setProperty('--sc', CAT_COL[p.cats[0]]);
+  body.innerHTML = `<div class="meta-row">${rarTag(p)}${catTags(p)}<span class="yr">${esc(yearOf(p))}</span></div>
     <h2 class="cb-t" id="case-title">${esc(L.title)}</h2>
     <p class="cb-k">${esc(L.kicker)}</p>
     <div class="schem">${schematic(p.cats[0])}</div>
@@ -529,7 +602,7 @@ function openCase(i, from) {
     <div class="cb-sec"><h3>${esc(T.built)}</h3><ul class="cb-pts">${L.points.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>
     <div class="cb-sec"><h3>${esc(T.stackL)}</h3><div class="skills">${p.stack.map((s) => (skillInfo(s, lang) ? `<button type="button" class="sk" data-skill="${esc(s)}" aria-expanded="false" translate="no">${esc(s)}</button>` : `<span class="sk" translate="no">${esc(s)}</span>`)).join('')}</div></div>
     <div class="cb-act">${p.link ? `<a class="btn primary" href="${p.link}" target="_blank" rel="noopener">${esc(p.link.includes('github.com') ? T.viewCode : T.openSite)} ↗</a>` : `<p class="cb-private">🔒 ${esc(T.privateRepo)}</p>`}</div>
-    <button class="cb-next" type="button" data-next="${next}"><span><small>${esc(T.next)}</small><b>${esc(PROJECTS[next][lang].title)}</b></span><span aria-hidden="true">→</span></button>`;
+    <button class="cb-next" type="button" data-next="${next}"><span><small>${esc(T.next)}</small><b>${esc(PROJECTS[next][lang].title)}</b></span><span aria-hidden="true">▸</span></button>`;
   $('.x', d).setAttribute('aria-label', T.close);
   const card = $('.case-card', d);
   if (d.hidden) { d.hidden = false; document.body.classList.add('lock'); requestAnimationFrame(() => requestAnimationFrame(() => d.classList.add('open'))); }
@@ -541,55 +614,78 @@ function closeCase() {
   if (d.hidden) return;
   d.classList.remove('open');
   document.body.classList.remove('lock');
-  setTimeout(() => { d.hidden = true; }, REDUCED ? 0 : 400);
-  lastFocus && lastFocus.focus({ preventScroll: true });
+  d.hidden = true;
+  if (lastFocus) lastFocus.focus({ preventScroll: true });
 }
 
-/* ------------------------------------------------------------------ experience */
-const openRows = new Set([0]);
+/* ------------------------------------------------------------------ journey map */
 function fmtDate(ym) {
   const [y, m] = ym.split('-').map(Number);
   return new Date(y, m - 1, 1).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-GB', { month: 'short', year: 'numeric' });
 }
-const yf = (ym) => { const [y, m] = ym.split('-').map(Number); return y + (m - 1) / 12; };
-function renderGantt() {
-  const now = new Date(), nowF = now.getFullYear() + now.getMonth() / 12;
-  const Y0 = 2019, Y1 = Math.ceil(nowF + 0.01), span = Y1 - Y0;
-  const rows = [
-    ...EDUCATION.slice().reverse().map((e) => { const [a, b] = e.years.split('–').map((s) => +s.trim()); return { l: e[lang][0], s: e[lang][1], f: a + 0.67, t: b + 0.5, c: '#64748b' }; }),
-    ...EXPERIENCE.slice().sort((a, b) => a.from.localeCompare(b.from)).map((x) => ({ l: x[lang].role, s: (lang === 'fr' && x.orgFr) || x.org, f: yf(x.from), t: x.to ? yf(x.to) : nowF, c: ICON_COL[x.icon] || '#4f8cff', on: !x.to })),
-  ];
-  const g = $('#gantt');
-  g.style.setProperty('--gl', '300px'); g.style.setProperty('--yrs', span); g.style.setProperty('--n', ((nowF - Y0) / span).toFixed(4));
-  g.innerHTML = `<div class="g-axis" style="grid-template-columns:repeat(${span},1fr)">${Array.from({ length: span }, (_, i) => `<span>${Y0 + i}</span>`).join('')}</div>
-    ${rows.map((r, i) => `<div class="g-row"><div class="g-lab">${esc(r.l)}<small>${esc(r.s)}</small></div><div class="g-track"><span class="g-bar${r.on ? ' on' : ''}" style="--x:${((r.f - Y0) / span) * 100}%;--w:${((r.t - r.f) / span) * 100}%;--c:${r.c};--d:${i * 0.08}s" title="${esc(r.l)}"></span></div></div>`).join('')}
-    <span class="g-now" aria-hidden="true"><span>${esc(T.now)}</span></span>`;
-  if (REDUCED) { g.classList.add('go'); return; }
-  const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { io.disconnect(); g.classList.add('go'); } }, { threshold: 0.3 });
-  io.observe(g);
+const SHORT = { en: ['BSc Information Systems', 'MSc IS Security', 'MuleSoft Consultant', 'AI Full-Stack Dev', 'Informatica Consultant', 'Tech Lead MuleSoft', 'Tech Lead MDM'], fr: ['Licence Ingénierie SI', 'Master Sécurité SI', 'Consultant MuleSoft', 'Dév Full-Stack IA', 'Consultant Informatica', 'Tech Lead MuleSoft', 'Tech Lead MDM'] };
+function levels() {
+  const edu = EDUCATION.slice().reverse().map((e) => ({ edu: e, from: e.years.split('–')[0].trim() }));
+  const xp = EXPERIENCE.map((x, i) => ({ xp: x, i })).sort((a, b) => a.xp.from.localeCompare(b.xp.from) || (a.xp.icon === 'mulesoft' ? -1 : 1));
+  return [...edu, ...xp];
 }
-function renderCV() {
-  $('#cv').innerHTML = EXPERIENCE.map((x, i) => {
-    const L = x[lang];
-    const org = (lang === 'fr' && x.orgFr) || x.org;
-    return `<li class="cv-row rv${openRows.has(i) ? ' open' : ''}" data-i="${i}" style="--c:${ICON_COL[x.icon] || '#4f8cff'}">
-      <div class="cv-top"><p class="cv-org">${icon(x.icon)}<span>${esc(org)}</span></p><span class="cv-when">${x.to ? `${fmtDate(x.from)} – ${fmtDate(x.to)}` : `${fmtDate(x.from)} –<span class="now-t">${esc(T.present)}</span>`}</span></div>
-      <h3 class="cv-role">${esc(L.role)}</h3>
-      <p class="cv-sum">${esc(L.sum)}</p>
-      <div class="cv-pts" id="cvp${i}"><ul>${L.pts.map((p) => `<li>${esc(p)}</li>`).join('')}</ul></div>
-      <button type="button" class="cv-more" aria-expanded="${openRows.has(i)}" aria-controls="cvp${i}"><i aria-hidden="true">+</i><span>${esc(openRows.has(i) ? T.less : T.more)}</span></button></li>`;
-  }).join('');
-  $('#cv').onclick = (e) => {
-    const b = e.target.closest('.cv-more'); if (!b) return;
-    const row = b.closest('.cv-row'), i = +row.dataset.i;
-    const open = !row.classList.contains('open');
-    row.classList.toggle('open', open);
-    open ? openRows.add(i) : openRows.delete(i);
-    b.setAttribute('aria-expanded', String(open));
-    b.querySelector('span').textContent = open ? T.less : T.more;
-  };
-  $('#edu').innerHTML = EDUCATION.map((e) => `<li><span>${esc(e[lang][0])}<small>${esc(e[lang][1])}</small></span><span>${esc(e.years)}</span></li>`).join('');
-  $('#langs').innerHTML = LANGUAGES[lang].map(([a, b]) => `<li><span>${esc(a)}</span><span>${esc(b)}</span></li>`).join('');
+let lvSel = -1, mapAnimDone = false;
+function renderJourney() {
+  const L = levels();
+  if (lvSel < 0) lvSel = L.length - 1;
+  const host = $('#map');
+  const W = host.clientWidth || 1000, vertical = W < 760;
+  const n = L.length;
+  const pts = L.map((_, i) => vertical
+    ? [i % 2 ? W * 0.72 : W * 0.28, 70 + i * 120]
+    : [70 + (i * (W - 140)) / (n - 1), i % 2 ? 230 : 90]);
+  const H = vertical ? 70 + (n - 1) * 120 + 90 : 330;
+  host.style.height = `${H}px`;
+  let d = `M${pts[0][0]},${pts[0][1]}`;
+  for (let i = 1; i < n; i++) {
+    const [x0, y0] = pts[i - 1], [x1, y1] = pts[i];
+    d += vertical ? ` C${x0},${(y0 + y1) / 2} ${x1},${(y0 + y1) / 2} ${x1},${y1}` : ` C${(x0 + x1) / 2},${y0} ${(x0 + x1) / 2},${y1} ${x1},${y1}`;
+  }
+  host.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="mapg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9b7bff"/><stop offset="1" stop-color="#38e1ff"/></linearGradient></defs><path class="map-path" d="${d}"/><path class="map-done" id="map-done" d="${d}"/></svg>
+    ${L.map((lv, i) => {
+      const cur = lv.xp && !lv.xp.to;
+      const col = lv.edu ? '#9b7bff' : ICON_COL[lv.xp.icon] || '#38e1ff';
+      const year = lv.edu ? lv.edu.years : fmtDate(lv.xp.from);
+      return `<button type="button" class="lv reached" data-l="${i}" aria-pressed="${i === lvSel}" style="left:${pts[i][0]}px;top:${pts[i][1]}px;--c:${col}">
+        <span class="lv-dot">${i + 1}</span><span class="lv-t">${esc(SHORT[lang][i] || '')}</span><span class="lv-y">${esc(year)}</span>${cur ? `<span class="cur">${esc(T.current)}</span>` : ''}</button>`;
+    }).join('')}
+    <span class="player-dot" id="player-dot"></span>`;
+  const path = $('#map-done'), len = path.getTotalLength(), dot = $('#player-dot');
+  const place = (k) => { const p = path.getPointAtLength(len * k); dot.style.left = `${(p.x / W) * 100}%`; dot.style.top = `${p.y}px`; path.style.strokeDashoffset = String(len * (1 - k)); };
+  path.style.strokeDasharray = String(len);
+  host.onclick = (e) => { const b = e.target.closest('.lv'); if (b) selectLevel(+b.dataset.l, true); };
+  if (mapAnimDone || REDUCED) { place(1); }
+  else {
+    place(0);
+    onView(host, () => {
+      const t0 = performance.now(), D = 2600;
+      const st = (now) => { const k = Math.min(1, (now - t0) / D); place(1 - Math.pow(1 - k, 3)); if (k < 1) requestAnimationFrame(st); else mapAnimDone = true; };
+      requestAnimationFrame(st);
+    }, 0.35);
+  }
+  selectLevel(lvSel);
+}
+function selectLevel(i, anim) {
+  lvSel = i;
+  $$('#map .lv').forEach((b) => b.setAttribute('aria-pressed', String(+b.dataset.l === i)));
+  const lv = levels()[i], box = $('#level-detail');
+  if (lv.edu) {
+    box.style.setProperty('--c', '#9b7bff');
+    box.innerHTML = `<div class="ld-top"><span class="lvn">${esc(T.lvl)} ${i + 1}</span><span class="tag" style="--c:#9b7bff">${esc(T.eduTag)}</span><span class="ld-when">${esc(lv.edu.years)}</span></div>
+      <h3 class="ld-role">${esc(lv.edu[lang][0])}</h3><p class="ld-org">${esc(lv.edu[lang][1])}</p>`;
+  } else {
+    const x = lv.xp, Lx = x[lang], org = (lang === 'fr' && x.orgFr) || x.org, col = ICON_COL[x.icon] || '#38e1ff';
+    box.style.setProperty('--c', col);
+    box.innerHTML = `<div class="ld-top"><span class="lvn">${esc(T.lvl)} ${i + 1}</span>${x.to ? '' : `<span class="tag" style="--c:#3dffa8">● ${esc(T.current)}</span>`}<span class="ld-when">${x.to ? `${fmtDate(x.from)} – ${fmtDate(x.to)}` : `${fmtDate(x.from)} – ${esc(T.present)}`}</span></div>
+      <h3 class="ld-role">${esc(Lx.role)}</h3><p class="ld-org">${icon(x.icon)}<span>${esc(org)}</span></p>
+      <p class="ld-sum">${esc(Lx.sum)}</p><ul class="ld-pts">${Lx.pts.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>`;
+  }
+  if (anim && !REDUCED) { box.classList.remove('swap'); void box.offsetWidth; box.classList.add('swap'); }
 }
 
 /* ------------------------------------------------------------------ contact */
@@ -599,6 +695,19 @@ function initContact() {
     const v = $('#msg').value.trim();
     location.href = `mailto:abdelkader.elazzouzi@gmail.com?subject=${encodeURIComponent(lang === 'fr' ? 'Prise de contact via votre portfolio' : 'Hello from your portfolio')}&body=${encodeURIComponent(v)}`;
   };
+}
+
+/* ------------------------------------------------------------------ toasts */
+const toasted = new Set();
+function toast(id) {
+  if (REDUCED || toasted.has(id) || !T.toasts[id]) return;
+  toasted.add(id);
+  const [t, d] = T.toasts[id];
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.innerHTML = `<span class="t-ic">🏆</span><span><small>${esc(T.toast)}</small><b>${esc(t)}</b><span>${esc(d)}</span></span>`;
+  $('#toasts').appendChild(el);
+  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 400); }, 3200);
 }
 
 /* ------------------------------------------------------------------ reveal + chrome */
@@ -611,9 +720,22 @@ function observeReveal() {
 }
 function initChrome() {
   $('#menu-btn').addEventListener('click', () => toggleSheet($('#menu-btn').getAttribute('aria-expanded') !== 'true'));
-  $('#sheet').addEventListener('click', (e) => { if (e.target.closest('a')) toggleSheet(false); });
+  $('#sheet').addEventListener('click', (e) => {
+    const a = e.target.closest('a'); if (!a) return;
+    const id = a.getAttribute('href');
+    if (!id.startsWith('#')) { toggleSheet(false); return; }
+    e.preventDefault();
+    toggleSheet(false);
+    const t = document.querySelector(id);
+    if (t) requestAnimationFrame(() => { t.scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth' }); history.replaceState(null, '', id); });
+  });
+  // one delegated handler for every project opener
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('#featured [data-p], #tiles [data-p]');
+    if (b) openCase(+b.dataset.p, b);
+  });
   $('#case').addEventListener('click', (e) => {
-    if (e.target.closest('[data-close]')) closeCase();
+    if (e.target.closest('[data-close]')) { closeCase(); return; }
     const n = e.target.closest('[data-next]'); if (n) openCase(+n.dataset.next);
   });
   addEventListener('keydown', (e) => {
@@ -630,12 +752,17 @@ function initChrome() {
     else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
   });
   const io = new IntersectionObserver((es) => {
-    es.forEach((e) => { if (e.isIntersecting) { current = e.target.id; markNav(); } });
+    es.forEach((e) => { if (e.isIntersecting) { current = e.target.id; markNav(); toast(e.target.id); } });
     if (scrollY < innerHeight * 0.4) { current = ''; markNav(); }
   }, { rootMargin: '-35% 0px -60% 0px' });
   $$('.sec').forEach((s) => io.observe(s));
+  let ticking = false;
+  addEventListener('scroll', () => {
+    if (ticking) return; ticking = true;
+    requestAnimationFrame(() => { ticking = false; const max = document.documentElement.scrollHeight - innerHeight; $('#xp-bar').style.setProperty('--p', max > 0 ? (scrollY / max).toFixed(4) : 0); });
+  }, { passive: true });
   let w = innerWidth;
-  addEventListener('resize', () => { if ((w < 760) !== (innerWidth < 760)) renderHub(); w = innerWidth; });
+  addEventListener('resize', () => { if (Math.abs(w - innerWidth) > 40) { w = innerWidth; renderJourney(); } });
 }
 
 /* ------------------------------------------------------------------ go */
@@ -643,16 +770,14 @@ function renderAll() {
   T = { ...UI[lang], ...COPY[lang] };
   fillText();
   renderNav();
-  renderHub();
-  renderKpis();
-  renderAbout();
+  renderHero();
+  renderPlayer();
   renderCompare();
   renderTeams();
+  renderTree();
   renderXTabs();
-  renderSkills();
-  renderProjects();
-  renderGantt();
-  renderCV();
+  renderQuests();
+  renderJourney();
   if (caseIdx >= 0 && !$('#case').hidden) openCase(caseIdx);
   observeReveal();
 }
@@ -662,3 +787,5 @@ initTip();
 initContact();
 renderAll();
 initLang();
+boot();
+initUniverse();
