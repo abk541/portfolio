@@ -47,8 +47,12 @@
   <main id="main">
     <!-- START SCREEN -->
     <section class="hero" id="top">
-      <canvas class="universe" id="universe" aria-label="3D universe of skills orbiting an integration core. Click a skill for details."></canvas>
-      <div class="hero-shade" aria-hidden="true"></div>
+      <div class="uni" id="uni">
+        <canvas class="universe" id="universe" aria-label="3D universe of skills orbiting an integration core. Drag to spin, tap a skill for details."></canvas>
+        <div class="uni-labels" id="uni-labels"></div>
+        <div class="uni-pop" id="uni-pop" role="status" hidden></div>
+        <p class="uni-hint" id="uni-hint"></p>
+      </div>
       <div class="hero-in wrap">
         <div class="hero-txt">
           <span class="chip-status"><i></i><span data-k="status"></span></span>

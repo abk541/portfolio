@@ -160,18 +160,57 @@ function toggleSheet(open) {
 }
 
 /* ------------------------------------------------------------------ hero */
+const WHAT_I_DO = { en: 'What I do with it', fr: 'Ce que j’en fais' };
+let popTimer = 0, lastTouch = performance.now();
 async function initUniverse() {
   if (sceneCtl) return;
   try {
     const { initScene } = await import('./scene.js');
-    sceneCtl = initScene($('#universe'), { onSkill: (name, x, y) => showTip(name, null, x, y) });
+    sceneCtl = initScene($('#uni'), { onPick: showPop, onInteract: () => { lastTouch = performance.now(); } });
   } catch (e) { console.warn('3D scene unavailable', e); }
+  if (!sceneCtl || REDUCED) return;
+  // when nobody is interacting, nudge one visible skill now and then
+  setInterval(() => {
+    if (document.hidden || !$('#uni-pop').hidden || performance.now() - lastTouch < 4000 || scrollY > innerHeight * 0.6) return;
+    const list = sceneCtl.hintable(); if (!list.length) return;
+    const n = list[(Math.random() * list.length) | 0];
+    n.el.classList.remove('hint'); void n.el.offsetWidth; n.el.classList.add('hint');
+  }, 3500);
 }
+function showPop(name, x, y, color) {
+  const info = skillInfo(name, lang); if (!info) return;
+  lastTouch = performance.now();
+  const pop = $('#uni-pop'), box = $('#uni');
+  clearTimeout(popTimer);
+  pop.classList.remove('out');
+  pop.style.setProperty('--c', color);
+  pop.innerHTML = `<b>${esc(name)}</b><p class="pw"><span>${esc(WHAT_I_DO[lang])}</span>${esc(info[1])}</p><small>${esc(info[0])}</small><i class="bar"></i>`;
+  pop.hidden = false;
+  const W = box.clientWidth, H = box.clientHeight, w = pop.offsetWidth, h = pop.offsetHeight;
+  const left = Math.min(Math.max(8, x - w / 2), W - w - 8);
+  let top = y + 14;
+  if (top + h > H - 8) top = Math.max(8, y - h - 48);
+  pop.style.left = `${left}px`; pop.style.top = `${top}px`;
+  void pop.offsetWidth; const bar = $('.bar', pop); bar.style.animation = 'none'; void bar.offsetWidth; bar.style.animation = '';
+  sceneCtl && sceneCtl.hold(true);
+  popTimer = setTimeout(hidePop, 5000);
+}
+function hidePop() {
+  const pop = $('#uni-pop');
+  clearTimeout(popTimer);
+  if (pop.hidden) return;
+  pop.classList.add('out');
+  sceneCtl && sceneCtl.hold(false);
+  setTimeout(() => { if (pop.classList.contains('out')) pop.hidden = true; }, 280);
+}
+document.addEventListener('pointerdown', (e) => { if (!e.target.closest('.uni-pop, .uni-l')) hidePop(); });
 let hudDone = false;
 function renderHero() {
   const hud = $('#hud');
   hud.innerHTML = T.hud.map(([n, s, l]) => `<div class="hud-i"><b><span data-n="${n}">${hudDone || REDUCED ? n : 0}</span>${s ? `<sup>${s}</sup>` : ''}</b><span>${esc(l)}</span></div>`).join('');
-  $('#legend').innerHTML = T.legend.map(([k, l]) => `<span class="lg" style="--c:${PC[k]}"><i></i>${esc(l)}</span>`).join('') + `<span class="hint">${esc(T.orbitHint)}</span>`;
+  $('#legend').innerHTML = T.legend.map(([k, l]) => `<span class="lg" style="--c:${PC[k]}"><i></i>${esc(l)}</span>`).join('');
+  $('#uni-hint').textContent = T.orbitHint;
+  hidePop();
   if (hudDone || REDUCED) return;
   hudDone = true;
   setTimeout(() => $$('[data-n]', hud).forEach((el, i) => {
@@ -393,10 +432,10 @@ function applyDom() {
   const det = $('#arch-detail');
   const txt = d ? `<b>${esc(d[lang][0])}</b><p>${esc(d[lang][1])}</p>` : `<b>${esc(UI[lang].all)}</b><p>${esc(X[lang].text)}</p>`;
   const cons = X.consumers[lang].map((c) => c.split(' (')[0]);
-  const srcs = (d ? d.sys : X.systems).slice(0, 6);
+  const srcs = (d ? d.sys : X.systems).slice(0, PHONE() ? 4 : 6);
   const tgts = d ? d.use.map((u) => cons[u]) : cons;
   const n = Math.max(srcs.length, tgts.length);
-  det.innerHTML = `<div class="dd-t">${txt}</div><div class="dd-flow" style="height:${Math.max(170, n * 36 + 36)}px"><canvas aria-hidden="true"></canvas></div>`;
+  det.innerHTML = `<div class="dd-t">${txt}</div><div class="dd-flow" style="height:${Math.max(200, n * 48 + 48)}px"><canvas aria-hidden="true"></canvas></div>`;
   if (ddCtl) ddCtl.destroy();
   ddCtl = heroFlow($('.dd-flow canvas', det), { sources: srcs, targets: tgts, hub: [xKey === 'mule' ? 'API' : 'MDM'], compact: true });
 }
@@ -444,7 +483,7 @@ function initTip() {
     }
   };
   document.addEventListener('click', (e) => {
-    if (e.target.closest('#universe')) return;
+    if (e.target.closest('#uni')) return;
     const b = e.target.closest('[data-skill]');
     if (!b) { if (!tip.contains(e.target)) close(); return; }
     if (cur === b) { close(); return; }
