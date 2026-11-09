@@ -3,7 +3,7 @@ const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const PHONE = innerWidth < 760;
 const NS = 'http://www.w3.org/2000/svg';
 /** Shared palette for every canvas: graphite, bone and a single signal accent. */
-export const THEME = { ink: '#05070f', raised: '#0c1326', bone: '#eaf0ff', bone2: '#9fb0d0', muted: '#6f80a3', accent: '#38e1ff', sans: 'Inter, system-ui, sans-serif', mono: '"JetBrains Mono", ui-monospace, monospace' };
+export const THEME = { ink: '#070b16', raised: '#10182e', bone: '#e9eefb', bone2: '#a9b5d0', muted: '#8190ae', accent: '#38c8ff', sans: 'Inter, system-ui, sans-serif', mono: '"JetBrains Mono", ui-monospace, monospace' };
 const K = THEME;
 
 /* ------------------------------------------------------------------ helpers */
@@ -121,7 +121,7 @@ export function heroFlow(canvas, { sources, targets, hub, compact = false }) {
     ctx.clearRect(0, 0, w, h);
     if (!nodesL.length) return;
     ctx.lineWidth = 1;
-    nodesL.forEach((a, i) => { ctx.strokeStyle = hover === i ? 'rgba(56,225,255,.75)' : `rgba(150,175,230,${hover >= 0 ? 0.05 : 0.14})`; strokeCurve(ctx, hcurve([a.e, a.y], [H[0] - HR, H[1]], 0.6)); });
+    nodesL.forEach((a, i) => { ctx.strokeStyle = hover === i ? 'rgba(56,200,255,.75)' : `rgba(150,175,230,${hover >= 0 ? 0.05 : 0.14})`; strokeCurve(ctx, hcurve([a.e, a.y], [H[0] - HR, H[1]], 0.6)); });
     nodesR.forEach((b) => { ctx.strokeStyle = 'rgba(150,175,230,.14)'; strokeCurve(ctx, hcurve([H[0] + HR, H[1]], [b.e, b.y], 0.6)); });
     if (!REDUCED && packets.length < (PHONE ? 20 : 36) && Math.random() < (hover >= 0 ? 0.35 : 0.16)) spawn(hover >= 0 && Math.random() < 0.7 ? hover : undefined, 0, hover >= 0);
     for (let k = packets.length - 1; k >= 0; k--) {
@@ -131,12 +131,12 @@ export function heroFlow(canvas, { sources, targets, hub, compact = false }) {
       if (p.s < 0) continue;
       const hot = p.hot || p.i === hover;
       const [x, y] = at(p.r, p.s), [x2, y2] = at(p.r, p.s - 16);
-      ctx.strokeStyle = hot ? 'rgba(56,225,255,.45)' : 'rgba(150,175,230,.3)'; ctx.lineWidth = 1.5;
+      ctx.strokeStyle = hot ? 'rgba(56,200,255,.45)' : 'rgba(150,175,230,.3)'; ctx.lineWidth = 1.5;
       ctx.beginPath(); ctx.moveTo(x2, y2); ctx.lineTo(x, y); ctx.stroke();
       ctx.fillStyle = hot ? K.accent : K.bone; ctx.beginPath(); ctx.arc(x, y, 2.2, 0, 6.283); ctx.fill();
     }
     const pulse = REDUCED ? 0 : (t % 2.6) / 2.6;
-    ctx.strokeStyle = `rgba(56,225,255,${0.45 * (1 - pulse)})`; ctx.lineWidth = 1;
+    ctx.strokeStyle = `rgba(56,200,255,${0.45 * (1 - pulse)})`; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.arc(H[0], H[1], HR + pulse * 26, 0, 6.283); ctx.stroke();
     ctx.strokeStyle = 'rgba(150,175,230,.18)';
     ctx.beginPath(); ctx.arc(H[0], H[1], HR + 7, 0, 6.283); ctx.stroke();
@@ -249,7 +249,7 @@ export function cutover(canvas, input, onChange, labels) {
     ctx.lineWidth = 1.5;
     ctx.strokeStyle = 'rgba(150,175,230,.2)'; strokeCurve(ctx, c1);
     ctx.strokeStyle = `rgba(124,122,116,${0.12 + 0.6 * (1 - cut)})`; strokeCurve(ctx, c3);
-    ctx.strokeStyle = `rgba(56,225,255,${0.12 + 0.6 * cut})`; strokeCurve(ctx, c4);
+    ctx.strokeStyle = `rgba(56,200,255,${0.12 + 0.6 * cut})`; strokeCurve(ctx, c4);
     if (!REDUCED && Math.random() < 0.55 && packets.length < 40) packets.push({ t: 0, seg: 0, to4: Math.random() < cut, v: 0.8 + Math.random() * 0.4 });
     for (let k = packets.length - 1; k >= 0; k--) {
       const p = packets[k];

@@ -9,8 +9,8 @@ const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 export const RINGS = [
   { key: 'ai', color: 0xa78bfa, r: 3.2, tilt: [1.2, 0, 0.35], speed: 0.13, skills: ['MCP', 'Claude', 'Azure OpenAI', 'Prompt engineering'] },
   { key: 'mule', color: 0x38bdf8, r: 4.7, tilt: [1.38, 0, -0.38], speed: -0.09, skills: ['Mule 4', 'DataWeave', 'Flex Gateway', 'API-led connectivity', 'MUnit'] },
-  { key: 'infa', color: 0xffa53b, r: 6.1, tilt: [1.1, 0, 0.85], speed: 0.06, skills: ['Business 360', 'CDI', 'Match & merge', 'Snowflake', 'CAI'] },
-  { key: 'web', color: 0x3dffa8, r: 7.4, tilt: [1.5, 0, 0.12], speed: -0.04, skills: ['React', 'TypeScript', 'Kotlin', 'Node.js'] },
+  { key: 'infa', color: 0xfb9a3c, r: 6.1, tilt: [1.1, 0, 0.85], speed: 0.06, skills: ['Business 360', 'CDI', 'Match & merge', 'Snowflake', 'CAI'] },
+  { key: 'web', color: 0x34d399, r: 7.4, tilt: [1.5, 0, 0.12], speed: -0.04, skills: ['React', 'TypeScript', 'Kotlin', 'Node.js'] },
 ];
 const hex = (c) => '#' + c.toString(16).padStart(6, '0');
 
@@ -51,18 +51,18 @@ export function initScene(box, { onPick, onInteract } = {}) {
   // core
   const core = new THREE.Group(); world.add(core);
   const ico = new THREE.IcosahedronGeometry(1.5, 1), ico2 = new THREE.IcosahedronGeometry(2.05, 0);
-  const wire = new THREE.LineSegments(new THREE.EdgesGeometry(ico), new THREE.LineBasicMaterial({ color: 0x38e1ff, transparent: true, opacity: 0.8 }));
-  const wire2 = new THREE.LineSegments(new THREE.EdgesGeometry(ico2), new THREE.LineBasicMaterial({ color: 0x9b7bff, transparent: true, opacity: 0.35 }));
+  const wire = new THREE.LineSegments(new THREE.EdgesGeometry(ico), new THREE.LineBasicMaterial({ color: 0x38c8ff, transparent: true, opacity: 0.8 }));
+  const wire2 = new THREE.LineSegments(new THREE.EdgesGeometry(ico2), new THREE.LineBasicMaterial({ color: 0x7c8cff, transparent: true, opacity: 0.35 }));
   const ball = new THREE.Mesh(new THREE.SphereGeometry(1.15, 24, 24), new THREE.MeshBasicMaterial({ color: 0x0b2a4a }));
   const mkGlow = (color, s, o) => { const m = new THREE.Sprite(new THREE.SpriteMaterial({ map: glow, color, transparent: true, opacity: o, depthWrite: false, blending: THREE.AdditiveBlending })); m.scale.set(s, s, 1); disposables.push(m.material); return m; };
-  const halo = mkGlow(0x38e1ff, 7, 0.85), halo2 = mkGlow(0x9b7bff, 13, 0.4);
+  const halo = mkGlow(0x38c8ff, 7, 0.85), halo2 = mkGlow(0x7c8cff, 13, 0.4);
   core.add(halo2, ball, wire, wire2, halo);
   disposables.push(ico, ico2, wire.geometry, wire.material, wire2.geometry, wire2.material, ball.geometry, ball.material);
 
   const pulses = [];
   const ringGeo = new THREE.RingGeometry(0.97, 1, 72); disposables.push(ringGeo);
   for (let i = 0; i < 2; i++) {
-    const m = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ color: 0x38e1ff, transparent: true, opacity: 0, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending }));
+    const m = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ color: 0x38c8ff, transparent: true, opacity: 0, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending }));
     m.rotation.x = Math.PI / 2 + 0.25; m.userData.t = i / 2; core.add(m); pulses.push(m); disposables.push(m.material);
   }
 
@@ -95,7 +95,7 @@ export function initScene(box, { onPick, onInteract } = {}) {
   const N = phone ? 80 : 170;
   const pos = new Float32Array(N * 3), col = new Float32Array(N * 3);
   const parts = [];
-  const palette = RINGS.map((r) => new THREE.Color(r.color)).concat([new THREE.Color(0x38e1ff)]);
+  const palette = RINGS.map((r) => new THREE.Color(r.color)).concat([new THREE.Color(0x38c8ff)]);
   const spawn = (p) => {
     const th = Math.random() * 6.283, ph = Math.acos(2 * Math.random() - 1), r = 9 + Math.random() * 5;
     p.a = new THREE.Vector3(r * Math.sin(ph) * Math.cos(th), r * Math.sin(ph) * Math.sin(th) * 0.6, r * Math.cos(ph));
