@@ -3,7 +3,7 @@ import { COPY, TREE } from './copy.js';
 import { PROJECTS } from './projects.data.js';
 import { skillInfo } from './skills.js';
 import { ICONS } from '../assets/icons.js';
-import { heroFlow, archFlow, teamFlow, cutover, barChart, donutChart, THEME } from './fx.js';
+import { heroFlow, archFlow, teamFlow, cutover, barChart, donutChart, THEME, setTheme } from './fx.js';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -24,9 +24,7 @@ const onView = (el, fn, threshold = 0.25) => {
   io.observe(el);
 };
 document.documentElement.classList.add('js');
-const PC = { mule: '#38bdf8', infa: '#fb9a3c', ai: '#a78bfa', web: '#34d399', ops: '#f472b6' };
-const CAT_COL = { ai: PC.ai, mule: PC.mule, infa: PC.infa, web: PC.web, mobile: '#f472b6', data: '#38c8ff', archive: '#fbbf24' };
-const ICON_COL = { mulesoft: PC.mule, informatica: PC.infa, claude: PC.ai };
+const PC = {}, CAT_COL = {}, ICON_COL = {};
 const PILLAR_KEYS = ['mule', 'infa', 'ai'];
 
 /* ------------------------------------------------------------------ language */
@@ -103,7 +101,7 @@ const X2 = {
 };
 const HERO_SOURCES = ['SAP ERP', 'Salesforce', 'Global HR', 'Informatica MDM', 'Hexagon'];
 const HUB_APPS = { en: ['HR', 'Payroll', 'Finance', 'Sales', 'Job sites', 'IT access'], fr: ['RH', 'Paie', 'Finance', 'Commercial', 'Chantiers', 'Accès IT'] };
-let archCtl = null, teamCtl = null, cutCtl = null, ddCtl = null, sceneCtl = null;
+let archCtl = null, teamCtl = null, cutCtl = null, ddCtl = null;
 
 /* ------------------------------------------------------------------ text */
 function fillText() {
@@ -113,17 +111,57 @@ function fillText() {
   $('#msg').placeholder = T.placeholder;
 }
 
-/* ------------------------------------------------------------------ nav */
-let current = '';
-function renderNav() {
-  const html = T.nav.map(([id, l]) => `<a href="#${id}" data-sec="${id}">${esc(l)}</a>`).join('');
-  $('#nav-links').innerHTML = html;
-  $('#sheet-links').innerHTML = html;
-  $('#dots').innerHTML = T.nav.map(([id, l]) => `<a href="#${id}" data-sec="${id}" aria-label="${esc(l)}"><span>${esc(l)}</span></a>`).join('');
-  markNav();
+/* ------------------------------------------------------------------ palette + theme */
+const cssVar = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const hexRgb = (h) => { const n = parseInt(h.slice(1), 16); return `${(n >> 16) & 255},${(n >> 8) & 255},${n & 255}`; };
+function readPalette() {
+  ['mule', 'infa', 'ai', 'web', 'ops', 'edu', 'data', 'gold', 'accent', 'green'].forEach((k) => { PC[k] = cssVar('--' + k); });
+  Object.assign(CAT_COL, { ai: PC.ai, mule: PC.mule, infa: PC.infa, web: PC.web, mobile: PC.ops, data: PC.data, archive: PC.gold });
+  Object.assign(ICON_COL, { mulesoft: PC.mule, informatica: PC.infa, claude: PC.ai });
+  const light = document.documentElement.dataset.theme === 'light';
+  setTheme({ ink: cssVar('--bg'), raised: cssVar('--surface'), bone: cssVar('--text'), bone2: cssVar('--text-2'), muted: cssVar('--muted'), accent: PC.accent, onAccent: cssVar('--on-accent'), aRgb: hexRgb(PC.accent), lRgb: light ? '60,64,74' : '160,166,178' });
 }
-function markNav() {
-  $$('[data-sec]').forEach((a) => { const on = a.dataset.sec === current; a.classList.toggle('on', on); on ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current'); });
+function initTheme() {
+  const btn = $('#theme-btn');
+  btn.addEventListener('click', () => {
+    const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+    document.documentElement.dataset.theme = next;
+    store.set('theme', next);
+    renderAll();
+  });
+}
+
+/* ------------------------------------------------------------------ nav: a pipeline that fills as you scroll */
+function renderNav() {
+  const items = T.nav.map(([id, l]) => `<a href="#${id}" data-sec="${id}"><i></i><span>${esc(l)}</span></a>`).join('');
+  const nav = $('#flow-nav');
+  nav.innerHTML = `<span class="fill"></span>${items}`;
+  nav.style.setProperty('--n', T.nav.length);
+  $('#sheet-links').innerHTML = items;
+  $$('.next[data-next]').forEach((a) => { const n = T.nav.find((x) => x[0] === a.dataset.next); a.innerHTML = `<small>${esc(T.nextSec)}</small>${esc(n[1])}<span aria-hidden="true">↓</span>`; });
+  $('#theme-btn').setAttribute('aria-label', T.themeL);
+  updateFlow();
+}
+function updateFlow() {
+  const ids = T.nav.map((n) => n[0]);
+  const y = scrollY + innerHeight * 0.38;
+  let idx = -1, frac = 0;
+  ids.forEach((id, i) => {
+    const el = document.getElementById(id), top = el.offsetTop;
+    if (y < top) return;
+    idx = i;
+    const end = i < ids.length - 1 ? document.getElementById(ids[i + 1]).offsetTop : top + el.offsetHeight;
+    frac = Math.max(0, Math.min(1, (y - top) / (end - top)));
+  });
+  const p = idx < 0 ? 0 : Math.min(1, (idx + (idx === ids.length - 1 ? 0 : frac)) / (ids.length - 1));
+  $('#flow-nav').style.setProperty('--p', p.toFixed(4));
+  const max = document.documentElement.scrollHeight - innerHeight;
+  $('#nav').style.setProperty('--pp', max > 0 ? (scrollY / max).toFixed(4) : 0);
+  $$('[data-sec]').forEach((a) => {
+    const i = ids.indexOf(a.dataset.sec), on = i === idx;
+    a.classList.toggle('on', on); a.classList.toggle('done', i < idx);
+    on ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current');
+  });
 }
 function toggleSheet(open) {
   const sheet = $('#sheet'), btn = $('#menu-btn');
@@ -134,70 +172,46 @@ function toggleSheet(open) {
   else { sheet.classList.remove('open'); sheet.hidden = true; }
 }
 
-/* ------------------------------------------------------------------ hero */
-const WHAT_I_DO = { en: 'What I do with it', fr: 'Ce que j’en fais' };
-let popTimer = 0, lastTouch = performance.now();
-async function initUniverse() {
-  if (sceneCtl) return;
-  try {
-    const { initScene } = await import('./scene.js');
-    sceneCtl = initScene($('#uni'), { onPick: showPop, onInteract: () => { lastTouch = performance.now(); } });
-  } catch (e) { console.warn('3D scene unavailable', e); }
-  if (!sceneCtl || REDUCED) return;
-  // when nobody is interacting, nudge one visible skill now and then
-  setInterval(() => {
-    if (document.hidden || !$('#uni-pop').hidden || performance.now() - lastTouch < 4000 || scrollY > innerHeight * 0.6) return;
-    const list = sceneCtl.hintable(); if (!list.length) return;
-    const n = list[(Math.random() * list.length) | 0];
-    n.el.classList.remove('hint'); void n.el.offsetWidth; n.el.classList.add('hint');
-  }, 3500);
+/* ------------------------------------------------------------------ hero: the site as a flow map */
+const MAP_COL = ['accent', 'mule', 'infa', 'ai', 'web', 'ops'];
+function renderMap() {
+  const svg = $('#sitemap'), small = innerWidth < 760;
+  const W = small ? 360 : 600, H = small ? 420 : 450, C = [W / 2, H / 2];
+  const nw = small ? 126 : 190, nh = small ? 46 : 62;
+  const pos = small ? [[70, 48], [290, 48], [292, 210], [290, 372], [70, 372], [68, 210]] : [[118, 66], [482, 66], [500, 225], [482, 384], [118, 384], [100, 225]];
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('aria-label', T.mapHint);
+  let html = '';
+  T.nav.forEach(([id, label], i) => {
+    const [x, y] = pos[i], col = PC[MAP_COL[i]];
+    const mx = (C[0] + x) / 2, my = (C[1] + y) / 2, bend = (i % 2 ? 1 : -1) * (small ? 14 : 22);
+    const d = `M${C[0]},${C[1]} Q${mx + (y === C[1] ? 0 : bend)},${my + (y === C[1] ? bend : 0)} ${x},${y}`;
+    const x0 = x - nw / 2, y0 = y - nh / 2;
+    html += `<g class="sm-g" style="--c:${col}"><path class="sm-edge" d="${d}"/>${REDUCED ? '' : `<circle r="3.5" class="sm-pkt"><animateMotion dur="${2.4 + i * 0.25}s" begin="${-i * 0.6}s" repeatCount="indefinite" path="${d}"/></circle>`}
+      <a class="sm-node" href="#${id}" aria-label="${esc(label)}: ${esc(T.mapNodes[id])}"><rect x="${x0}" y="${y0}" width="${nw}" height="${nh}" rx="14"/><rect class="bar" x="${x0 + 10}" y="${y0 + 12}" width="4" height="${nh - 24}" rx="2"/>
+        <text class="t" x="${x0 + 24}" y="${small ? y + 5 : y0 + 26}">${esc(label)}</text>${small ? '' : `<text class="s" x="${x0 + 24}" y="${y0 + 45}">${esc(T.mapNodes[id])}</text>`}
+        <text class="go" x="${x0 + nw - 24}" y="${y + 5}">→</text></a></g>`;
+  });
+  html += `<g class="sm-core"><circle class="ring" cx="${C[0]}" cy="${C[1]}" r="${small ? 26 : 32}"/><circle class="c" cx="${C[0]}" cy="${C[1]}" r="${small ? 26 : 32}"/><text x="${C[0]}" y="${C[1] + 6}" text-anchor="middle">AE</text></g>`;
+  svg.innerHTML = html;
 }
-function showPop(name, x, y, color) {
-  const info = skillInfo(name, lang); if (!info) return;
-  lastTouch = performance.now();
-  const pop = $('#uni-pop'), box = $('#uni');
-  clearTimeout(popTimer);
-  pop.classList.remove('out');
-  pop.style.setProperty('--c', color);
-  pop.innerHTML = `<b>${esc(name)}</b><p class="pw"><span>${esc(WHAT_I_DO[lang])}</span>${esc(info[1])}</p><small>${esc(info[0])}</small><i class="bar"></i>`;
-  pop.hidden = false;
-  const W = box.clientWidth, H = box.clientHeight, w = pop.offsetWidth, h = pop.offsetHeight;
-  const left = Math.min(Math.max(8, x - w / 2), W - w - 8);
-  let top = y + 14;
-  if (top + h > H - 8) top = Math.max(8, y - h - 48);
-  pop.style.left = `${left}px`; pop.style.top = `${top}px`;
-  void pop.offsetWidth; const bar = $('.bar', pop); bar.style.animation = 'none'; void bar.offsetWidth; bar.style.animation = '';
-  sceneCtl && sceneCtl.hold(true);
-  popTimer = setTimeout(hidePop, 5000);
-}
-function hidePop() {
-  const pop = $('#uni-pop');
-  clearTimeout(popTimer);
-  if (pop.hidden) return;
-  pop.classList.add('out');
-  sceneCtl && sceneCtl.hold(false);
-  setTimeout(() => { if (pop.classList.contains('out')) pop.hidden = true; }, 280);
-}
-document.addEventListener('pointerdown', (e) => { if (!e.target.closest('.uni-pop, .uni-l')) hidePop(); });
 const KPI_META = [
-  ['#38c8ff', 'M4 7h16M4 12h16M4 17h10', [8, 14, 12, 22, 30, 42, 60, 78, 96, 120]],
-  ['#fb9a3c', 'M4 6c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3zm0 0v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6', [10, 22, 30, 52, 70, 88, 104, 118, 130, 140]],
-  ['#a78bfa', 'M12 3l2.2 5.8L20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2z', [0, 1, 2, 4, 6, 9, 14, 19, 25, 30]],
-  ['#34d399', 'M12 3a9 9 0 100 18 9 9 0 000-18zm-9 9h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3', [12, 20, 26, 34, 41, 50, 58, 66, 74, 80]],
+  ['mule', 'M4 7h16M4 12h16M4 17h10', [8, 14, 12, 22, 30, 42, 60, 78, 96, 120]],
+  ['infa', 'M4 6c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3zm0 0v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6', [10, 22, 30, 52, 70, 88, 104, 118, 130, 140]],
+  ['ai', 'M12 3l2.2 5.8L20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2z', [0, 1, 2, 4, 6, 9, 14, 19, 25, 30]],
+  ['web', 'M12 3a9 9 0 100 18 9 9 0 000-18zm-9 9h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3', [12, 20, 26, 34, 41, 50, 58, 66, 74, 80]],
 ];
 function spark(vals, col, id) {
   const max = Math.max(...vals), W = 96, H = 36;
   const pts = vals.map((v, i) => [(i / (vals.length - 1)) * W, H - 3 - (v / max) * (H - 6)]);
   const d = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
-  return `<svg class="spark" viewBox="0 0 ${W} ${H}" aria-hidden="true"><defs><linearGradient id="sg${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".35"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></linearGradient></defs><path d="${d} L${W},${H} L0,${H} Z" fill="url(#sg${id})"/><path class="sp-line" d="${d}" fill="none" stroke="${col}" stroke-width="2" stroke-linecap="round" pathLength="1"/></svg>`;
+  return `<svg class="spark" viewBox="0 0 ${W} ${H}" aria-hidden="true"><defs><linearGradient id="sg${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".3"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></linearGradient></defs><path d="${d} L${W},${H} L0,${H} Z" fill="url(#sg${id})"/><path class="sp-line" d="${d}" fill="none" stroke="${col}" stroke-width="2" stroke-linecap="round" pathLength="1"/></svg>`;
 }
 let kpiDone = false;
 function renderHero() {
-  $('#legend').innerHTML = T.legend.map(([k, l]) => `<span style="--c:${PC[k]}"><i></i>${esc(l)}</span>`).join('');
-  $('#uni-hint').textContent = T.orbitHint;
-  hidePop();
+  renderMap();
   const box = $('#kpis');
-  box.innerHTML = T.kpis.map(([n, sfx, l, d], i) => { const [col, ic, vals] = KPI_META[i]; return `<article class="card kpi rv" style="--c:${col};--d:${i * 0.07}s">
+  box.innerHTML = T.kpis.map(([n, sfx, l, d], i) => { const [ck, ic, vals] = KPI_META[i], col = PC[ck]; return `<article class="card kpi rv" style="--c:${col};--d:${i * 0.07}s">
       <div class="kpi-top"><span class="kpi-ic"><svg viewBox="0 0 24 24"><path d="${ic}"/></svg></span><span class="kpi-d">${esc(d)}</span></div>
       <div class="kpi-row"><b class="kpi-v"><span data-n="${n}">${kpiDone || REDUCED ? n : 0}</span>${sfx ? `<sup>${sfx}</sup>` : ''}</b>${spark(vals, col, i)}</div>
       <p class="kpi-l">${esc(l)}</p></article>`; }).join('');
@@ -213,10 +227,11 @@ function renderHero() {
 }
 
 /* ------------------------------------------------------------------ about */
-const HL_COL = ['#38bdf8', '#34d399', '#a78bfa', '#fb9a3c', '#f472b6', '#7c8cff'];
 function renderAbout() {
   $('#facts').innerHTML = T.facts.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('');
-  $('#hl').innerHTML = T.hl.map(([n, t, d], i) => `<article class="card hl-i rv" style="--c:${HL_COL[i]};--d:${(i % 3) * 0.07}s"><b>${esc(n)}</b><span><strong>${esc(t)}</strong><span>${esc(d)}</span></span></article>`).join('');
+  $('#pipeline').innerHTML = `<div class="pl-end">${esc(T.pipeIn)}</div><i class="pl-arrow"></i>`
+    + T.pillars.map((p, i) => { const k = PILLAR_KEYS[i]; return `<div class="pl-step" style="--c:${PC[k]}"><div class="top"><span class="pl-ic">${icon(EXPERTISE[k].icon)}</span><span><b>${esc(p.k)}</b><small>${esc(p.p)}</small></span></div><p>${esc(p.t)}</p></div><i class="pl-arrow"></i>`; }).join('')
+    + `<div class="pl-end out">${esc(T.pipeOut)}</div>`;
   renderRadar();
 }
 function renderRadar() {
@@ -306,7 +321,7 @@ function showTeam(i, quiet) {
   board.innerHTML = `<canvas class="team-fx" aria-hidden="true"></canvas><div class="tb-from"><span>${t.id === 'mgmt' ? '⟵' : '⟶'}</span><b>${esc(t.from)}</b></div>
     <div class="tb-to">${t.to.map((x) => `<div class="tb-item"><i>✓</i><span>${esc(x)}</span></div>`).join('')}<p class="tb-res">${esc(res)}</p></div>`;
   if (teamCtl) teamCtl.destroy();
-  teamCtl = teamFlow($('.team-fx', board), board, '#34d399');
+  teamCtl = teamFlow($('.team-fx', board), board, PC.green);
   const items = $$('.tb-item, .tb-res', board);
   if (REDUCED) { items.forEach((el) => el.classList.add('in')); return; }
   const run = () => items.forEach((el, k) => teamTimers.push(setTimeout(() => el.classList.add('in'), 100 + k * 110)));
@@ -363,7 +378,7 @@ function renderX(swap) {
     }
   }
   panel.innerHTML = `<div class="x-top">
-      <article class="panel plain-box"><span class="tag" style="--c:#34d399">${esc(T.plainLabel)}</span><p>${esc(pillar.t)}</p></article>
+      <article class="panel plain-box"><span class="tag" style="--c:${PC.green}">${esc(T.plainLabel)}</span><p>${esc(pillar.t)}</p></article>
       <article class="panel x-intro"><span class="tag">${esc(T.techLabel)}</span><h3>${esc(L.title)}</h3><p>${esc(L.text)}</p></article>
     </div>${body}
     <div class="x-cols">
@@ -401,7 +416,7 @@ function renderChart() {
   if (xKey === 'mule') { host.innerHTML = `<h5>${esc(C.muleChart)}</h5><div></div>`; barChart(host.lastElementChild, C.muleBars, PC.mule); }
   else if (xKey === 'infa') {
     host.innerHTML = `<h5>${esc(C.infaChart)}</h5><div></div>`;
-    donutChart(host.lastElementChild, [39, 36, 32, 21, 12].map((v, i) => [C.infaSegs[i], v, [PC.infa, '#fbbf24', PC.mule, PC.ai, '#64748b'][i]]), C.infaTotal);
+    donutChart(host.lastElementChild, [39, 36, 32, 21, 12].map((v, i) => [C.infaSegs[i], v, [PC.infa, PC.gold, PC.mule, PC.ai, PC.edu][i]]), C.infaTotal);
   } else { host.innerHTML = `<h5>${esc(C.aiChart)}</h5><div></div>`; barChart(host.lastElementChild, C.aiBars, PC.ai); }
 }
 function applyDom() {
@@ -464,7 +479,6 @@ function initTip() {
     }
   };
   document.addEventListener('click', (e) => {
-    if (e.target.closest('#uni')) return;
     const b = e.target.closest('[data-skill]');
     if (!b) { if (!tip.contains(e.target)) close(); return; }
     if (cur === b) { close(); return; }
@@ -535,30 +549,85 @@ function schematic(cat) {
   return `<svg viewBox="0 0 320 220" preserveAspectRatio="xMidYMid meet" aria-hidden="true">${g}</svg><span class="lbl">${esc(SCH_LBL[lang][cat] || '')}</span>`;
 }
 
-/* ------------------------------------------------------------------ skills */
-const BR_IC = { mule: 'mulesoft', infa: 'informatica', ai: 'claude', web: 'react', ops: 'github' };
+/* ------------------------------------------------------------------ skills: link graph skills ↔ projects */
 const yearsSince = (ym) => { const [y, m] = ym.split('-').map(Number); return (Date.now() - new Date(y, m - 1, 1)) / 31557600000; };
-let treeSel = 'mule';
+const ALIAS = { MuleSoft: 'Anypoint Platform', RTF: 'Runtime Fabric', 'API-led': 'API-led connectivity', 'Informatica MDM': 'Business 360', 'Next.js 15': 'Next.js', 'Azure AD': 'Entra ID', 'IDMC REST API': 'IDMC' };
+const SKILL_DOM = {};
+Object.entries(TREE).forEach(([k, tiers]) => tiers.flat().forEach((s) => { SKILL_DOM[s] = k; }));
+const PROJ_SKILLS = PROJECTS.map((p) => [...new Set(p.stack.map((s) => ALIAS[s] || s).filter((s) => SKILL_DOM[s]))]);
+let gSel = { type: 'skill', id: 'Mule 4' }, gDom = 'mule', gRO = null;
 function renderSkills() {
-  barChart($('#years'), T.yearsRows.map(([l, d]) => [l, Math.round(yearsSince(d) * 10) / 10, T.yearsUnit]), '#38c8ff');
-  const ycols = [PC.mule, PC.ai, PC.infa, '#7c8cff'];
+  barChart($('#years'), T.yearsRows.map(([l, d]) => [l, Math.round(yearsSince(d) * 10) / 10, T.yearsUnit]), PC.accent);
+  const ycols = [PC.mule, PC.ai, PC.infa, PC.web];
   $$('#years .bar-track i').forEach((i, k) => i.style.setProperty('--c', ycols[k]));
   donutChart($('#skill-donut'), T.branches.map(([k, name]) => [name, TREE[k].flat().length, PC[k]]), T.donutTotal);
-  const host = $('#domains');
-  host.innerHTML = T.branches.map(([k, name, sub], bi) => `<article class="card dom-c rv${k === treeSel ? ' sel' : ''}" data-b="${k}" style="--c:${PC[k]};--d:${bi * 0.06}s">
-      <div class="dom-h"><span class="dom-ic">${icon(BR_IC[k])}</span><span><b>${esc(name)}</b><small>${esc(sub)}</small></span></div>
-      ${TREE[k].map((list, ti) => `<div class="tier"><div class="tier-l"><span>${esc(T.tiers[ti])}</span><span class="lvl">${[0, 1, 2].map((x) => `<s class="${x <= ti ? 'f' : ''}"></s>`).join('')}</span></div>
-        <div class="nodes">${list.map((s) => `<button type="button" class="node" data-skill="${esc(s)}" aria-expanded="false" translate="no">${esc(s)}</button>`).join('')}</div></div>`).join('')}
-    </article>`).join('');
-  const seg = $('#tree-seg');
-  seg.innerHTML = T.branches.map(([k, name]) => `<button role="tab" type="button" data-b="${k}" aria-selected="${k === treeSel}">${esc(name)}</button>`).join('');
+  const g = $('#graph');
+  g.innerHTML = `<svg aria-hidden="true"></svg>
+    <div class="g-col"><h4>${esc(T.skillsCol)}</h4>${T.branches.map(([k, name, sub]) => `<section class="g-dom${k === gDom ? ' sel' : ''}" data-b="${k}" style="--c:${PC[k]}"><h5><i></i>${esc(name)}<small>${esc(sub)}</small></h5>
+      <div class="g-chips">${TREE[k].flat().map((s) => `<button type="button" class="g-skill" data-s="${esc(s)}" aria-pressed="false" translate="no">${esc(s)}</button>`).join('')}</div></section>`).join('')}</div>
+    <div class="g-gap"></div>
+    <div class="g-col g-pcol"><h4>${esc(T.projectsCol)}</h4><div class="g-projs">${PROJECTS.map((p, i) => `<button type="button" class="g-proj" data-g="${i}" aria-pressed="false" style="--c:${CAT_COL[p.cats[0]]}"><i></i>${esc(p[lang].title)}</button>`).join('')}</div></div>`;
+  const seg = $('#graph-seg');
+  seg.innerHTML = T.branches.map(([k, name]) => `<button role="tab" type="button" data-b="${k}" aria-selected="${k === gDom}">${esc(name)}</button>`).join('');
   seg.onclick = (e) => {
     const b = e.target.closest('button'); if (!b) return;
-    treeSel = b.dataset.b;
+    gDom = b.dataset.b;
     $$('button', seg).forEach((x) => x.setAttribute('aria-selected', String(x === b)));
-    $$('.dom-c', host).forEach((c) => c.classList.toggle('sel', c.dataset.b === treeSel));
+    $$('.g-dom', g).forEach((d) => d.classList.toggle('sel', d.dataset.b === gDom));
+    selectGraph('skill', TREE[gDom][0][0]);
   };
-  onView(host, () => $$('.dom-c', host).forEach((c) => $$('.node', c).forEach((n, i) => setTimeout(() => n.classList.add('on'), REDUCED ? 0 : 120 + i * 45))), 0.1);
+  const pick = (e) => {
+    const s = e.target.closest('.g-skill'), p = e.target.closest('.g-proj');
+    if (s) selectGraph('skill', s.dataset.s); else if (p) selectGraph('proj', +p.dataset.g);
+  };
+  g.onclick = pick;
+  g.onpointerover = (e) => { if (e.pointerType === 'mouse') pick(e); };
+  g.onfocusin = pick;
+  $('#graph-info').onclick = (e) => { const b = e.target.closest('[data-open]'); if (b) openCase(+b.dataset.open, b); };
+  if (gRO) gRO.disconnect();
+  gRO = new ResizeObserver(() => drawLinks()); gRO.observe(g);
+  selectGraph(gSel.type, gSel.id);
+}
+function selectGraph(type, id) {
+  if (gSel.type === type && gSel.id === id && $('#graph').classList.contains('sel')) return;
+  gSel = { type, id };
+  const g = $('#graph'); g.classList.add('sel');
+  const skills = type === 'skill' ? [id] : PROJ_SKILLS[id];
+  const projs = type === 'skill' ? PROJECTS.map((_, i) => i).filter((i) => PROJ_SKILLS[i].includes(id)) : [id];
+  $$('.g-skill', g).forEach((b) => { const on = skills.includes(b.dataset.s); b.setAttribute('aria-pressed', String(type === 'skill' && on)); b.classList.toggle('hit', type === 'proj' && on); });
+  $$('.g-proj', g).forEach((b) => { const on = projs.includes(+b.dataset.g); b.setAttribute('aria-pressed', String(type === 'proj' && on)); b.classList.toggle('hit', type === 'skill' && on); });
+  const info = $('#graph-info');
+  if (type === 'skill') {
+    const i = skillInfo(id, lang) || ['', ''];
+    info.innerHTML = `<div class="gi-t" style="--c:${PC[SKILL_DOM[id]]}"><b>${esc(id)}</b> · ${esc(i[0])}<em>${esc(i[1])}</em></div>
+      <div class="gi-p">${projs.length ? `<small>${esc(T.usedIn)}</small>${projs.map((p) => `<button type="button" class="gi-btn" data-open="${p}">${esc(PROJECTS[p][lang].title)}</button>`).join('')}` : `<small>${esc(T.everyday)}</small>`}</div>`;
+  } else {
+    const p = PROJECTS[id];
+    info.innerHTML = `<div class="gi-t" style="--c:${CAT_COL[p.cats[0]]}"><b>${esc(p[lang].title)}</b> · ${esc(p[lang].kicker)}<em>${esc(skills.join(' · '))}</em></div>
+      <div class="gi-p"><button type="button" class="gi-btn" data-open="${id}">${esc(T.viewProject)} →</button></div>`;
+  }
+  drawLinks();
+}
+function drawLinks() {
+  const g = $('#graph'), svg = $('svg', g);
+  if (!svg) return;
+  svg.innerHTML = '';
+  if (getComputedStyle(svg).display === 'none') return;
+  const R = g.getBoundingClientRect();
+  const skills = gSel.type === 'skill' ? [gSel.id] : PROJ_SKILLS[gSel.id];
+  const projs = gSel.type === 'skill' ? PROJECTS.map((_, i) => i).filter((i) => PROJ_SKILLS[i].includes(gSel.id)) : [gSel.id];
+  skills.forEach((s) => {
+    const se = $(`.g-skill[data-s="${CSS.escape(s)}"]`, g); if (!se) return;
+    const a = se.getBoundingClientRect();
+    projs.forEach((p) => {
+      const b = $(`.g-proj[data-g="${p}"]`, g).getBoundingClientRect();
+      const x1 = a.right - R.left, y1 = a.top + a.height / 2 - R.top, x2 = b.left - R.left, y2 = b.top + b.height / 2 - R.top;
+      const dx = Math.max(60, (x2 - x1) * 0.5);
+      const path = svgEl('path', { d: `M${x1},${y1} C${x1 + dx},${y1} ${x2 - dx},${y2} ${x2},${y2}`, class: 'g-link' }, svg);
+      path.style.setProperty('--c', PC[SKILL_DOM[s]]);
+      path.style.setProperty('--len', Math.ceil(path.getTotalLength()));
+    });
+  });
 }
 
 /* ------------------------------------------------------------------ projects */
@@ -574,7 +643,7 @@ function renderProjects() {
       <div class="feat-b"><div class="meta-row">${catTags(p)}<span class="yr">${esc(yearOf(p))}</span></div>
         <h4>${esc(L.title)}</h4><p class="k">${esc(L.kicker)}</p><p>${esc(L.summary)}</p><span class="go-l">${esc(T.read)} →</span></div></button>`;
   }).join('');
-  renderYearChart();
+  renderTimeline();
   const counts = { all: PROJECTS.length };
   PROJECTS.forEach((p) => p.cats.forEach((c) => (counts[c] = (counts[c] || 0) + 1)));
   const fl = $('#filters');
@@ -589,17 +658,25 @@ function renderProjects() {
   }).join('');
   applyFilter();
 }
-function renderYearChart() {
-  // projects per start year, stacked by main category
+function renderTimeline() {
+  // every project as a dot: one row per category, one column per year
   const yearKey = (p) => { const m = String(p.year).match(/\d{4}/); return m ? m[0] : 'early'; };
   const years = [...new Set(PROJECTS.map(yearKey))].sort((a, b) => (a === 'early' ? -1 : b === 'early' ? 1 : a.localeCompare(b)));
   const cats = Object.keys(T.filters).filter((c) => c !== 'all' && PROJECTS.some((p) => p.cats[0] === c));
-  const data = years.map((y) => { const ps = PROJECTS.filter((p) => yearKey(p) === y); return { y, n: ps.length, by: cats.map((c) => ps.filter((p) => p.cats[0] === c).length) }; });
-  const max = Math.max(...data.map((d) => d.n));
-  const host = $('#yearchart');
-  host.innerHTML = `<div><div class="yc-plot">${data.map((d, i) => `<div class="yc-col" style="--h:${(d.n / max) * 100}%">${d.by.map((v, k) => (v ? `<span class="yc-seg" style="--c:${CAT_COL[cats[k]]};--sh:${(v / d.n) * 100}%;--d:${(i * 0.08 + k * 0.04).toFixed(2)}s" title="${esc(T.filters[cats[k]])}: ${v}"></span>` : '')).join('')}<span class="yc-top">${d.n}</span></div>`).join('')}</div>
-    <div class="yc-x">${data.map((d) => `<span>${d.y === 'early' ? esc(T.early) : d.y}</span>`).join('')}</div></div>
-    <div class="yc-legend">${cats.map((c) => `<span style="--c:${CAT_COL[c]}"><i></i>${esc(T.filters[c])}</span>`).join('')}</div>`;
+  const host = $('#timeline');
+  host.style.setProperty('--cols', years.length);
+  let n = 0;
+  host.innerHTML = `<span class="tl-y"></span>${years.map((y) => `<span class="tl-y">${y === 'early' ? esc(T.early) : y}</span>`).join('')}`
+    + cats.map((c) => `<span class="tl-lab" style="--c:${CAT_COL[c]}"><i></i>${esc(T.filters[c])}</span>`
+      + years.map((y) => `<span class="tl-cell">${PROJECTS.map((p, i) => (p.cats[0] === c && yearKey(p) === y ? `<button type="button" class="tl-dot" data-p="${i}" data-title="${esc(p[lang].title)}" aria-label="${esc(p[lang].title)}" style="--c:${CAT_COL[c]};--d:${(n++ * 0.04).toFixed(2)}s"></button>` : '')).join('')}</span>`).join('')).join('');
+  const lab = $('#hover-label');
+  host.onpointerover = (e) => {
+    const d = e.target.closest('.tl-dot'); if (!d || e.pointerType !== 'mouse') return;
+    const r = d.getBoundingClientRect();
+    lab.textContent = d.dataset.title; lab.hidden = false;
+    lab.style.left = `${r.left + r.width / 2}px`; lab.style.top = `${r.top}px`;
+  };
+  host.onpointerout = (e) => { if (e.target.closest('.tl-dot')) lab.hidden = true; };
   host.classList.remove('go');
   onView(host, () => host.classList.add('go'), 0.3);
 }
@@ -645,50 +722,66 @@ function closeCase() {
   if (lastFocus) lastFocus.focus({ preventScroll: true });
 }
 
-/* ------------------------------------------------------------------ career */
+/* ------------------------------------------------------------------ career: one line that branches */
 function fmtDate(ym) {
   const [y, m] = ym.split('-').map(Number);
   return new Date(y, m - 1, 1).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-GB', { month: 'short', year: 'numeric' });
 }
-const yf = (ym) => { const [y, m] = ym.split('-').map(Number); return y + (m - 1) / 12; };
-function renderGantt() {
-  const now = new Date(), nowF = now.getFullYear() + now.getMonth() / 12;
-  const Y0 = 2019, Y1 = Math.ceil(nowF + 0.01), span = Y1 - Y0;
-  const rows = [
-    ...EDUCATION.slice().reverse().map((e) => { const [a, b] = e.years.split('–').map((s) => +s.trim()); return { l: e[lang][0], s: e[lang][1], f: a + 0.67, t: b + 0.5, c: '#7c8cff' }; }),
-    ...EXPERIENCE.slice().sort((a, b) => a.from.localeCompare(b.from)).map((x) => ({ l: x[lang].role, s: (lang === 'fr' && x.orgFr) || x.org, f: yf(x.from), t: x.to ? yf(x.to) : nowF, c: ICON_COL[x.icon] || '#38c8ff', on: !x.to })),
-  ];
-  const g = $('#gantt');
-  g.style.setProperty('--gl', '300px'); g.style.setProperty('--yrs', span); g.style.setProperty('--n', ((nowF - Y0) / span).toFixed(4));
-  g.innerHTML = `<div class="g-axis" style="grid-template-columns:repeat(${span},1fr)">${Array.from({ length: span }, (_, i) => `<span>${Y0 + i}</span>`).join('')}</div>
-    ${rows.map((r, i) => `<div class="g-row"><div class="g-lab">${esc(r.l)}<small>${esc(r.s)}</small></div><div class="g-track"><span class="g-bar${r.on ? ' on' : ''}" style="--x:${((r.f - Y0) / span) * 100}%;--w:${((r.t - r.f) / span) * 100}%;--c:${r.c};--d:${i * 0.08}s" title="${esc(r.l)}"></span></div></div>`).join('')}
-    <span class="g-now" aria-hidden="true"><span>${esc(T.now)}</span></span>`;
-  g.classList.remove('go');
-  onView(g, () => g.classList.add('go'), 0.3);
-}
-const openRows = new Set([0]);
-function renderCV() {
-  $('#cv').innerHTML = EXPERIENCE.map((x, i) => {
-    const L = x[lang];
-    const org = (lang === 'fr' && x.orgFr) || x.org;
-    return `<li class="cv-row rv${openRows.has(i) ? ' open' : ''}" data-i="${i}" style="--c:${ICON_COL[x.icon] || '#38c8ff'}">
-      <div class="cv-top"><p class="cv-org">${icon(x.icon)}<span>${esc(org)}</span></p><span class="cv-when">${x.to ? `${fmtDate(x.from)} – ${fmtDate(x.to)}` : `${fmtDate(x.from)} –<span class="now-t">${esc(T.present)}</span>`}</span></div>
-      <h3 class="cv-role">${esc(L.role)}</h3>
-      <p class="cv-sum">${esc(L.sum)}</p>
-      <div class="cv-pts" id="cvp${i}"><ul>${L.pts.map((p) => `<li>${esc(p)}</li>`).join('')}</ul></div>
-      <button type="button" class="cv-more" aria-expanded="${openRows.has(i)}" aria-controls="cvp${i}"><i aria-hidden="true">+</i><span>${esc(openRows.has(i) ? T.less : T.more)}</span></button></li>`;
+// newest first; track 0 = MuleSoft (and studies), 1 = Informatica, 2 = AI & full-stack
+const BRANCH = [{ x: 0, t: 0 }, { x: 1, t: 1 }, { x: 3, t: 1 }, { x: 2, t: 2 }, { x: 4, t: 0 }, { e: 0, t: 0 }, { e: 1, t: 0 }];
+const TRACK_KEY = ['mule', 'infa', 'ai'];
+const openSteps = new Set([0]);
+let bRO = null, bRaf = 0;
+function renderCareer() {
+  $('#track-legend').innerHTML = T.tracks.map((t, i) => `<span style="--c:${PC[TRACK_KEY[i]]}"><i></i>${esc(t)}</span>`).join('') + `<span style="--c:${PC.edu}"><i></i>${esc(T.studies)}</span>`;
+  const host = $('#branch');
+  host.innerHTML = `<svg aria-hidden="true"></svg>` + BRANCH.map((r, k) => {
+    if (r.e !== undefined) {
+      const e = EDUCATION[r.e];
+      return `<div class="b-row" data-r="${k}" style="--c:${PC.edu}"><div class="b-head"><h4>${esc(e[lang][0])}</h4><p><span>${esc(e[lang][1])}</span><span class="b-when">${esc(e.years)}</span></p></div></div>`;
+    }
+    const x = EXPERIENCE[r.x], L = x[lang], org = (lang === 'fr' && x.orgFr) || x.org, open = openSteps.has(k);
+    return `<div class="b-row${open ? ' open' : ''}" data-r="${k}" style="--c:${PC[TRACK_KEY[r.t]]}">
+      <button type="button" class="b-head" aria-expanded="${open}" aria-controls="bm${k}"><h4>${esc(L.role)}</h4>
+        <p>${icon(x.icon)}<span>${esc(org)}</span><span class="b-when">${x.to ? `${fmtDate(x.from)} – ${fmtDate(x.to)}` : `${fmtDate(x.from)} – ${esc(T.present)}`}</span>${x.to ? '' : `<span class="b-cur">${esc(T.current)}</span>`}</p>
+        <span class="b-plus" aria-hidden="true">+</span></button>
+      <div class="b-more" id="bm${k}"><div><p class="sum">${esc(L.sum)}</p><ul>${L.pts.map((p) => `<li>${esc(p)}</li>`).join('')}</ul></div></div></div>`;
   }).join('');
-  $('#cv').onclick = (e) => {
-    const b = e.target.closest('.cv-more'); if (!b) return;
-    const row = b.closest('.cv-row'), i = +row.dataset.i;
-    const open = !row.classList.contains('open');
-    row.classList.toggle('open', open);
-    open ? openRows.add(i) : openRows.delete(i);
+  host.onclick = (e) => {
+    const b = e.target.closest('button.b-head'); if (!b) return;
+    const row = b.closest('.b-row'), k = +row.dataset.r, open = !row.classList.contains('open');
+    row.classList.toggle('open', open); open ? openSteps.add(k) : openSteps.delete(k);
     b.setAttribute('aria-expanded', String(open));
-    b.querySelector('span').textContent = open ? T.less : T.more;
+    drawBranch();
   };
+  if (bRO) bRO.disconnect();
+  bRO = new ResizeObserver(() => { if (!bRaf) bRaf = requestAnimationFrame(() => { bRaf = 0; drawBranch(); }); });
+  bRO.observe(host);
+  drawBranch();
   $('#edu').innerHTML = EDUCATION.map((e) => `<li><span>${esc(e[lang][0])}<small>${esc(e[lang][1])}</small></span><span>${esc(e.years)}</span></li>`).join('');
   $('#langs').innerHTML = LANGUAGES[lang].map(([a, b]) => `<li><span>${esc(a)}</span><span>${esc(b)}</span></li>`).join('');
+  if (REDUCED) host.classList.add('go'); else onView(host, () => host.classList.add('go'), 0.15);
+}
+function drawBranch() {
+  const host = $('#branch'), svg = $('svg', host); if (!svg) return;
+  const rows = $$('.b-row', host);
+  const y = rows.map((r) => r.offsetTop + $('.b-head', r).offsetHeight / 2);
+  const X = innerWidth < 760 ? [12, 32, 52] : [16, 42, 68];
+  const top = y[0], c = PC;
+  const mid = (a, b, k) => a + (b - a) * k;
+  const yB1 = mid(y[2], y[3], 0.6), yB2 = mid(y[3], y[4], 0.6);
+  const lines = [
+    [c.edu, `M${X[0]},${y[6]} L${X[0]},${y[4]}`, 0],
+    [c.mule, `M${X[0]},${y[4]} L${X[0]},${top}`, 0.35],
+    [c.ai, `M${X[0]},${yB2} C${X[0]},${mid(yB2, y[3], 0.55)} ${X[2]},${mid(yB2, y[3], 0.45)} ${X[2]},${y[3]} L${X[2]},${top}`, 0.7],
+    [c.infa, `M${X[0]},${yB1} C${X[0]},${mid(yB1, y[2], 0.55)} ${X[1]},${mid(yB1, y[2], 0.45)} ${X[1]},${y[2]} L${X[1]},${top}`, 0.95],
+  ];
+  svg.innerHTML = '';
+  lines.forEach(([col, d, delay]) => { const p = svgEl('path', { d, class: 'b-line' }, svg); p.style.setProperty('--c', col); p.style.setProperty('--len', Math.ceil(p.getTotalLength())); p.style.setProperty('--d', `${delay}s`); });
+  BRANCH.forEach((r, k) => {
+    const n = svgEl('circle', { cx: X[r.t], cy: y[k], r: 7, class: `b-node${rows[k].classList.contains('open') ? ' sel' : ''}` }, svg);
+    n.style.setProperty('--c', r.e !== undefined ? c.edu : c[TRACK_KEY[r.t]]);
+  });
 }
 
 /* ------------------------------------------------------------------ contact */
@@ -721,7 +814,7 @@ function initChrome() {
   });
   // one delegated handler for every project opener
   document.addEventListener('click', (e) => {
-    const b = e.target.closest('#featured [data-p], #tiles [data-p]');
+    const b = e.target.closest('#featured [data-p], #tiles [data-p], #timeline [data-p]');
     if (b) openCase(+b.dataset.p, b);
   });
   $('#case').addEventListener('click', (e) => {
@@ -741,21 +834,16 @@ function initChrome() {
     if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
     else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
   });
-  const io = new IntersectionObserver((es) => {
-    es.forEach((e) => { if (e.isIntersecting) { current = e.target.id; markNav(); } });
-    if (scrollY < innerHeight * 0.4) { current = ''; markNav(); }
-  }, { rootMargin: '-35% 0px -60% 0px' });
-  $$('.sec').forEach((s) => io.observe(s));
   let ticking = false;
-  addEventListener('scroll', () => {
-    if (ticking) return; ticking = true;
-    requestAnimationFrame(() => { ticking = false; const max = document.documentElement.scrollHeight - innerHeight; $('#progress').style.setProperty('--p', max > 0 ? (scrollY / max).toFixed(4) : 0); $('#dots').classList.toggle('show', scrollY > innerHeight * 0.6); });
-  }, { passive: true });
+  addEventListener('scroll', () => { if (ticking) return; ticking = true; requestAnimationFrame(() => { ticking = false; updateFlow(); }); }, { passive: true });
+  let w = innerWidth;
+  addEventListener('resize', () => { updateFlow(); if ((w < 760) !== (innerWidth < 760)) renderMap(); w = innerWidth; });
 }
 
 /* ------------------------------------------------------------------ go */
 function renderAll() {
   T = { ...UI[lang], ...COPY[lang] };
+  readPalette();
   fillText();
   renderNav();
   renderHero();
@@ -765,15 +853,14 @@ function renderAll() {
   renderSkills();
   renderXTabs();
   renderProjects();
-  renderGantt();
-  renderCV();
+  renderCareer();
   if (caseIdx >= 0 && !$('#case').hidden) openCase(caseIdx);
   observeReveal();
 }
 
 initChrome();
+initTheme();
 initTip();
 initContact();
 renderAll();
 initLang();
-initUniverse();

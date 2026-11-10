@@ -3,7 +3,9 @@ const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const PHONE = innerWidth < 760;
 const NS = 'http://www.w3.org/2000/svg';
 /** Shared palette for every canvas: graphite, bone and a single signal accent. */
-export const THEME = { ink: '#070b16', raised: '#10182e', bone: '#e9eefb', bone2: '#a9b5d0', muted: '#8190ae', accent: '#38c8ff', sans: 'Inter, system-ui, sans-serif', mono: '"JetBrains Mono", ui-monospace, monospace' };
+export const THEME = { ink: '#15161a', raised: '#1d1f24', bone: '#ecedee', bone2: '#a8acb3', muted: '#7f848c', accent: '#8f9bff', onAccent: '#14151a', aRgb: '143,155,255', lRgb: '160,166,178', sans: 'Geist, Inter, system-ui, sans-serif', mono: '"Geist Mono", ui-monospace, monospace' };
+/** Re-point every canvas at the current page theme (called when light/dark changes). */
+export function setTheme(t) { Object.assign(THEME, t); }
 const K = THEME;
 
 /* ------------------------------------------------------------------ helpers */
@@ -74,7 +76,7 @@ export function heroFlow(canvas, { sources, targets, hub, compact = false }) {
     const w = ctx.measureText(label).width + 20, h = PH;
     const x0 = align === 'l' ? x : x - w;
     ctx.fillStyle = K.raised; ctx.beginPath(); ctx.roundRect(x0, y - h / 2, w, h, 7); ctx.fill();
-    ctx.strokeStyle = hot ? K.accent : 'rgba(150,175,230,.16)'; ctx.lineWidth = 1;
+    ctx.strokeStyle = hot ? K.accent : `rgba(${K.lRgb},.16)`; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.roundRect(x0 + 0.5, y - h / 2 + 0.5, w - 1, h - 1, 7); ctx.stroke();
     ctx.fillStyle = hot ? K.accent : K.muted;
     ctx.fillRect(align === 'l' ? x0 + 8 : x0 + w - 11, y - 1.5, 3, 3);
@@ -121,8 +123,8 @@ export function heroFlow(canvas, { sources, targets, hub, compact = false }) {
     ctx.clearRect(0, 0, w, h);
     if (!nodesL.length) return;
     ctx.lineWidth = 1;
-    nodesL.forEach((a, i) => { ctx.strokeStyle = hover === i ? 'rgba(56,200,255,.75)' : `rgba(150,175,230,${hover >= 0 ? 0.05 : 0.14})`; strokeCurve(ctx, hcurve([a.e, a.y], [H[0] - HR, H[1]], 0.6)); });
-    nodesR.forEach((b) => { ctx.strokeStyle = 'rgba(150,175,230,.14)'; strokeCurve(ctx, hcurve([H[0] + HR, H[1]], [b.e, b.y], 0.6)); });
+    nodesL.forEach((a, i) => { ctx.strokeStyle = hover === i ? `rgba(${K.aRgb},.75)` : `rgba(${K.lRgb},${hover >= 0 ? 0.05 : 0.14})`; strokeCurve(ctx, hcurve([a.e, a.y], [H[0] - HR, H[1]], 0.6)); });
+    nodesR.forEach((b) => { ctx.strokeStyle = `rgba(${K.lRgb},.14)`; strokeCurve(ctx, hcurve([H[0] + HR, H[1]], [b.e, b.y], 0.6)); });
     if (!REDUCED && packets.length < (PHONE ? 20 : 36) && Math.random() < (hover >= 0 ? 0.35 : 0.16)) spawn(hover >= 0 && Math.random() < 0.7 ? hover : undefined, 0, hover >= 0);
     for (let k = packets.length - 1; k >= 0; k--) {
       const p = packets[k];
@@ -131,17 +133,17 @@ export function heroFlow(canvas, { sources, targets, hub, compact = false }) {
       if (p.s < 0) continue;
       const hot = p.hot || p.i === hover;
       const [x, y] = at(p.r, p.s), [x2, y2] = at(p.r, p.s - 16);
-      ctx.strokeStyle = hot ? 'rgba(56,200,255,.45)' : 'rgba(150,175,230,.3)'; ctx.lineWidth = 1.5;
+      ctx.strokeStyle = hot ? `rgba(${K.aRgb},.45)` : `rgba(${K.lRgb},.3)`; ctx.lineWidth = 1.5;
       ctx.beginPath(); ctx.moveTo(x2, y2); ctx.lineTo(x, y); ctx.stroke();
       ctx.fillStyle = hot ? K.accent : K.bone; ctx.beginPath(); ctx.arc(x, y, 2.2, 0, 6.283); ctx.fill();
     }
     const pulse = REDUCED ? 0 : (t % 2.6) / 2.6;
-    ctx.strokeStyle = `rgba(56,200,255,${0.45 * (1 - pulse)})`; ctx.lineWidth = 1;
+    ctx.strokeStyle = `rgba(${K.aRgb},${0.45 * (1 - pulse)})`; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.arc(H[0], H[1], HR + pulse * 26, 0, 6.283); ctx.stroke();
-    ctx.strokeStyle = 'rgba(150,175,230,.18)';
+    ctx.strokeStyle = `rgba(${K.lRgb},.18)`;
     ctx.beginPath(); ctx.arc(H[0], H[1], HR + 7, 0, 6.283); ctx.stroke();
     ctx.fillStyle = K.accent; ctx.beginPath(); ctx.arc(H[0], H[1], HR, 0, 6.283); ctx.fill();
-    ctx.fillStyle = K.ink; ctx.font = HFONT; ctx.textAlign = 'center';
+    ctx.fillStyle = K.onAccent; ctx.font = HFONT; ctx.textAlign = 'center';
     hub.forEach((l, i) => ctx.fillText(l.toUpperCase(), H[0], H[1] + 3.5 + (i - (hub.length - 1) / 2) * 12));
     ctx.textAlign = 'left';
     nodesL.forEach((n, i) => tag(ctx, n.x, n.y, n.l, 'l', hover === i));
@@ -177,7 +179,7 @@ export function archFlow(canvas, grid, getModel) {
     ctx.lineWidth = 1.2;
     paths.forEach((p) => {
       const on = !sel || p.d === sel;
-      ctx.strokeStyle = on ? rgba(col, sel ? 0.75 : 0.2) : 'rgba(150,175,230,.04)';
+      ctx.strokeStyle = on ? rgba(col, sel ? 0.75 : 0.2) : `rgba(${K.lRgb},.04)`;
       strokeCurve(ctx, p.c);
     });
     const pool = sel ? paths.filter((p) => p.d === sel) : paths;
@@ -247,9 +249,9 @@ export function cutover(canvas, input, onChange, labels) {
     const A = [bw / 2 + 2, h / 2], P = [w * 0.48, h / 2], M3 = [w - bw / 2 - 2, h * 0.24], M4 = [w - bw / 2 - 2, h * 0.76];
     const c1 = hcurve([A[0] + bw / 2, A[1]], [P[0] - bw / 2, P[1]]), c3 = hcurve([P[0] + bw / 2, P[1]], [M3[0] - bw / 2, M3[1]]), c4 = hcurve([P[0] + bw / 2, P[1]], [M4[0] - bw / 2, M4[1]]);
     ctx.lineWidth = 1.5;
-    ctx.strokeStyle = 'rgba(150,175,230,.2)'; strokeCurve(ctx, c1);
-    ctx.strokeStyle = `rgba(124,122,116,${0.12 + 0.6 * (1 - cut)})`; strokeCurve(ctx, c3);
-    ctx.strokeStyle = `rgba(56,200,255,${0.12 + 0.6 * cut})`; strokeCurve(ctx, c4);
+    ctx.strokeStyle = `rgba(${K.lRgb},.2)`; strokeCurve(ctx, c1);
+    ctx.strokeStyle = `rgba(${K.lRgb},${0.12 + 0.6 * (1 - cut)})`; strokeCurve(ctx, c3);
+    ctx.strokeStyle = `rgba(${K.aRgb},${0.12 + 0.6 * cut})`; strokeCurve(ctx, c4);
     if (!REDUCED && Math.random() < 0.55 && packets.length < 40) packets.push({ t: 0, seg: 0, to4: Math.random() < cut, v: 0.8 + Math.random() * 0.4 });
     for (let k = packets.length - 1; k >= 0; k--) {
       const p = packets[k];
@@ -271,7 +273,7 @@ export function cutover(canvas, input, onChange, labels) {
       ctx.font = `11px ${K.mono}`; ctx.fillStyle = K.muted; ctx.fillText(sub, pt[0], pt[1] + 13);
       ctx.textAlign = 'left'; ctx.globalAlpha = 1;
     };
-    box(A, labels.src, labels.srcSub, 'rgba(150,175,230,.3)');
+    box(A, labels.src, labels.srcSub, `rgba(${K.lRgb},.3)`);
     box(P, labels.proxy, labels.proxySub, K.bone);
     box(M3, 'Mule 3', `${40 - Math.round(cut * 40)} ${labels.flows}`, K.muted, 0.4 + 0.6 * (1 - cut));
     box(M4, 'Mule 4', `${Math.round(cut * 40)} ${labels.flows}`, K.accent);
@@ -315,7 +317,7 @@ export function donutChart(host, data, totalLabel) {
   const wrap = document.createElement('div'); wrap.className = 'donut';
   const s = svg('svg', { viewBox: '0 0 200 200', role: 'img' });
   const R = 78, C = 2 * Math.PI * R;
-  svg('circle', { cx: 100, cy: 100, r: R, fill: 'none', stroke: 'rgba(150,175,230,.07)', 'stroke-width': 14 }, s);
+  svg('circle', { cx: 100, cy: 100, r: R, fill: 'none', stroke: `rgba(${K.lRgb},.07)`, 'stroke-width': 14 }, s);
   let acc = 0;
   const segs = data.map(([l, v, c], i) => {
     const len = (v / total) * C;
